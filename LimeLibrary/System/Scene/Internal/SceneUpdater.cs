@@ -32,8 +32,8 @@ internal class SceneUpdater : MonoBehaviour {
     switch (_interface.GetSceneState()) {
     case SceneState.CheckNextScene: {
       if (_interface.IsRequested()) {
-        _interface.ResetRequest();
         var requestSceneType = _interface.GetRequestSceneId();
+        _interface.ResetRequest();
         if (CheckRequest(requestSceneType)) {
           _interface.SetNowSceneType(requestSceneType);
           _interface.SetSceneState(SceneState.Create);
