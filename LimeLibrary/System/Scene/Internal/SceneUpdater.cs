@@ -99,10 +99,6 @@ internal class SceneUpdater : MonoBehaviour {
 
   private IScene GetScene(Type sceneType) {
     var scene = _scenes.FirstOrDefault(scene => scene.GetType() == sceneType);
-    if (scene == null) {
-      Assertion.Assert(false);
-      return null;
-    }
     return scene;
   }
 
