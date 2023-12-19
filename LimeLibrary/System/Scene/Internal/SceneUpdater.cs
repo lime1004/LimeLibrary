@@ -10,7 +10,7 @@ using UniRx;
 
 namespace LimeLibrary.Scene {
 
-[DefaultExecutionOrder(10)]
+[DefaultExecutionOrder(-5)]
 [RequireComponent(typeof(SceneUpdaterInterface))]
 internal class SceneUpdater : MonoBehaviour {
   private readonly HashSet<IScene> _scenes = new();

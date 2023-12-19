@@ -8,7 +8,7 @@ using UniRx;
 
 namespace LimeLibrary.Event {
 
-[DefaultExecutionOrder(5)]
+[DefaultExecutionOrder(-10)]
 [RequireComponent(typeof(EventUpdaterInterface))]
 internal class EventUpdater : MonoBehaviour {
   private class EventData {
