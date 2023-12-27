@@ -93,6 +93,14 @@ internal class SceneUpdater : MonoBehaviour {
     }
   }
 
+  private void LateUpdate() {
+    switch (_interface.GetSceneState()) {
+    case SceneState.Running:
+      GetScene(_interface.GetNowSceneType())?.OnLateUpdate();
+      break;
+    }
+  }
+
   private void OnDestroy() {
     GetScene(_interface.GetNowSceneType())?.Dispose();
   }

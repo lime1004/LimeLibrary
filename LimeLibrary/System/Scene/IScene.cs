@@ -9,6 +9,7 @@ public interface IScene : IDisposable {
   public UniTask CreateAsync(Type prevSceneType, CancellationToken cancellationToken);
   public void OnUpdate();
   public void OnFixedUpdate();
+  public void OnLateUpdate();
   public void Destroy(Type nextSceneType);
 }
 
