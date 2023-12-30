@@ -252,6 +252,14 @@ public static class UnityExtensions {
   }
 
   /// <summary>
+  /// Vector3Int -> Vector2Intの変換
+  /// XとZの値を使用する
+  /// </summary>
+  public static Vector2Int ToVector2IntXZ(this Vector3Int v) {
+    return new Vector2Int(v.x, v.z);
+  }
+
+  /// <summary>
   /// Vector2Int -> Vector3Intの変換
   /// </summary>
   public static Vector3Int ToVector3Int(this Vector2Int v, int z = 0) {
@@ -263,6 +271,14 @@ public static class UnityExtensions {
   /// </summary>
   public static Vector2 ToVector2(this Vector3 v) {
     return new Vector2(v.x, v.y);
+  }
+
+  /// <summary>
+  /// Vector3 -> Vector2の変換
+  /// XとZの値を使用する
+  /// </summary>
+  public static Vector2 ToVector2XZ(this Vector3 v) {
+    return new Vector2(v.x, v.z);
   }
 
   /// <summary>
