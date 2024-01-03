@@ -66,7 +66,7 @@ public class Probability<T> : ProbabilityBase<T> {
     _weight = weight;
   }
 
-  [SerializeField, LabelText("内容"), PropertyOrder(-1)]
+  [SerializeField, HideLabel, PropertyOrder(-1)]
   private T _content;
   public override T Content => _content;
 }
@@ -81,7 +81,7 @@ public class ProbabilityPreview<T> : ProbabilityBase<T> {
     _weight = weight;
   }
 
-  [SerializeField, LabelText("内容"), PreviewField, PropertyOrder(-1)]
+  [SerializeField, HideLabel, PreviewField, PropertyOrder(-1)]
   private T _content;
   public override T Content => _content;
 }
