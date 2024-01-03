@@ -16,6 +16,7 @@ public class DefineSymbolsManager {
     AddDefineIfNecessary("Cysharp.Threading.Tasks.UniTask", "UniTask", "LIME_UNITASK");
     AddDefineIfNecessary("DG.Tweening.Tween", "DOTween", "LIME_DOTWEEN");
     AddDefineIfNecessary("Steamworks.SteamUtils", "com.rlabrecque.steamworks.net", "LIME_STEAMWORKS");
+    AddDefineIfNecessary("Sirenix.OdinInspector.LabelTextAttribute", "Sirenix.OdinInspector.Attributes", "LIME_ODIN_INSPECTOR");
   }
 
   private static void AddDefineIfNecessary(string typeName, string assemblyName, string define) {
