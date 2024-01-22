@@ -9,7 +9,7 @@ namespace LimeLibrary.Module {
 /// <summary>
 /// 確率を設定可能なリスト
 /// </summary>
-[Serializable]
+[Serializable, HideLabel]
 public class ProbabilityList<T> {
   [SerializeField, LabelText("確率リスト"), OnValueChanged("SetProbabilityParameterParameter", true)]
   private List<Probability<T>> _probabilityList = new();
@@ -31,7 +31,7 @@ public class ProbabilityList<T> {
   }
 }
 
-[Serializable]
+[Serializable, HideLabel]
 public class ProbabilityPreviewList<T> {
   [SerializeField, LabelText("確率リスト"), OnValueChanged("SetProbabilityParameterParameter", true)]
   private List<ProbabilityPreview<T>> _probabilityList = new();
