@@ -8,9 +8,9 @@ public static class TextLoader {
   /// <summary>
   /// Textのパスからデータを読み込みTextQueryとして返す
   /// </summary>
-  public static TextQuery<TDataTable, TData> Load<TDataTable, TData>(string path)
+  public static TextQuery<TDataTable, TData> Load<TDataTable, TData>(string address)
     where TDataTable : class, ITable<TData> where TData : struct, ITextData {
-    using var textDataTable = ResourceLoader.Load<TDataTable>(path);
+    using var textDataTable = ResourceLoader.Load<TDataTable>(address);
     var textQuery = new TextQuery<TDataTable, TData>(textDataTable.Resource);
     return textQuery;
   }
@@ -19,9 +19,9 @@ public static class TextLoader {
   /// <summary>
   /// Textのパスからデータを読み込みTextQueryとして返す
   /// </summary>
-  public static async UniTask<TextQuery<TDataTable, TData>> LoadAsync<TDataTable, TData>(string path, CancellationToken cancellationToken)
+  public static async UniTask<TextQuery<TDataTable, TData>> LoadAsync<TDataTable, TData>(string address, CancellationToken cancellationToken)
     where TDataTable : class, ITable<TData> where TData : struct, ITextData {
-    using var textDataTable = await ResourceLoader.LoadAsync<TDataTable>(path, cancellationToken);
+    using var textDataTable = await ResourceLoader.LoadAsync<TDataTable>(address, cancellationToken);
     var textQuery = new TextQuery<TDataTable, TData>(textDataTable.Resource);
     return textQuery;
   }
