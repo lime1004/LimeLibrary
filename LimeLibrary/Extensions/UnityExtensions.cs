@@ -505,6 +505,24 @@ public static class UnityExtensions {
       _ => 0
     };
   }
+
+  /// <summary>
+  /// Navigationを設定
+  /// </summary>
+  public static void EnableNavigation(this Selectable selectable, Navigation.Mode navigationMode) {
+    var navigation = selectable.navigation;
+    navigation.mode = navigationMode;
+    selectable.navigation = navigation;
+  }
+
+  /// <summary>
+  /// Navigationを無効化
+  /// </summary>
+  public static void DisableNavigation(this Selectable selectable) {
+    var navigation = selectable.navigation;
+    navigation.mode = Navigation.Mode.None;
+    selectable.navigation = navigation;
+  }
 }
 
 }
