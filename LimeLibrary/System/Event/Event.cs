@@ -31,16 +31,16 @@ public abstract class Event {
     return (T) Enum.ToObject(typeof(T), _sequence);
   }
 
-  internal virtual UniTask InitializeAsync(CancellationToken cancellationToken) => UniTask.CompletedTask;
+  public virtual UniTask InitializeAsync(CancellationToken cancellationToken) => UniTask.CompletedTask;
 
-  internal virtual void Start() {
+  public virtual void Start() {
     _onStartSubject.OnNext(Unit.Default);
     _onStartSubject.OnCompleted();
   }
 
-  internal abstract EventUpdateResult Update();
+  public abstract EventUpdateResult Update();
 
-  internal virtual void End() {
+  public virtual void End() {
     _onEndSubject.OnNext(Unit.Default);
     _onEndSubject.OnCompleted();
   }
