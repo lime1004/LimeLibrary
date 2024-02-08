@@ -5,38 +5,37 @@ namespace LimeLibrary.UI.MessageWindow {
 
 public class MessageWindow : MonoBehaviour {
   [SerializeField]
+  private Canvas _canvas;
+  [SerializeField]
   private MessageWindowSettings _messageWindowSettings;
   [SerializeField]
-  private MessageMainWindow m_messageMainWindow;
+  private MessageMainWindow _messageMainWindow;
   [SerializeField]
   private KeyWait _keyWait;
   [SerializeField]
   private ChoiceWindow _choiceWindow;
   [SerializeField]
-  private SpeakerWindow m_speakerWindow;
+  private SpeakerWindow _speakerWindow;
 
-  private Canvas m_canvas;
-
-  public MessageMainWindow MessageMainWindow => m_messageMainWindow;
+  public MessageMainWindow MessageMainWindow => _messageMainWindow;
   public KeyWait KeyWait => _keyWait;
   public ChoiceWindow ChoiceWindow => _choiceWindow;
-  public SpeakerWindow SpeakerWindow => m_speakerWindow;
+  public SpeakerWindow SpeakerWindow => _speakerWindow;
 
   public async UniTask Initialize(Camera uiCamera) {
     gameObject.SetActive(true);
 
     // Canvas
-    m_canvas = GetComponent<Canvas>();
-    m_canvas.worldCamera = uiCamera;
-    m_canvas.sortingLayerName = "UI";
+    _canvas.worldCamera = uiCamera;
+    _canvas.sortingLayerName = "UI";
 
     // 各パーツ
     var cancellationToken = gameObject.GetCancellationTokenOnDestroy();
     await UniTask.WhenAll(
-      m_messageMainWindow.Initialize(cancellationToken),
+      _messageMainWindow.Initialize(cancellationToken),
       _keyWait.Initialize(cancellationToken),
       _choiceWindow.Initialize(cancellationToken),
-      m_speakerWindow.Initialize(cancellationToken));
+      _speakerWindow.Initialize(cancellationToken));
   }
 }
 
