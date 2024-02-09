@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using DG.Tweening;
+using LimeLibrary.Extensions;
 using LimeLibrary.Utility;
 using UnityEngine;
 
@@ -60,10 +60,10 @@ public class UIAnimator {
 
   public void RegisterShowHideFadeAnimation(CanvasGroup canvasGroup, float duration) {
     RegisterShowAnimation(async ct => {
-      await canvasGroup.DOFade(1f, duration).SetLink(canvasGroup.gameObject).ToUniTask(cancellationToken: ct);
+      await canvasGroup.PlayFadeTween(1f, duration, ct);
     }, () => canvasGroup.alpha = 1f);
     RegisterHideAnimation(async ct => {
-      await canvasGroup.DOFade(0f, duration).SetLink(canvasGroup.gameObject).ToUniTask(cancellationToken: ct);
+      await canvasGroup.PlayFadeTween(0f, duration, ct);
     }, () => canvasGroup.alpha = 0f);
   }
 

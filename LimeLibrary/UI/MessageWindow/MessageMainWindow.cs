@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 using Cysharp.Threading.Tasks;
-using DG.Tweening;
+using LimeLibrary.Extensions;
 using LimeLibrary.UI.View;
 using TMPro;
 using UniRx;
@@ -21,7 +21,8 @@ public class MessageMainWindow : UISingleView {
   [SerializeField]
   private Sprite _talkMessageWindowSprite;
 
-  private Tween _textTween;
+  private CancellationTokenSource _cancellationTokenSource;
+  private string _playingText = string.Empty;
 
   public MessageWindowType MessageWindowType { get; set; }
 
@@ -39,20 +40,20 @@ public class MessageMainWindow : UISingleView {
     return UniTask.CompletedTask;
   }
 
-  public async UniTask ShowText(string text, CancellationToken cancellationToken, float durationMultiplier = 1.0f) {
-    if (_textTween?.IsActive() ?? false) _textTween.Kill();
-    _text.text = string.Empty;
-    float duration = _messageWindowSettings.ShowTextDurationEveryChar * text.Length * durationMultiplier;
-    _textTween = _text.DOText(text, duration).SetEase(Ease.Linear).SetLink(_text.gameObject);
-    await _textTween.ToUniTask(cancellationToken: cancellationToken);
-  }
+  public async UniTask<bool> ShowText(string text, CancellationToken cancellationToken, float durationMultiplier = 1.0f) {
+    _cancellationTokenSource?.Cancel();
+    _cancellationTokenSource = new CancellationTokenSource();
+    var mergedCancellationTokenToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _cancellationTokenSource.Token).Token;
 
-  public async UniTask WaitText(CancellationToken cancellationToken) {
-    await UniTask.WaitUntil(() => !_textTween.IsActive(), cancellationToken: cancellationToken);
+    _text.text = string.Empty;
+    _playingText = text;
+    float duration = _messageWindowSettings.ShowTextDurationEveryChar * text.Length * durationMultiplier;
+    return await _text.PlayTextTween(text, duration, mergedCancellationTokenToken).SuppressCancellationThrow();
   }
 
   public void SkipText() {
-    if (_textTween?.IsActive() ?? false) _textTween.Kill(true);
+    _cancellationTokenSource?.Cancel();
+    _text.text = _playingText;
   }
 }
 

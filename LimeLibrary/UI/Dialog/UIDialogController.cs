@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using DG.Tweening;
 using LimeLibrary.Extensions;
 using LimeLibrary.UI.Parts;
 using LimeLibrary.UI.View;
@@ -18,7 +17,7 @@ public class UIDialogController {
   private readonly IEnumerable<IUIView> _allViews;
 
   private GameObject _backGroundGameObject;
-  private Tween _backGroundColorTween;
+  private CancellationTokenSource _cancellationTokenSource;
 
   public UIDialogController(IEnumerable<IUIView> allViews) {
     _allViews = allViews;
@@ -136,9 +135,9 @@ public class UIDialogController {
     var image = gameObject.GetOrAddComponent<Image>();
     if (startColor.HasValue) image.color = startColor.Value;
 
-    _backGroundColorTween?.KillIfActive();
-    _backGroundColorTween = image.DOColor(endColor, duration).SetLink(gameObject);
-    await _backGroundColorTween.ToUniTask(cancellationToken: cancellationToken);
+    _cancellationTokenSource?.Cancel();
+    _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+    await image.PlayColorTween(endColor, duration, _cancellationTokenSource.Token);
   }
 }
 

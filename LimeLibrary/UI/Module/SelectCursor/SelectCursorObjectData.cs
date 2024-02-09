@@ -10,7 +10,7 @@ public class SelectCursorObjectData {
 
   public GameObject CursorObject { get; }
   public Vector2 Offset { get; set; }
-  public SelectCursorResidentAnimator ResidentAnimator { get; }
+  public ISelectCursorResidentAnimator ResidentAnimator { get; }
 
   public bool Enabled {
     get => _enabled;
@@ -23,10 +23,10 @@ public class SelectCursorObjectData {
   public Transform TargetObject { get; set; }
   public bool IsFollowTarget { get; set; }
 
-  public SelectCursorObjectData(GameObject cursorObject, Vector2 offset = new()) {
+  public SelectCursorObjectData(GameObject cursorObject, Vector2 offset = new(), ISelectCursorResidentAnimator residentAnimator = null) {
     CursorObject = cursorObject;
     Offset = offset;
-    ResidentAnimator = new SelectCursorResidentAnimator(cursorObject);
+    ResidentAnimator = residentAnimator;
     Enabled = false;
 
     cursorObject.UpdateAsObservable().Where(_ => IsFollowTarget).Subscribe(_ => {

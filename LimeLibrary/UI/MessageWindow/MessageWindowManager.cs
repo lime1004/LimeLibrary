@@ -48,11 +48,6 @@ public class MessageWindowManager : MonoBehaviour {
       _messageWindow.MessageMainWindow.ShowText(text, cancellationToken, durationMultiplier));
   }
 
-  public async UniTask WaitMainText(CancellationToken cancellationToken) {
-    if (!IsShowMessageMainWindow()) return;
-    await _messageWindow.MessageMainWindow.WaitText(cancellationToken);
-  }
-
   public void SkipMainText() {
     if (!IsShowMessageMainWindow()) return;
     _messageWindow.MessageMainWindow.SkipText();
