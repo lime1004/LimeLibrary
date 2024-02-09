@@ -17,8 +17,6 @@ namespace LimeLibrary.UI {
 public class UIAppManager : MonoBehaviour {
   [SerializeField]
   private Camera _uiCamera;
-  [SerializeField]
-  private SortingLayer _sortingLayer;
 
   private class UIAppData {
     public UIApp UIApp { get; }
@@ -40,7 +38,6 @@ public class UIAppManager : MonoBehaviour {
     // カメラ設定
     var rootCanvas = appObject.GetOrAddComponent<Canvas>();
     rootCanvas.worldCamera = _uiCamera;
-    rootCanvas.sortingLayerID = _sortingLayer.id;
 
     // App生成時処理
     var uiApp = appObject.GetComponent<UIApp>();

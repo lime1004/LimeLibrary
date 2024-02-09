@@ -8,7 +8,7 @@ namespace LimeLibrary.UI.MessageWindow {
    menuName = "LimeLibrary/UI/MessageWindowSettings")]
 public class MessageWindowSettings : ScriptableObject {
   [SerializeField]
-  private float _showTextDurationEveryChar;
+  private float _showTextDurationEveryChar = 0.05f;
   public float ShowTextDurationEveryChar => _showTextDurationEveryChar;
 }
 
