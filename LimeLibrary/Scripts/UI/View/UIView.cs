@@ -65,7 +65,7 @@ public abstract class UIView : MonoBehaviour, IUIView {
     EventObservables = observables;
 
     // Controllerの生成
-    _controller = new UIViewController(RootObject, observables, Animator, animationIdGetter);
+    _controller = new UIViewController(gameObject, observables, Animator, animationIdGetter);
 
     // UIPartsの初期化
     foreach (var uiParts in RootObject.GetComponentsInChildren<IUIParts>(true)) {
