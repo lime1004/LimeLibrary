@@ -32,6 +32,10 @@ public class UIAppManager : MonoBehaviour {
   private readonly Stack<List<UIAppData>> _appDataListStack = new();
   private readonly List<UIApp> _residentAppList = new();
 
+  public async UniTask<T> CreateAppAsync<T>(string address, UIAppAwakeType appAwakeType, CancellationToken cancellationToken, bool isShow = true) where T : UIApp {
+    return await CreateAppAsync(address, appAwakeType, cancellationToken, isShow) as T;
+  }
+
   public async UniTask<UIApp> CreateAppAsync(string address, UIAppAwakeType appAwakeType, CancellationToken cancellationToken, bool isShow = true) {
     var appObject = await ResourceLoader.InstantiateAsync(address, cancellationToken, transform);
 
