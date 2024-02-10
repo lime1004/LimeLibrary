@@ -51,11 +51,12 @@ public class UIAppManager : MonoBehaviour {
       Assertion.Assert(false, "UIAppが見つかりません.");
       return null;
     }
-    // 削除時にリストから削除
-    uiApp.EventObservables.GetObservable(UIAppEventType.Destroy).Subscribe(_ => OnDestroyUIApp(uiApp)).AddTo(gameObject);
 
     // Appの初期化
     await uiApp.InitializeAsync(cancellationToken);
+
+    // 削除時にリストから削除
+    uiApp.EventObservables.GetObservable(UIAppEventType.Destroy).Subscribe(_ => OnDestroyUIApp(uiApp)).AddTo(gameObject);
 
     // 即時表示
     if (isShow) await uiApp.Show(default);
