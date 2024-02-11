@@ -1,19 +1,19 @@
 ﻿using LimeLibrary.UI.View;
-using LimeLibrary.Utility;
 using UnityEngine;
 
 namespace LimeLibrary.UI {
 
-public interface IInstantiatableUiElements<out T> where T : MonoBehaviour {
-  public T Self { get; }
+public interface IInstantiatableUiElements {
+  public MonoBehaviour Self { get; }
+  public void Initialize(IUIView parentView);
+}
 
-  public T Instantiate(IUIView parentView) {
-    var instantiateObject = UnityUtility.Instantiate(Self, Self.transform.parent);
-    Setup(parentView);
-    return instantiateObject;
+public static class InstantiatableUiElementsExtensions {
+  public static T Instantiate<T>(this IInstantiatableUiElements instantiatable, IUIView parentView) where T : MonoBehaviour {
+    var instantiateObject = Object.Instantiate(instantiatable.Self, instantiatable.Self.transform.parent);
+    instantiatable.Initialize(parentView);
+    return instantiateObject as T;
   }
-
-  public void Setup(IUIView parentView);
 }
 
 }
