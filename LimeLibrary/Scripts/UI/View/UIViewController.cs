@@ -43,7 +43,7 @@ internal class UIViewController {
   }
 
   public async UniTask Show(UIViewShowOption showOption, CancellationToken cancellationToken) {
-    if (State is UIViewState.Show or UIViewState.Showing) {
+    if (State is UIViewState.Show or UIViewState.Showing && !showOption.IsForce) {
       if (showOption.IsFocus) Focus();
       return;
     }
@@ -71,7 +71,7 @@ internal class UIViewController {
   }
 
   public async UniTask Hide(UIViewHideOption hideOption, CancellationToken cancellationToken) {
-    if (State is UIViewState.Hide or UIViewState.Hiding) return;
+    if (State is UIViewState.Hide or UIViewState.Hiding && !hideOption.IsForce) return;
 
     var mergedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, RootObject.GetCancellationTokenOnDestroy());
 

@@ -80,10 +80,10 @@ public abstract class UIView : MonoBehaviour, IUIView {
     // 初期化時挙動の実行
     switch (_initializeBehaviour) {
     case UIInitializeBehaviour.Hide:
-      _controller.Hide(new UIViewHideOption { IsImmediate = true }, ObjectCancellationToken).RunHandlingError().Forget();
+      _controller.Hide(new UIViewHideOption { IsImmediate = true, IsForce = true }, ObjectCancellationToken).RunHandlingError().Forget();
       break;
     case UIInitializeBehaviour.Show:
-      _controller.Show(new UIViewShowOption { IsImmediate = true }, ObjectCancellationToken).RunHandlingError().Forget();
+      _controller.Show(new UIViewShowOption { IsImmediate = true, IsForce = true }, ObjectCancellationToken).RunHandlingError().Forget();
       break;
     default:
       Assertion.Assert(false, _initializeBehaviour);

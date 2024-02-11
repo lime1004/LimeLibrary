@@ -63,10 +63,10 @@ public class UISingleView : MonoBehaviour, IUIView {
     // 初期化時挙動の実行
     switch (_initializeBehaviour) {
     case UIInitializeBehaviour.Hide:
-      Hide(new UIViewHideOption { IsImmediate = true }, ObjectCancellationToken).RunHandlingError().Forget();
+      Hide(new UIViewHideOption { IsImmediate = true, IsForce = true }, ObjectCancellationToken).RunHandlingError().Forget();
       break;
     case UIInitializeBehaviour.Show:
-      Show(new UIViewShowOption { IsImmediate = true }, ObjectCancellationToken).RunHandlingError().Forget();
+      Show(new UIViewShowOption { IsImmediate = true, IsForce = true }, ObjectCancellationToken).RunHandlingError().Forget();
       break;
     default:
       Assertion.Assert(false, _initializeBehaviour);
