@@ -20,10 +20,10 @@ public abstract class UIApp : MonoBehaviour, IUI {
   private UIDialogController _dialogController;
   private IUITextGetter _textGetter;
   private IUICommonInput _commonInput;
-  
+
   internal UIDialogController DialogController => _dialogController;
 
-  public IUIAppEventObservables EventObservables { get; private set; }
+  public IUIAppEventObservables EventObservables { get; private set; } = new UIAppEventObservables();
   public IUIInputObservables InputObservables { get; private set; }
 
   public GameObject RootObject => gameObject;
@@ -42,8 +42,6 @@ public abstract class UIApp : MonoBehaviour, IUI {
 
   public async UniTask InitializeAsync(CancellationToken cancellationToken) {
     // Eventの生成
-    var eventObservables = new UIAppEventObservables();
-    EventObservables = eventObservables;
     InputObservables = new UIInputObservables();
 
     // Viewの収集
@@ -51,7 +49,7 @@ public abstract class UIApp : MonoBehaviour, IUI {
     Array.Sort(viewArray, (view1, view2) => view1.InitializePriority - view2.InitializePriority);
 
     // Controllerの生成
-    _controller = new UIAppController(gameObject, eventObservables, viewArray.ToList(), _showViewList);
+    _controller = new UIAppController(gameObject, EventObservables as UIAppEventObservables, viewArray.ToList(), _showViewList);
     _dialogController = new UIDialogController(_controller.Views);
 
     // App初期化前処理

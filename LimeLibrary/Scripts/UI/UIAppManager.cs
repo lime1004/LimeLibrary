@@ -32,11 +32,11 @@ public class UIAppManager : MonoBehaviour {
   private readonly Stack<List<UIAppData>> _appDataListStack = new();
   private readonly List<UIApp> _residentAppList = new();
 
-  public async UniTask<T> CreateAppAsync<T>(string address, UIAppAwakeType appAwakeType, CancellationToken cancellationToken, bool isShow = true) where T : UIApp {
-    return await CreateAppAsync(address, appAwakeType, cancellationToken, isShow) as T;
+  public async UniTask<T> CreateAppAsync<T>(string address, UIAppAwakeType appAwakeType, CancellationToken cancellationToken, bool isInitialize = true, bool isShow = true) where T : UIApp {
+    return await CreateAppAsync(address, appAwakeType, cancellationToken, isInitialize, isShow) as T;
   }
 
-  public async UniTask<UIApp> CreateAppAsync(string address, UIAppAwakeType appAwakeType, CancellationToken cancellationToken, bool isShow = true) {
+  public async UniTask<UIApp> CreateAppAsync(string address, UIAppAwakeType appAwakeType, CancellationToken cancellationToken, bool isInitialize = true, bool isShow = true) {
     var appObject = await ResourceLoader.InstantiateAsync(address, cancellationToken, transform);
 
     // カメラ設定
@@ -51,13 +51,11 @@ public class UIAppManager : MonoBehaviour {
       Assertion.Assert(false, "UIAppが見つかりません.");
       return null;
     }
-
-    // Appの初期化
-    await uiApp.InitializeAsync(cancellationToken);
-
     // 削除時にリストから削除
     uiApp.EventObservables.GetObservable(UIAppEventType.Destroy).Subscribe(_ => OnDestroyUIApp(uiApp)).AddTo(gameObject);
 
+    // Appの初期化
+    if (isInitialize) await uiApp.InitializeAsync(cancellationToken);
     // 即時表示
     if (isShow) await uiApp.Show(default);
 

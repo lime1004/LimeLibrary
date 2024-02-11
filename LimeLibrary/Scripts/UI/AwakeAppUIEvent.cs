@@ -25,7 +25,7 @@ public class AwakeAppUIEvent : Event.Event {
 
   public override void Start() {
     // UI生成
-    _createUIAppTask = UIManager.Instance.UIAppManager.CreateAppAsync(_address, _awakeType, CancellationToken, false).RunHandlingError();
+    _createUIAppTask = UIManager.Instance.UIAppManager.CreateAppAsync(_address, _awakeType, CancellationToken, true, false).RunHandlingError();
   }
 
   private enum Seq {
