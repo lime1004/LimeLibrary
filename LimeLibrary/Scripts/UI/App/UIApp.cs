@@ -19,6 +19,7 @@ public abstract class UIApp : MonoBehaviour, IUI {
   private UIAppController _controller;
   private UIDialogController _dialogController;
   private IUITextGetter _textGetter;
+  private IUICommonInput _commonInput;
   
   internal UIDialogController DialogController => _dialogController;
 
@@ -27,6 +28,7 @@ public abstract class UIApp : MonoBehaviour, IUI {
 
   public GameObject RootObject => gameObject;
   public UIAppState State => _controller.State;
+  public IUICommonInput CommonInput => _commonInput;
   public IObservable<Unit> OnShowEndObservable => EventObservables.GetObservable(UIAppEventType.ShowEnd);
   public IObservable<Unit> OnHideEndObservable => EventObservables.GetObservable(UIAppEventType.HideEnd);
 
@@ -36,6 +38,7 @@ public abstract class UIApp : MonoBehaviour, IUI {
 
   public void SetInputObservables(IUIInputObservables inputObservables) => InputObservables = inputObservables;
   public void SetUItextGetter(IUITextGetter textGetter) => _textGetter = textGetter;
+  public void SetCommonInput(IUICommonInput commonInput) => _commonInput = commonInput;
 
   public async UniTask InitializeAsync(CancellationToken cancellationToken) {
     // Eventの生成

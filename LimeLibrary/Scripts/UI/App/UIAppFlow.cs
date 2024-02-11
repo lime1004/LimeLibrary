@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using LimeLibrary.UI.App;
+using LimeLibrary.UI.Module.Input;
 using LimeLibrary.Utility;
 
 namespace LimeLibrary.UI {
@@ -23,8 +24,11 @@ public abstract class UIAppFlow<TState, TContext> where TState : Enum where TCon
 
     _cancellationTokenSource = new CancellationTokenSource();
     _cancellationTokenSource.RegisterRaiseCancelOnDestroy(_uiApp);
+    var cancelInputReceiver = new UIInputReceiver(_uiApp);
+    cancelInputReceiver.AddInputBinding(_uiApp.CommonInput.GetCancelInputAction());
     _context = new TContext {
       UIApp = uiApp,
+      CancelInputReceiver = cancelInputReceiver,
       CancellationTokenSource = _cancellationTokenSource,
     };
   }
