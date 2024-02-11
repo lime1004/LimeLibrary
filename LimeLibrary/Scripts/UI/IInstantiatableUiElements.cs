@@ -3,16 +3,16 @@ using UnityEngine;
 
 namespace LimeLibrary.UI {
 
-public interface IInstantiatableUiElements {
-  public MonoBehaviour Self { get; }
+public interface IInstantiatableUiElements<out T> where T : MonoBehaviour {
+  public T Self { get; }
   public void Initialize(IUIView parentView);
 }
 
 public static class InstantiatableUiElementsExtensions {
-  public static T Instantiate<T>(this IInstantiatableUiElements instantiatable, IUIView parentView) where T : MonoBehaviour {
+  public static T Instantiate<T>(this IInstantiatableUiElements<T> instantiatable, IUIView parentView) where T : MonoBehaviour, IInstantiatableUiElements<T> {
     var instantiateObject = Object.Instantiate(instantiatable.Self, instantiatable.Self.transform.parent);
-    instantiatable.Initialize(parentView);
-    return instantiateObject as T;
+    instantiateObject.Initialize(parentView);
+    return instantiateObject;
   }
 }
 
