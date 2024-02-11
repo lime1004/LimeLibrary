@@ -6,7 +6,7 @@ using LimeLibrary.UI.View;
 
 namespace LimeLibrary.UI {
 
-public abstract class UIFlowState<TState, TContext> where TState : Enum where TContext : UIFlowContext {
+public abstract class UIAppFlowState<TState, TContext> where TState : Enum where TContext : UIAppFlowContext {
   protected UIApp UIApp => Context.UIApp;
   protected CancellationToken CancellationToken => Context.CancellationTokenSource.Token;
 

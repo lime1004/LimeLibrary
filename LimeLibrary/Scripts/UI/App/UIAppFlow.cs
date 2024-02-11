@@ -7,8 +7,8 @@ using LimeLibrary.Utility;
 
 namespace LimeLibrary.UI {
 
-public abstract class UIAppFlow<TState, TContext> where TState : Enum where TContext : UIFlowContext, new() {
-  private readonly Dictionary<TState, UIFlowState<TState, TContext>> _dictionary = new();
+public abstract class UIAppFlow<TState, TContext> where TState : Enum where TContext : UIAppFlowContext, new() {
+  private readonly Dictionary<TState, UIAppFlowState<TState, TContext>> _dictionary = new();
   private readonly UIApp _uiApp;
   private readonly CancellationTokenSource _cancellationTokenSource;
   private readonly TContext _context;
@@ -42,7 +42,7 @@ public abstract class UIAppFlow<TState, TContext> where TState : Enum where TCon
     _cancellationTokenSource.Cancel();
   }
 
-  protected void AddState<TFlowState>(TState state) where TFlowState : UIFlowState<TState, TContext>, new() {
+  protected void AddState<TFlowState>(TState state) where TFlowState : UIAppFlowState<TState, TContext>, new() {
     var flowState = new TFlowState {
       Context = _context
     };
