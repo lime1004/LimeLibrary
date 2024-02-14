@@ -15,6 +15,7 @@ public class SelectCursorObjectData {
   public bool Enabled {
     get => _enabled;
     set {
+      if (_enabled == value) return;
       _enabled = value;
       CursorObject.SetActive(value);
       if (value) {
