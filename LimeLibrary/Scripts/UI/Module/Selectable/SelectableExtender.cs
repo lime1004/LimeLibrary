@@ -74,8 +74,9 @@ public class SelectableExtender {
     ExtendSelectionState = ExtendSelectionState.Normal;
   }
 
-  public void AddSelectableAppearance(ExtendSelectionState extendSelectionState, SelectableAppearance.SelectableAppearance selectableAppearance, params InputMode[] enableInputModes) {
-    _selectableAppearanceDictionary.AddAppearance(extendSelectionState, selectableAppearance, enableInputModes);
+  public void AddSelectableAppearance(ExtendSelectionState extendSelectionState, SelectableAppearance.SelectableAppearance selectableAppearance, InputMode inputMode, params InputMode[] additionalInputModes) {
+    _selectableAppearanceDictionary.AddAppearance(extendSelectionState, selectableAppearance, inputMode);
+    _selectableAppearanceDictionary.AddAppearance(extendSelectionState, selectableAppearance, additionalInputModes);
   }
 
   public void ClearSelectableAppearance() {

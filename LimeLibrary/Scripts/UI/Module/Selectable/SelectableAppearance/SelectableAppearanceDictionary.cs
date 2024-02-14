@@ -4,7 +4,7 @@ using LimeLibrary.System;
 
 namespace LimeLibrary.UI.Module.Selectable.SelectableAppearance {
 
-public class SelectableAppearanceDictionary {
+internal class SelectableAppearanceDictionary {
   private readonly Dictionary<ExtendSelectionState, List<SelectableAppearanceData>> _dictionary = new();
 
   public SelectableAppearanceDictionary() {

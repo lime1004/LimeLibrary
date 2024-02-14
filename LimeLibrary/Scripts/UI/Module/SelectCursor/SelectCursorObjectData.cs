@@ -10,7 +10,7 @@ public class SelectCursorObjectData {
 
   public GameObject CursorObject { get; }
   public Vector2 Offset { get; set; }
-  public ISelectCursorResidentAnimator ResidentAnimator { get; }
+  public ISelectCursorResidentAnimator ResidentAnimator { get; set; }
 
   public bool Enabled {
     get => _enabled;
