@@ -17,6 +17,11 @@ public class SelectCursorObjectData {
     set {
       _enabled = value;
       CursorObject.SetActive(value);
+      if (value) {
+        ResidentAnimator?.Play();
+      } else {
+        ResidentAnimator?.Stop();
+      }
     }
   }
   public float MoveCounter { get; private set; }
