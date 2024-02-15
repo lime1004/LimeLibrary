@@ -64,9 +64,10 @@ internal class UIViewController {
       }
     }
 
+    State = UIViewState.Show;
+
     if (showOption.IsFocus) Focus();
 
-    State = UIViewState.Show;
     _eventNotifier.Notify(UIViewEventType.ShowEnd);
   }
 
