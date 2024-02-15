@@ -14,7 +14,7 @@ public class SelectableData {
 
   public bool IsSelectable() {
     if (Selectable == null) return false;
-    if (!Selectable.gameObject.activeInHierarchy) return false;
+    if (!Selectable.gameObject.activeSelf) return false;
     if (!Selectable.interactable) return false;
 
     return true;
