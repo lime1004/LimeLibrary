@@ -37,7 +37,7 @@ public class SelectCursorObjectData {
 
     cursorObject.UpdateAsObservable().Where(_ => IsFollowTarget).Subscribe(_ => {
       if (TargetObject == null) {
-        cursorObject.SetActive(false);
+        Enabled = false;
         return;
       }
       CursorObject.transform.position = TargetObject.transform.position + Offset.ToVector3();
