@@ -239,6 +239,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0719d450dfa4429cad791399c92e557d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _uiAppManager: {fileID: 7483854818391142180}
+  _uiScreenSpaceManager: {fileID: 2256971145410718927}
+  _uiWorldSpaceManager: {fileID: 4500902830654086493}
+  _messageWindowManager: {fileID: 3927938685573209286}
 --- !u!1 &7483854818391142178
 GameObject:
   m_ObjectHideFlags: 0
@@ -301,11 +305,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1804860718522930002, guid: 3b10623f996ef65488b7c1099cb86ae3, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 142.84
       objectReference: {fileID: 0}
     - target: {fileID: 1804860718522930002, guid: 3b10623f996ef65488b7c1099cb86ae3, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 89.05
       objectReference: {fileID: 0}
     - target: {fileID: 1978130796771393348, guid: 3b10623f996ef65488b7c1099cb86ae3, type: 3}
       propertyPath: m_AdditionalShaderChannelsFlag
@@ -321,19 +325,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4318833906700507318, guid: 3b10623f996ef65488b7c1099cb86ae3, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4318833906700507318, guid: 3b10623f996ef65488b7c1099cb86ae3, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4318833906700507318, guid: 3b10623f996ef65488b7c1099cb86ae3, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 82.84
       objectReference: {fileID: 0}
     - target: {fileID: 4318833906700507318, guid: 3b10623f996ef65488b7c1099cb86ae3, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 29.05
       objectReference: {fileID: 0}
     - target: {fileID: 4318833906700507318, guid: 3b10623f996ef65488b7c1099cb86ae3, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -341,7 +345,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4318833906700507318, guid: 3b10623f996ef65488b7c1099cb86ae3, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -30
       objectReference: {fileID: 0}
     - target: {fileID: 4621608464994824805, guid: 3b10623f996ef65488b7c1099cb86ae3, type: 3}
       propertyPath: m_AdditionalShaderChannelsFlag
@@ -350,6 +354,10 @@ PrefabInstance:
     - target: {fileID: 5694763557570698092, guid: 3b10623f996ef65488b7c1099cb86ae3, type: 3}
       propertyPath: m_Name
       value: MessageWindow
+      objectReference: {fileID: 0}
+    - target: {fileID: 5694763557570698092, guid: 3b10623f996ef65488b7c1099cb86ae3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5975404019532990068, guid: 3b10623f996ef65488b7c1099cb86ae3, type: 3}
       propertyPath: m_Pivot.x
