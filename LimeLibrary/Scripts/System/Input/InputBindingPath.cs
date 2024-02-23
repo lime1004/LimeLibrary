@@ -159,6 +159,10 @@ public static class InputBindingPath {
     Assertion.Assert(false, inputBindingPath);
     return default;
   }
+
+  public static string GetAnyGamepadButtonPath() => $"{GamePadRoot}<Button>";
+  public static string GetAnyGamepadPath() => $"{GamePadRoot}*";
+  public static string GetAnyKeyboardKeyPath() => $"{Keyboard}anyKey";
 }
 
 }
