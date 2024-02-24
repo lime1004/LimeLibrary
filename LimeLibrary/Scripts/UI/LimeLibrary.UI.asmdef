@@ -15,10 +15,9 @@
     "precompiledReferences": [],
     "autoReferenced": false,
     "defineConstraints": [
-        "LIME_UNIRX",
-        "LIME_UNITASK",
         "LIME_INPUTSYSTEM",
-        "LIME_DOTWEEN"
+        "LIME_UNIRX",
+        "LIME_UNITASK"
     ],
     "versionDefines": [],
     "noEngineReferences": false
