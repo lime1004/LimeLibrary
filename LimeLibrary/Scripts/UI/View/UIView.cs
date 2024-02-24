@@ -36,6 +36,7 @@ public abstract class UIView : MonoBehaviour, IUIView {
   public CanvasGroup CanvasGroup => _controller.CanvasGroup;
   public CanvasScaler CanvasScaler => _controller.CanvasScaler;
 
+  public bool IsInitialized { get; private set; }
   public UIViewState State => _controller.State;
   public bool IsFocus => _controller.IsFocus;
   public IUIViewEventObservables EventObservables { get; private set; }
@@ -91,6 +92,8 @@ public abstract class UIView : MonoBehaviour, IUIView {
     }
 
     await OnInitialize(cancellationToken);
+
+    IsInitialized = true;
   }
 
   protected abstract UniTask OnInitialize(CancellationToken cancellationToken);
