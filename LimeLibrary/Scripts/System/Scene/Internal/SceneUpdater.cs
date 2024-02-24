@@ -64,7 +64,6 @@ internal class SceneUpdater : MonoBehaviour {
 
       if (_interface.IsRequested()) {
         var requestSceneType = _interface.GetRequestSceneId();
-        _interface.ResetRequest();
 
         var scene = GetScene(_interface.GetNowSceneType());
         scene?.Destroy(requestSceneType);
