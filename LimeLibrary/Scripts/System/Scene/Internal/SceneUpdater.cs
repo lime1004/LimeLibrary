@@ -116,7 +116,7 @@ internal class SceneUpdater : MonoBehaviour {
       return false;
     }
 
-    if (!_scenes.Any(scene => scene.GetType() == requestSceneType)) {
+    if (!_scenes.Any(scene => scene.GetType() == requestSceneType || scene.GetType().GetInterfaces().Contains(requestSceneType))) {
       Assertion.Assert(false, "RequestSceneType is not found. " + requestSceneType);
       return false;
     }
