@@ -76,10 +76,6 @@ public static class UnityUtility {
     return gameObject;
   }
 
-  public static GameObject CreateGameObject(string name = null, GameObject parentObject = null, string sceneName = null, bool worldPositionStays = true) {
-    return CreateGameObject(name, parentObject, sceneName != null ? SceneManager.GetSceneByName(sceneName) : null, worldPositionStays);
-  }
-
   /// <summary>
   /// RectTransform付きのGamaObjectの生成
   /// </summary>
