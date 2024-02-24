@@ -70,7 +70,6 @@ internal class SceneUpdater : MonoBehaviour {
         scene?.Dispose();
 
         _prevSceneType = _interface.GetNowSceneType();
-        _interface.SetNowSceneType(requestSceneType);
 
         _interface.SetSceneState(SceneState.CheckNextScene);
       }
