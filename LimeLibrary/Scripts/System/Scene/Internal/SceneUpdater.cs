@@ -103,7 +103,7 @@ internal class SceneUpdater : MonoBehaviour {
   }
 
   private IScene GetScene(Type sceneType) {
-    var scene = _scenes.FirstOrDefault(scene => scene.GetType() == sceneType);
+    var scene = _scenes.FirstOrDefault(scene => scene.GetType() == sceneType || scene.GetType().GetInterfaces().Contains(sceneType));
     return scene;
   }
 
