@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -64,19 +65,26 @@ public static class UnityUtility {
   /// <summary>
   /// GamaObjectの生成
   /// </summary>
-  public static GameObject CreateGameObject(string name = null, GameObject parentObject = null, bool worldPositionStays = true) {
+  public static GameObject CreateGameObject(string name = null, GameObject parentObject = null, UnityEngine.SceneManagement.Scene? scene = null, bool worldPositionStays = true) {
     var gameObject = new GameObject(name);
+    if (scene.HasValue) {
+      SceneManager.MoveGameObjectToScene(gameObject, scene.Value);
+    }
     if (parentObject) {
       gameObject.transform.SetParent(parentObject.transform, worldPositionStays);
     }
     return gameObject;
   }
 
+  public static GameObject CreateGameObject(string name = null, GameObject parentObject = null, string sceneName = null, bool worldPositionStays = true) {
+    return CreateGameObject(name, parentObject, sceneName != null ? SceneManager.GetSceneByName(sceneName) : null, worldPositionStays);
+  }
+
   /// <summary>
   /// RectTransform付きのGamaObjectの生成
   /// </summary>
-  public static GameObject CreateGameObjectWithRectTransform(string name = null, GameObject parentObject = null, bool worldPositionStays = true) {
-    var gameObject = CreateGameObject(name, parentObject, worldPositionStays);
+  public static GameObject CreateGameObjectWithRectTransform(string name = null, GameObject parentObject = null, UnityEngine.SceneManagement.Scene? scene = null, bool worldPositionStays = true) {
+    var gameObject = CreateGameObject(name, parentObject, scene, worldPositionStays);
     var rectTransform = gameObject.AddComponent<RectTransform>();
     rectTransform.localPosition = Vector3.zero;
     rectTransform.localRotation = Quaternion.identity;
