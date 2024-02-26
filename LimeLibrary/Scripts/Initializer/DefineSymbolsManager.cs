@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+using System;
 using System.Linq;
 using UnityEditor;
 
@@ -43,3 +44,4 @@ public class DefineSymbolsManager {
 }
 
 }
+#endif
