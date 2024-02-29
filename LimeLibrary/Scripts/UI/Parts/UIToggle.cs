@@ -1,7 +1,6 @@
 ﻿using System;
 using LimeLibrary.Extensions;
 using LimeLibrary.UI.View;
-using Sirenix.OdinInspector;
 using UniRx;
 using UnityEngine;
 using UnityEngine.InputSystem;
