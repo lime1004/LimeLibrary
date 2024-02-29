@@ -18,18 +18,6 @@ public class UIWorldSpaceManager : MonoBehaviour {
     canvas.renderMode = RenderMode.WorldSpace;
     canvas.worldCamera = _camera;
     RootObject = gameObject;
-
-    SetScale();
-  }
-
-  public void OnUpdate() {
-    SetScale();
-  }
-
-  private void SetScale() {
-    var resolution = new Vector2Int(Screen.width, Screen.height);
-    float scale = _camera.orthographicSize * 2f / resolution.y;
-    RootObject.transform.localScale = new Vector3(scale, scale, scale);
   }
 }
 
