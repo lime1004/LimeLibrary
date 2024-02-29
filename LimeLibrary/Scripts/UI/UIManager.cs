@@ -27,7 +27,6 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
 
   private void Update() {
     UIAppManager.OnUpdate();
-    UIWorldSpaceManager.OnUpdate();
   }
 }
 
