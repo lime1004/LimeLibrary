@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using LimeLibrary.Extensions;
 using LimeLibrary.UI.View;
 using LimeLibrary.Utility;
-using Sirenix.OdinInspector;
 using TMPro;
 using UniRx;
 using UnityEngine;
@@ -15,7 +14,6 @@ namespace LimeLibrary.UI.Parts {
 
 [RequireComponent(typeof(Button))]
 public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler, ISubmitHandler {
-  [SerializeField, ReadOnly]
   private InputAction _inputAction;
 
   private readonly Dictionary<UIButtonEventType, Subject<BaseEventData>> _eventSubjects = new();
