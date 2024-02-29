@@ -11,7 +11,7 @@ namespace LimeLibrary.UI.Parts {
 
 [RequireComponent(typeof(Toggle))]
 public class UIToggle : MonoBehaviour, IUIParts {
-  [SerializeField, ReadOnly]
+  [SerializeField]
   private InputAction _toggleInputAction;
 
   private readonly Subject<bool> _onValueChangeSubject = new();
