@@ -19,6 +19,8 @@ public class UIWorldSpaceManager : MonoBehaviour {
     canvas.worldCamera = _camera;
     RootObject = gameObject;
   }
+
+  public void OnUpdate() { }
 }
 
 }
