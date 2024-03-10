@@ -19,7 +19,7 @@ public abstract class UIApp : MonoBehaviour, IUI {
   private UIAppController _controller;
   private UIDialogController _dialogController;
   private IUITextGetter _textGetter;
-  private IUICommonInput _commonInput;
+  private IUICommonInput _commonInput = new UICommonInput();
 
   internal UIDialogController DialogController => _dialogController;
 
