@@ -5,7 +5,7 @@ using System.Reflection;
 using UnityEngine.AddressableAssets;
 #endif
 
-namespace LimeLibrary.System {
+namespace LimeLibrary.Resource {
 
 /// <summary>
 /// Disposeによってリソースの解放を行うクラス

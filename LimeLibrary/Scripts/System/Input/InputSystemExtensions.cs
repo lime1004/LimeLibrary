@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine.InputSystem;
 
-namespace LimeLibrary.System {
+namespace LimeLibrary.Input {
 
 public static class InputSystemExtensions {
   public static IEnumerable<string> GetInputBindingPaths(this InputAction inputAction) {

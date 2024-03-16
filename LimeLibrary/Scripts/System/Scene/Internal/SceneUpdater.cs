@@ -5,10 +5,10 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using LimeLibrary.Extensions;
 using LimeLibrary.Utility;
-using UnityEngine;
 using UniRx;
+using UnityEngine;
 
-namespace LimeLibrary.Scene {
+namespace LimeLibrary.Scene.Internal {
 
 [DefaultExecutionOrder(-5)]
 [RequireComponent(typeof(SceneUpdaterInterface))]

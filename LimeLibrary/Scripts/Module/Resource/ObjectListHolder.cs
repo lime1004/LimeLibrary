@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using LimeLibrary.System;
+using LimeLibrary.Resource;
 using LimeLibrary.Utility;
 using UnityEngine;
 #if LIME_UNITASK

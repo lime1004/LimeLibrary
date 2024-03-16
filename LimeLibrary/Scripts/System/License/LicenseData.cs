@@ -1,10 +1,10 @@
 ﻿using System;
 using UnityEngine;
 
-namespace LimeLibrary.Licence {
+namespace LimeLibrary.License {
 
 [Serializable]
-public class LicenceData {
+public class LicenseData {
   [SerializeField]
   private string _targetName;
   public string TargetName => _targetName;
@@ -18,8 +18,8 @@ public class LicenceData {
   public string Year => _year;
 
   [SerializeField]
-  private LicenceType _licenceType;
-  public LicenceType LicenceType => _licenceType;
+  private LicenseType _licenseType;
+  public LicenseType LicenseType => _licenseType;
 }
 
 }

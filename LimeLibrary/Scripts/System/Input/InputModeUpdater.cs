@@ -19,7 +19,7 @@ using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.Users;
 #endif
 
-namespace LimeLibrary.System {
+namespace LimeLibrary.Input {
 
 #if LIME_INPUTSYSTEM && LIME_UNITASK
 /// <summary>

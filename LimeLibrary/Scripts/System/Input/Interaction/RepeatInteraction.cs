@@ -6,7 +6,7 @@ using UnityEditor;
 #endif
 #endif
 
-namespace LimeLibrary.System {
+namespace LimeLibrary.Input.Interaction {
 
 #if LIME_INPUTSYSTEM
 #if UNITY_EDITOR

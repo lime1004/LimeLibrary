@@ -1,4 +1,4 @@
-﻿namespace LimeLibrary.System {
+﻿namespace LimeLibrary.Input {
 
 public enum ControllerType {
   /// <summary>

@@ -6,7 +6,7 @@ using LimeLibrary.Extensions;
 using LimeLibrary.Utility;
 using UnityEngine;
 
-namespace LimeLibrary.Sound {
+namespace LimeLibrary.Sound.Internal {
 
 internal class SoundKit {
   private class SoundDataList {

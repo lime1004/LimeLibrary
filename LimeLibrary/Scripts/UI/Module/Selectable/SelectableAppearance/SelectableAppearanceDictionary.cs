@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using FastEnumUtility;
-using LimeLibrary.System;
+using LimeLibrary.Input;
 
 namespace LimeLibrary.UI.Module.Selectable.SelectableAppearance {
 

@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 using Cysharp.Threading.Tasks;
-using LimeLibrary.System;
+using LimeLibrary.Resource;
 
 namespace LimeLibrary.Text {
 

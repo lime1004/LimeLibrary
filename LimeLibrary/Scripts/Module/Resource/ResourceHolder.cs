@@ -1,5 +1,5 @@
 ﻿using System.Threading;
-using LimeLibrary.System;
+using LimeLibrary.Resource;
 using LimeLibrary.Utility;
 #if LIME_UNITASK
 using Cysharp.Threading.Tasks;

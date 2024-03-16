@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LimeLibrary.System {
+namespace LimeLibrary.Resource {
 
 public interface IDynamicResource : IDisposable { }
 

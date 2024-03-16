@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using LimeLibrary.Extensions;
-using LimeLibrary.System;
+using LimeLibrary.Resource;
 using LimeLibrary.UI.App;
 using LimeLibrary.Utility;
 using UniRx;

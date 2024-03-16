@@ -12,7 +12,7 @@ using UnityEngine.InputSystem.Editor;
 #endif
 
 #if LIME_INPUTSYSTEM
-namespace LimeLibrary.System {
+namespace LimeLibrary.Input.Interaction {
 
 #if UNITY_EDITOR
 [InitializeOnLoad]

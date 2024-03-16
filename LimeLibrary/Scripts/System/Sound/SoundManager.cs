@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using LimeLibrary.Module;
 using Cysharp.Threading.Tasks;
+using LimeLibrary.Sound.Internal;
 using LimeLibrary.Utility;
 
 namespace LimeLibrary.Sound {

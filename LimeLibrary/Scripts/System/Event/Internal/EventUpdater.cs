@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using LimeLibrary.Extensions;
 using LimeLibrary.Utility;
-using UnityEngine;
 using UniRx;
+using UnityEngine;
 
-namespace LimeLibrary.Event {
+namespace LimeLibrary.Event.Internal {
 
 [DefaultExecutionOrder(-10)]
 [RequireComponent(typeof(EventUpdaterInterface))]

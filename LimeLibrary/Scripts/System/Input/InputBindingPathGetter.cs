@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace LimeLibrary.System {
+namespace LimeLibrary.Input {
 
 [Serializable, CreateAssetMenu(
    fileName = "InputBindingPathGetter",

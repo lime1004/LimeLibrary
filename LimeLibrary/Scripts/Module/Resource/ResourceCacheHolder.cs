@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using LimeLibrary.System;
+using LimeLibrary.Resource;
 using LimeLibrary.Utility;
 
 namespace LimeLibrary.Module {

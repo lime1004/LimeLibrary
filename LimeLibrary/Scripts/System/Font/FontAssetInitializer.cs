@@ -16,7 +16,7 @@ using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 #endif
 
-namespace Next.GameSystem.Text {
+namespace LimeLibrary.Font {
 
 [Serializable, CreateAssetMenu(
    fileName = "FontAssetInitializer",

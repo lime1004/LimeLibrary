@@ -1,6 +1,6 @@
 ﻿using FastEnumUtility;
 using LimeLibrary.Extensions;
-using LimeLibrary.System;
+using LimeLibrary.Input;
 using LimeLibrary.UI.View;
 using UnityEngine;
 using UnityEngine.InputSystem;

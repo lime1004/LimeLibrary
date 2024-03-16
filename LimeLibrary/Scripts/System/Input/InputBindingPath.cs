@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using LimeLibrary.Utility;
 
-namespace LimeLibrary.System {
+namespace LimeLibrary.Input {
 
 public static class InputBindingPath {
   private const string GamePadRoot = "<Gamepad>/";

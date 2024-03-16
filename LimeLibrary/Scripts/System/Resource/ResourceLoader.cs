@@ -16,7 +16,7 @@ using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
 #endif
 
-namespace LimeLibrary.System {
+namespace LimeLibrary.Resource {
 
 /// <summary>
 /// リソースロード静的クラス
