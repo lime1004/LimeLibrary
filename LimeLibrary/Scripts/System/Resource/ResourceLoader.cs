@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.ResourceManagement.ResourceProviders;
 #endif
 
 namespace LimeLibrary.System {
@@ -40,6 +41,26 @@ public static class ResourceLoader {
     var resource = await asyncOperationHandle.WithCancellation(cancellationToken);
     if (AssertIfFailed(asyncOperationHandle, address)) return new DynamicResource<T>(null);
     return ToDynamicResource(resource);
+  }
+#endif
+
+#if LIME_UNITASK
+  /// <summary>
+  /// シーンの非同期ロード
+  /// </summary>
+  public static async UniTask<SceneInstance> LoadSceneAsync(string address, CancellationToken cancellationToken) {
+    var asyncOperationHandle = Addressables.LoadSceneAsync(address);
+    var resource = await asyncOperationHandle.WithCancellation(cancellationToken);
+    if (AssertIfFailed(asyncOperationHandle, address)) return default;
+    return resource;
+  }
+
+  /// <summary>
+  /// シーンのアンロード
+  /// </summary>
+  public static async UniTask UnloadSceneAsync(SceneInstance sceneInstance, CancellationToken cancellationToken) {
+    var asyncOperationHandle = Addressables.UnloadSceneAsync(sceneInstance);
+    await asyncOperationHandle.WithCancellation(cancellationToken);
   }
 #endif
 
