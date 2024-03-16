@@ -95,6 +95,8 @@ public class UISingleView : MonoBehaviour, IUIView {
   public void SetAnchoredPosition(Vector2 anchoredPosition) => _controller.SetAnchoredPosition(anchoredPosition);
 
   public void SetSortingOrderFront() => _controller.SetSortingOrderFront();
+  
+  public void Destroy() => OnDestroyView();
 }
 
 }
