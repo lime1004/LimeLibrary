@@ -13,6 +13,7 @@ using System.Linq;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
+using UnityEngine.SceneManagement;
 #endif
 
 namespace LimeLibrary.System {
@@ -48,8 +49,8 @@ public static class ResourceLoader {
   /// <summary>
   /// シーンの非同期ロード
   /// </summary>
-  public static async UniTask<SceneInstance> LoadSceneAsync(string address, CancellationToken cancellationToken) {
-    var asyncOperationHandle = Addressables.LoadSceneAsync(address);
+  public static async UniTask<SceneInstance> LoadSceneAsync(string address, LoadSceneMode loadSceneMode, CancellationToken cancellationToken) {
+    var asyncOperationHandle = Addressables.LoadSceneAsync(address, loadSceneMode);
     var resource = await asyncOperationHandle.WithCancellation(cancellationToken);
     if (AssertIfFailed(asyncOperationHandle, address)) return default;
     return resource;
