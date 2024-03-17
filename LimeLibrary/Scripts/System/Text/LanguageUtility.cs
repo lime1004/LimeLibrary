@@ -54,6 +54,59 @@ public static class LanguageUtility {
     };
   }
 
+  public static Language ConvertFromISO639(string code) {
+    return code switch {
+      "ar" => Language.Arabic,
+      "bg" => Language.Bulgarian,
+      "cs" => Language.Czech,
+      "da" => Language.Danish,
+      "nl" => Language.Dutch,
+      "en" => Language.English,
+      "fi" => Language.Finnish,
+      "fr" => Language.French,
+      "de" => Language.German,
+      "el" => Language.Greek,
+      "hu" => Language.Hungarian,
+      "id" => Language.Indonesian,
+      "it" => Language.Italian,
+      "ja" => Language.Japanese,
+      "ko" => Language.Korean,
+      "no" => Language.Norwegian,
+      "pl" => Language.Polish,
+      "pt" => Language.Portuguese,
+      "pt-br" => Language.PortugueseBrazil,
+      "ro" => Language.Romanian,
+      "ru" => Language.Russian,
+      "es" => Language.SpanishSpain,
+      "es-uy" => Language.SpanishLatinAmerica,
+      "es-ec" => Language.SpanishLatinAmerica,
+      "es-sv" => Language.SpanishLatinAmerica,
+      "es-gt" => Language.SpanishLatinAmerica,
+      "es-cr" => Language.SpanishLatinAmerica,
+      "es-co" => Language.SpanishLatinAmerica,
+      "es-cl" => Language.SpanishLatinAmerica,
+      "es-do" => Language.SpanishLatinAmerica,
+      "es-ni" => Language.SpanishLatinAmerica,
+      "es-pa" => Language.SpanishLatinAmerica,
+      "es-py" => Language.SpanishLatinAmerica,
+      "es-pr" => Language.SpanishLatinAmerica,
+      "es-ve" => Language.SpanishLatinAmerica,
+      "es-pe" => Language.SpanishLatinAmerica,
+      "es-bo" => Language.SpanishLatinAmerica,
+      "es-hn" => Language.SpanishLatinAmerica,
+      "es-mx" => Language.SpanishLatinAmerica,
+      "es-ar" => Language.SpanishLatinAmerica,
+      "sv" => Language.Swedish,
+      "th" => Language.Thai,
+      "tr" => Language.Turkish,
+      "uk" => Language.Ukrainian,
+      "vi" => Language.Vietnamese,
+      "zh-cn" => Language.ChineseSimplified,
+      "zh-tw" => Language.ChineseTraditional,
+      _ => Language.English
+    };
+  }
+
   public static Language ConvertFromSystemLanguage(SystemLanguage systemLanguage) {
     return systemLanguage switch {
       SystemLanguage.Arabic => Language.Arabic,
