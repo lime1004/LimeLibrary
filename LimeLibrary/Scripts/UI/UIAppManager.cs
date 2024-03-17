@@ -123,14 +123,15 @@ public class UIAppManager : MonoBehaviour {
 
   public void OnUpdate() {
     foreach (var residentApp in _residentAppList) {
+      if (!residentApp.IsInitialized) continue;
       residentApp.OnUpdate();
     }
 
     if (_appDataListStack.Count != 0) {
-      var updateAppList = _appDataListStack.Peek();
-      foreach (var uiApp in updateAppList) {
-        if (!uiApp.UIApp.IsInitialized) continue;
-        uiApp.UIApp.OnUpdate();
+      var updateAppDataList = _appDataListStack.Peek();
+      foreach (var uiAppData in updateAppDataList) {
+        if (!uiAppData.UIApp.IsInitialized) continue;
+        uiAppData.UIApp.OnUpdate();
       }
     }
   }
