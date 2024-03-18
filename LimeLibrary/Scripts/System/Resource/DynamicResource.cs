@@ -33,10 +33,11 @@ public class DynamicResource<T> : IDynamicResource where T : class {
 
 #if LIME_ADDRESSABLES
 #if UNITY_EDITOR
-    // UnityEditor上ではEditor終了時にAddressablesが初期化されてしまうため初期化されないルートでリリースする
-    ReleaseReflection();
-#else
-    Addressables.Release(_handle.HasValue ? _handle.Value : Resource);
+    if (_handle.HasValue) {
+      Addressables.Release(_handle.Value);
+    } else {
+      Addressables.Release(Resource);
+    }
 #endif
 #else
     // Resourcesフォルダ利用想定で処理
