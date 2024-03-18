@@ -30,7 +30,7 @@ public static class ResourceLoader {
     var asyncOperationHandle = Addressables.LoadAssetAsync<T>(address);
     var resource = asyncOperationHandle.WaitForCompletion();
     if (AssertIfFailed(asyncOperationHandle, address)) return new DynamicResource<T>(null);
-    return ToDynamicResource(resource);
+    return ToDynamicResource(resource, asyncOperationHandle);
   }
 
 #if LIME_UNITASK
@@ -41,7 +41,7 @@ public static class ResourceLoader {
     var asyncOperationHandle = Addressables.LoadAssetAsync<T>(address);
     var resource = await asyncOperationHandle.WithCancellation(cancellationToken);
     if (AssertIfFailed(asyncOperationHandle, address)) return new DynamicResource<T>(null);
-    return ToDynamicResource(resource);
+    return ToDynamicResource(resource, asyncOperationHandle);
   }
 #endif
 
@@ -116,7 +116,7 @@ public static class ResourceLoader {
     var asyncOperationHandle = Addressables.LoadAssetsAsync<T>(label, null);
     var resourceList = asyncOperationHandle.WaitForCompletion();
     if (AssertIfFailed(asyncOperationHandle, label)) return new DynamicResource<IList<T>>(null);
-    return ToDynamicResource(resourceList);
+    return ToDynamicResource(resourceList, asyncOperationHandle);
   }
 
 #if LIME_UNITASK
@@ -127,12 +127,12 @@ public static class ResourceLoader {
     var asyncOperationHandle = Addressables.LoadAssetsAsync<T>(label, null);
     var resourceList = await asyncOperationHandle.WithCancellation(cancellationToken);
     if (AssertIfFailed(asyncOperationHandle, label)) return new DynamicResource<IList<T>>(null);
-    return ToDynamicResource(resourceList);
+    return ToDynamicResource(resourceList, asyncOperationHandle);
   }
 #endif
 
-  private static DynamicResource<T> ToDynamicResource<T>(T resource) where T : class {
-    var dynamicResource = new DynamicResource<T>(resource);
+  private static DynamicResource<T> ToDynamicResource<T>(T resource, AsyncOperationHandle<T> handle) where T : class {
+    var dynamicResource = new DynamicResource<T>(resource, handle);
 #if LIME_UNIRX
     dynamicResource.AddTo(UniRxExtensions.Lifespan.Application);
 #endif

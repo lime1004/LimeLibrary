@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.ResourceManagement.AsyncOperations;
 #if LIME_ADDRESSABLES
 using System.Reflection;
 using UnityEngine.AddressableAssets;
@@ -11,10 +12,13 @@ namespace LimeLibrary.Resource {
 /// Disposeによってリソースの解放を行うクラス
 /// </summary>
 public class DynamicResource<T> : IDynamicResource where T : class {
+  private readonly AsyncOperationHandle<T>? _handle;
+
   public T Resource { get; private set; }
 
-  public DynamicResource(T resource) {
+  public DynamicResource(T resource, AsyncOperationHandle<T>? handle = null) {
     Resource = resource;
+    _handle = handle;
   }
 
   /// <summary>
@@ -32,7 +36,7 @@ public class DynamicResource<T> : IDynamicResource where T : class {
     // UnityEditor上ではEditor終了時にAddressablesが初期化されてしまうため初期化されないルートでリリースする
     ReleaseReflection();
 #else
-    Addressables.Release(Resource);
+    Addressables.Release(_handle.HasValue ? _handle.Value : Resource);
 #endif
 #else
     // Resourcesフォルダ利用想定で処理
@@ -65,7 +69,7 @@ public class DynamicResource<T> : IDynamicResource where T : class {
       if (method.Name == "Release" && method.IsGenericMethod) {
         if (method.GetParameters()[0].ParameterType == method.GetGenericArguments()[0]) {
           var genericReleaseMethodInfo = method.MakeGenericMethod(typeof(T));
-          genericReleaseMethodInfo.Invoke(addressableImpl, new object[] { Resource });
+          genericReleaseMethodInfo.Invoke(addressableImpl, new object[] { _handle.HasValue ? _handle.Value : Resource });
           return;
         }
       }
