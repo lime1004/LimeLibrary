@@ -40,6 +40,7 @@ public enum EasingType {
 
 public static class Easing {
   public static float Ease(EasingType type, float t) {
+    t = Mathf.Clamp01(t);
     return type switch {
       EasingType.Constant => Unsupported(t),
       EasingType.InQuad => InQuad(t),
