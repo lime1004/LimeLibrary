@@ -377,6 +377,20 @@ public static class UnityExtensions {
   }
 
   /// <summary>
+  /// ほぼ等しいか
+  /// </summary>
+  public static bool Approximately(this Vector2 a, Vector2 b) {
+    return Mathf.Approximately(a.x, b.x) && Mathf.Approximately(a.y, b.y);
+  }
+
+  /// <summary>
+  /// ほぼ等しいか
+  /// </summary>
+  public static bool Approximately(this Vector3 a, Vector3 b) {
+    return Mathf.Approximately(a.x, b.x) && Mathf.Approximately(a.y, b.y) && Mathf.Approximately(a.z, b.z);
+  }
+
+  /// <summary>
   /// 距離を取得
   /// </summary>
   public static float ToLength(this Vector2 vec1, Vector2 vec2) {
