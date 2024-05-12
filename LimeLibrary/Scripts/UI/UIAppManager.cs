@@ -38,7 +38,15 @@ public class UIAppManager : MonoBehaviour {
 
   public async UniTask<UIApp> CreateAppAsync(string address, UIAppAwakeType appAwakeType, CancellationToken cancellationToken, bool isInitialize = true, bool isShow = true) {
     var appObject = await ResourceLoader.InstantiateAsync(address, cancellationToken, transform);
+    return await SetupApp(appObject, appAwakeType, cancellationToken, isInitialize, isShow);
+  }
 
+  public async UniTask<UIApp> CreateAppAsync(GameObject prefab, UIAppAwakeType appAwakeType, CancellationToken cancellationToken, bool isInitialize = true, bool isShow = true) {
+    var appObject = UnityUtility.Instantiate(prefab, transform);
+    return await SetupApp(appObject, appAwakeType, cancellationToken, isInitialize, isShow);
+  }
+
+  private async UniTask<UIApp> SetupApp(GameObject appObject, UIAppAwakeType appAwakeType, CancellationToken cancellationToken, bool isInitialize = true, bool isShow = true) {
     // カメラ設定
     var rootCanvas = appObject.GetOrAddComponent<Canvas>();
     rootCanvas.worldCamera = _uiCamera;
@@ -46,7 +54,7 @@ public class UIAppManager : MonoBehaviour {
     // App生成時処理
     var uiApp = appObject.GetComponent<UIApp>();
     if (uiApp) {
-      OnCreateApp(uiApp, address, appAwakeType);
+      OnCreateApp(uiApp, appObject.name, appAwakeType);
     } else {
       Assertion.Assert(false, "UIAppが見つかりません.");
       return null;
