@@ -4,6 +4,7 @@ public class UIViewShowOption {
   public bool IsFocus { get; set; } = true;
   public bool IsImmediate { get; set; } = false;
   public bool IsForce { get; set; } = false;
+  public bool IsActiveGameObject { get; set; } = true;
 }
 
 }

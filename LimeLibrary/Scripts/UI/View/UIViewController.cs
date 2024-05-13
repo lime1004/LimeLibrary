@@ -51,7 +51,7 @@ internal class UIViewController {
     var mergedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, RootObject.GetCancellationTokenOnDestroy());
 
     State = UIViewState.Showing;
-    RootObject.SetActive(true);
+    if (showOption.IsActiveGameObject) RootObject.SetActive(true);
 
     _eventNotifier.Notify(UIViewEventType.ShowStart);
 
@@ -90,7 +90,7 @@ internal class UIViewController {
       }
     }
 
-    RootObject.SetActive(false);
+    if (hideOption.IsDeactivateGameObject) RootObject.SetActive(false);
 
     State = UIViewState.Hide;
     _eventNotifier.Notify(UIViewEventType.HideEnd);
