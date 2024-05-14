@@ -14,14 +14,11 @@ public static class InputInteractionBuilder {
     return interactions;
   }
 
-  public static string GetRepeatInteractions(float? durationSeconds = null, float? startSeconds = null) {
+  public static string GetRepeatInteractions(float? delaySeconds = null, float? intervalSeconds = null, float? pressPoint = null) {
     var stringBuilder = new StringBuilder("Repeat", 128);
-    if (durationSeconds.HasValue) {
-      AppendParameter(stringBuilder, "m_repeatDuration", $"{durationSeconds.Value:F}");
-    }
-    if (startSeconds.HasValue) {
-      AppendParameter(stringBuilder, "m_repeatSeconds", $"{startSeconds.Value:F}");
-    }
+    if (delaySeconds.HasValue) AppendParameter(stringBuilder, "_repeatDelay", $"{delaySeconds.Value:F}");
+    if (intervalSeconds.HasValue) AppendParameter(stringBuilder, "_repeatInterval", $"{intervalSeconds.Value:F}");
+    if (pressPoint.HasValue) AppendParameter(stringBuilder, "_pressPoint", $"{pressPoint.Value:F}");
     EndParameter(stringBuilder);
 
     return stringBuilder.ToString();
