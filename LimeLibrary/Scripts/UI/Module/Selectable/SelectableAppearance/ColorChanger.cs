@@ -34,6 +34,7 @@ public class ColorChanger : SelectableAppearance {
       if (graphic == null) continue;
       if (OverwriteColor.HasValue) colorStacker.RemoveColor("BaseColor");
       colorStacker.RemoveColor("MultiplyColor");
+      graphic.color = colorStacker.GetColor();
     }
   }
 
