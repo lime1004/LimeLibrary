@@ -105,6 +105,16 @@ public static class CommonExtensions {
     }
   }
 
+  public static int IndexOf<T>(this IReadOnlyList<T> items, T item) {
+    for (int i = 0; i < items.Count; ++i) {
+      if (item.Equals(items[i])) {
+        return i;
+      }
+    }
+
+    return -1;
+  }
+
   /// <summary>
   /// Listからランダムに値を取得
   /// </summary>
