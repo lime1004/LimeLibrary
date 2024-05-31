@@ -40,6 +40,8 @@ public class SelectCursorObjectData {
         Enabled = false;
         return;
       }
+      if (!TargetObject.gameObject.activeInHierarchy) return;
+
       CursorObject.transform.position = TargetObject.transform.position + Offset.ToVector3();
     }).AddTo(cursorObject);
   }
