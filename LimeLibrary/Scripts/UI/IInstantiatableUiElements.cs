@@ -15,6 +15,10 @@ public static class InstantiatableUiElementsExtensions {
     instantiateObject.Initialize(parentView);
     return instantiateObject;
   }
+
+  public static void Destroy<T>(this IInstantiatableUiElements<T> instantiatable) where T : MonoBehaviour, IInstantiatableUiElements<T> {
+    Object.Destroy(instantiatable.Self.gameObject);
+  }
 }
 
 }
