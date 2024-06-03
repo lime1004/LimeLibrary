@@ -46,6 +46,7 @@ public class SelectCursor : ISelectCursor {
 
   private async UniTask MoveCursor(SelectCursorObjectData cursorObjectData, GameObject targetObject, bool isImmediately, CancellationToken cancellationToken) {
     if (!cursorObjectData.Enabled || cursorObjectData.CursorObject == null) return;
+    if (targetObject == null || !targetObject.activeInHierarchy) return;
 
     cursorObjectData.ResetMoveCounter();
     cursorObjectData.TargetObject = targetObject.transform;
