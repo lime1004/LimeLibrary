@@ -18,6 +18,7 @@ public class DefineSymbolsManager {
     AddDefineIfNecessary("DG.Tweening.Tween", "DOTween", "LIME_DOTWEEN");
     AddDefineIfNecessary("Steamworks.SteamUtils", "com.rlabrecque.steamworks.net", "LIME_STEAMWORKS");
     AddDefineIfNecessary("Sirenix.OdinInspector.LabelTextAttribute", "Sirenix.OdinInspector.Attributes", "LIME_ODIN_INSPECTOR");
+    AddDefineIfNecessary("UImGui.UImGui", "UImGui", "LIME_IMGUI");
   }
 
   private static void AddDefineIfNecessary(string typeName, string assemblyName, string define) {

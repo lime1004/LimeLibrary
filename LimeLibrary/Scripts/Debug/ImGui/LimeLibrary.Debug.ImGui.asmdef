@@ -1,0 +1,18 @@
+{
+    "name": "LimeLibrary.Debug.ImGui",
+    "rootNamespace": "",
+    "references": [
+        "GUID:9a87097604f806340b969a2d9261a322"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "LIME_IMGUI"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
