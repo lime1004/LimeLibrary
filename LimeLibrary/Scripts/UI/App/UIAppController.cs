@@ -112,17 +112,20 @@ internal class UIAppController {
 
   public async UniTask HideAndDestroy(CancellationToken cancellationToken) {
     await Hide(new UIAppHideOption(), cancellationToken);
-    Destroy();
+    Destroy(false);
   }
 
-  public void Destroy() {
+  public void Destroy(bool isApplicationQuitDestroy) {
     foreach (var view in Views) {
       view.OnDestroyView();
     }
 
     _eventNotifier.Notify(UIAppEventType.Destroy);
+    _eventNotifier.Notify(isApplicationQuitDestroy ?
+      UIAppEventType.ApplicationQuitDestroy :
+      UIAppEventType.NormalDestroy);
 
-    Object.Destroy(RootObject);
+    if (!isApplicationQuitDestroy) Object.Destroy(RootObject);
   }
 
   public T GetView<T>(bool containsSubClass = true, int? id = null) where T : UIView {

@@ -22,6 +22,7 @@ public abstract class UIApp : MonoBehaviour, IUI {
   private IUICommonInput _commonInput = new UICommonInput();
 
   internal UIDialogController DialogController => _dialogController;
+  internal bool IsApplicationQuitting { get; private set; }
 
   public IUIAppEventObservables EventObservables { get; private set; } = new UIAppEventObservables();
   public IUIInputObservables InputObservables { get; private set; }
@@ -80,7 +81,7 @@ public abstract class UIApp : MonoBehaviour, IUI {
   public async UniTask Hide(UIAppHideOption hideOption, CancellationToken cancellationToken) => await _controller.Hide(hideOption, cancellationToken);
 
   public async UniTask HideAndDestroy(CancellationToken cancellationToken) => await _controller.HideAndDestroy(cancellationToken);
-  public void Destroy() => _controller.Destroy();
+  public void Destroy() => _controller.Destroy(false);
 
   public T GetView<T>(bool containsSubClass = true, int? id = null) where T : UIView => _controller.GetView<T>(containsSubClass, id);
   public IEnumerable<UIView> GetViewAll() => _controller.Views;
@@ -95,6 +96,9 @@ public abstract class UIApp : MonoBehaviour, IUI {
   }
 
   public async UniTask ShowDialog(IUIView view, UIDialogOption dialogOption, CancellationToken cancellationToken) => await _dialogController.Show(view, dialogOption, cancellationToken);
+
+  private void OnDestroy() => _controller.Destroy(IsApplicationQuitting);
+  private void OnApplicationQuit() => IsApplicationQuitting = true;
 }
 
 }

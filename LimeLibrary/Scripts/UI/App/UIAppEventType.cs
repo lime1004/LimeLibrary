@@ -7,6 +7,8 @@ public enum UIAppEventType {
   HideStart,
   HideEnd,
   Destroy,
+  NormalDestroy,
+  ApplicationQuitDestroy,
 }
 
 }
