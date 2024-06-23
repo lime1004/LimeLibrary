@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FastEnumUtility;
 using LimeLibrary.Utility;
 using UniRx;
 
@@ -9,7 +10,7 @@ internal class UIViewEventObservables : IUIViewEventNotifier, IUIViewEventObserv
   private readonly Dictionary<UIViewEventType, Subject<Unit>> _subjects = new();
 
   public UIViewEventObservables() {
-    foreach (UIViewEventType eventType in Enum.GetValues(typeof(UIViewEventType))) {
+    foreach (var eventType in FastEnum.GetValues<UIViewEventType>()) {
       _subjects.Add(eventType, new Subject<Unit>());
     }
   }
