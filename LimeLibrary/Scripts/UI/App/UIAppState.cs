@@ -6,6 +6,7 @@ public enum UIAppState {
   Show,
   Hiding,
   Hide,
+  Destroy,
 }
 
 }
