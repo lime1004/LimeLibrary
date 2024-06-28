@@ -15,10 +15,6 @@ public class InputBindingPathGetter : ScriptableObject {
 
   private Dictionary<InputMode, string> _groupNameDictionary = new();
 
-  private void OnEnable() {
-    _groupNameDictionary?.Clear();
-  }
-
   public string GetInputBindingPath(InputAction inputAction, InputMode inputMode) {
     return GetInputBindingPaths(inputAction, inputMode).FirstOrDefault();
   }
@@ -53,17 +49,18 @@ public class InputBindingPathGetter : ScriptableObject {
   }
 
   private string[] GetControlPaths(InputMode inputMode) {
-    switch (inputMode) {
-    case InputMode.Gamepad:
-      return new[] { new Gamepad().path };
-    case InputMode.MouseKeyboard:
-      return new[] {
-        new Mouse().path,
-        new Keyboard().path,
-      };
-    default:
-      return new[] { string.Empty };
-    }
+    return (inputMode switch {
+      InputMode.Gamepad => new[] {
+        nameof(Gamepad),
+      },
+      InputMode.MouseKeyboard => new[] {
+        nameof(Mouse),
+        nameof(Keyboard),
+      },
+      _ => new[] {
+        string.Empty
+      }
+    }).Select(deviceName => $"<{deviceName}>").ToArray();
   }
 }
 
