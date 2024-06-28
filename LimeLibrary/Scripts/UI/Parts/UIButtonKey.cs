@@ -57,6 +57,7 @@ public class UIButtonKey : MonoBehaviour, IUIParts {
   }
 
   private void BindInputInternal(string inputBindingPath, InputMode inputMode) {
+    if (string.IsNullOrEmpty(inputBindingPath)) return;
     _uiButton.AddInputBinding(inputBindingPath);
     _keyImage.BindInput(inputBindingPath, inputMode);
   }
