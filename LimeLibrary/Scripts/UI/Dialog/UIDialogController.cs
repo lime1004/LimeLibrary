@@ -90,8 +90,8 @@ public class UIDialogController {
     // 背景イメージアニメーション
     PlayBackGroundAnimation(gameObject,
       new Color(0f, 0f, 0, 0f),
-      dialogData.DialogOption.IsDarkenBackground ? new Color(0f, 0f, 0, 0.2f) : new Color(0f, 0f, 0, 0f),
-      dialogData.DialogOption.IsDarkenBackground ? 0.2f : 0f,
+      dialogData.DialogOption.BackgroundColor,
+      0.2f,
       gameObject.GetCancellationTokenOnDestroy()).RunHandlingError().Forget();
 
     // ボタン追加
