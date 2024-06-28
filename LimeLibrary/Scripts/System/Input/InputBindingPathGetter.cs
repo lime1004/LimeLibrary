@@ -15,6 +15,10 @@ public class InputBindingPathGetter : ScriptableObject {
 
   private Dictionary<InputMode, string> _groupNameDictionary = new();
 
+  private void OnEnable() {
+    _groupNameDictionary?.Clear();
+  }
+
   public string GetInputBindingPath(InputAction inputAction, InputMode inputMode) {
     return GetInputBindingPaths(inputAction, inputMode).FirstOrDefault();
   }
@@ -31,8 +35,6 @@ public class InputBindingPathGetter : ScriptableObject {
     var bindings = inputAction.bindings.Where(binding => ContainsGroup(binding.groups, groupName));
     return bindings.Select(binding => binding.hasOverrides ? binding.overridePath : binding.path);
   }
-
-  
 
   private bool ContainsGroup(string groups, string groupName) {
     return groups.Split(";").Any(group => group == groupName);
