@@ -39,8 +39,8 @@ public class UIButtonKey : MonoBehaviour, IUIParts {
     _isInitialized = true;
   }
 
-  public void BindInput(string inputBindingPath, InputMode inputMode) {
-    _uiButton.ClearInputBinding();
+  public void BindInput(string inputBindingPath, InputMode inputMode, bool isClear = true) {
+    if (isClear) _uiButton.ClearInputBinding();
     BindInputInternal(inputBindingPath, inputMode);
   }
 
@@ -52,7 +52,7 @@ public class UIButtonKey : MonoBehaviour, IUIParts {
   public void BindInput(InputAction inputAction) {
     _uiButton.ClearInputBinding();
     foreach (var inputMode in FastEnum.GetValues<InputMode>()) {
-      BindInput(_inputBindingPathGetter.GetInputBindingPath(inputAction, inputMode), inputMode);
+      BindInput(_inputBindingPathGetter.GetInputBindingPath(inputAction, inputMode), inputMode, false);
     }
   }
 
