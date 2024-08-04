@@ -47,7 +47,7 @@ public abstract class UIApp : MonoBehaviour, IUI {
 
     // Viewの収集
     var viewArray = GetComponentsInChildren<UIView>(true);
-    Array.Sort(viewArray, (view1, view2) => view1.InitializePriority - view2.InitializePriority);
+    Array.Sort(viewArray, (view1, view2) => view1.AdvanceSettings.InitializePriority - view2.AdvanceSettings.InitializePriority);
 
     // Controllerの生成
     _controller = new UIAppController(gameObject, EventObservables as UIAppEventObservables, viewArray.ToList(), _showViewList);

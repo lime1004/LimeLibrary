@@ -18,14 +18,8 @@ public abstract class UIView : MonoBehaviour, IUIView {
   [SerializeField]
   private UIInitializeBehaviour _initializeBehaviour = UIInitializeBehaviour.Hide;
   [SerializeField]
-  private int _initializePriority = 0;
-  internal int InitializePriority => _initializePriority;
-  [SerializeField]
-  private int _focusPriority = 0;
-  internal int FocusPriority => _focusPriority;
-  [SerializeField]
-  private int _id;
-  public int Id => _id;
+  private UIViewAdvanceSettings _advanceSettings;
+  public UIViewAdvanceSettings AdvanceSettings => _advanceSettings;
 
   private UIViewController _controller;
   protected UIAnimator Animator { get; private set; }

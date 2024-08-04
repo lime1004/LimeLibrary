@@ -74,7 +74,7 @@ internal class UIAppController {
     await showTask;
 
     // フォーカス処理
-    var focusOrderedViews = _showViews.OrderBy(view => view.FocusPriority).ToList();
+    var focusOrderedViews = _showViews.OrderBy(view => view.AdvanceSettings.FocusPriority).ToList();
     foreach (var view in focusOrderedViews) {
       if (view == focusOrderedViews[0]) view.Focus();
       else view.Unfocus();
@@ -134,7 +134,7 @@ internal class UIAppController {
 
   public T GetView<T>(bool containsSubClass = true, int? id = null) where T : UIView {
     foreach (var view in Views) {
-      if (id.HasValue && view.Id != id.Value) continue;
+      if (id.HasValue && view.AdvanceSettings.Id != id.Value) continue;
       if (containsSubClass && view is T getView) return getView;
       if (!containsSubClass && view.GetType() == typeof(T)) return view as T;
     }
