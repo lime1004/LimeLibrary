@@ -8,6 +8,7 @@ using LimeLibrary.UI.View;
 using LimeLibrary.Utility;
 using UniRx;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace LimeLibrary.UI.Dialog {
@@ -34,6 +35,9 @@ public class UIDialogController {
     foreach (var showedView in _allViews.Where(uiView => uiView.State == UIViewState.Show)) {
       showedView.Unfocus();
     }
+
+    // Selectedを外す
+    EventSystem.current.SetSelectedGameObject(null);
 
     // ポップアップの背景用オブジェクト生成
     if (_backGroundGameObject == null) {
