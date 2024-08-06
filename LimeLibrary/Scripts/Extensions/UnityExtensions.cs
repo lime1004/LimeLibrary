@@ -506,8 +506,8 @@ public static class UnityExtensions {
     return new Color(r, g, b, a);
   }
 
-  public static Color FromHSL(int h, int s, int l, int a = 255) {
-    return FromHSL(h / 360f, s / 100f, l / 100f, a / 255f);
+  public static Color FromHSL(int h, int s, int l, float a = 1f) {
+    return FromHSL(h / 360f, s / 100f, l / 100f, a);
   }
 
   private static float HueToRGB(float v1, float v2, float vH) {
