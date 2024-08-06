@@ -491,7 +491,7 @@ public static class UnityExtensions {
   /// <summary>
   /// HSLからColorに変換
   /// </summary>
-  public static Color FromHSL(float h, float s, float l) {
+  public static Color FromHSL(float h, float s, float l, float a = 1f) {
     float r = l;
     float g = l;
     float b = l;
@@ -503,7 +503,7 @@ public static class UnityExtensions {
       g = HueToRGB(v1, v2, h);
       b = HueToRGB(v1, v2, h - 1f / 3f);
     }
-    return new Color(r, g, b);
+    return new Color(r, g, b, a);
   }
 
   private static float HueToRGB(float v1, float v2, float vH) {
