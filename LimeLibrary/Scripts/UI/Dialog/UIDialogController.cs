@@ -68,7 +68,7 @@ public class UIDialogController {
     if (_dialogDataStack.Any()) {
       SetupBackGround(_backGroundGameObject, _dialogDataStack.Peek());
     } else {
-      DisableBackGround(_backGroundGameObject);
+      DisableBackGround(_backGroundGameObject).RunHandlingError().Forget();
     }
     // 既存のViewの復帰
     if (_dialogDataStack.Any()) {
@@ -126,13 +126,15 @@ public class UIDialogController {
     }
   }
 
-  private void DisableBackGround(GameObject gameObject) {
+  private async UniTask DisableBackGround(GameObject gameObject) {
     // 背景イメージアニメーション
-    PlayBackGroundAnimation(gameObject,
+    await PlayBackGroundAnimation(gameObject,
       null,
       new Color(0f, 0f, 0, 0f),
       0.2f,
-      gameObject.GetCancellationTokenOnDestroy()).RunHandlingError().Forget();
+      gameObject.GetCancellationTokenOnDestroy());
+
+    gameObject.SetActive(false);
   }
 
   private async UniTask PlayBackGroundAnimation(GameObject gameObject, Color? startColor, Color endColor, float duration, CancellationToken cancellationToken) {
