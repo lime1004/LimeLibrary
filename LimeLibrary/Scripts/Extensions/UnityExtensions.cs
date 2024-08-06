@@ -489,6 +489,38 @@ public static class UnityExtensions {
   }
 
   /// <summary>
+  /// HSLからColorに変換
+  /// </summary>
+  public static Color FromHSL(float h, float s, float l) {
+    float r = l;
+    float g = l;
+    float b = l;
+    if (s != 0) {
+      float v2 = (l < 0.5f) ? l * (1 + s) : (l + s) - (l * s);
+      float v1 = 2 * l - v2;
+
+      r = HueToRGB(v1, v2, h + 1f / 3f);
+      g = HueToRGB(v1, v2, h);
+      b = HueToRGB(v1, v2, h - 1f / 3f);
+    }
+    return new Color(r, g, b);
+  }
+
+  private static float HueToRGB(float v1, float v2, float vH) {
+    if (vH < 0)
+      vH += 1;
+    if (vH > 1)
+      vH -= 1;
+    if ((6 * vH) < 1)
+      return (v1 + (v2 - v1) * 6 * vH);
+    if ((2 * vH) < 1)
+      return (v2);
+    if ((3 * vH) < 2)
+      return (v1 + (v2 - v1) * ((2f / 3f) - vH) * 6);
+    return (v1);
+  }
+
+  /// <summary>
   /// アルファ値の設定
   /// </summary>
   public static void SetAlpha(this Graphic graphic, float alpha) {
