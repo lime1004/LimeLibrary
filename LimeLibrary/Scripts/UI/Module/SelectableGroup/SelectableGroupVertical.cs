@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using LimeLibrary.UI.View;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace LimeLibrary.UI.Module.SelectableGroup {
@@ -39,16 +40,35 @@ public class SelectableGroupVertical : SelectableGroupVerticalOrHorizontal {
   private void ConnectNavigationRow(List<SelectableData> selectableDataList) {
     for (int i = 0; i < selectableDataList.Count; i++) {
       UnityEngine.UI.Selectable prevSelectable = null;
-      for (int k = i - 1; k >= 0; k--) {
-        if (!selectableDataList[k].IsSelectable()) continue;
-        prevSelectable = selectableDataList[k].Selectable;
-        break;
+      if (IsLoop) {
+        for (int k = 1; k < selectableDataList.Count; k++) {
+          int index = (int) Mathf.Repeat(i - k, selectableDataList.Count);
+          if (!selectableDataList[index].IsSelectable()) continue;
+          prevSelectable = selectableDataList[index].Selectable;
+          break;
+        }
+      } else {
+        for (int k = i - 1; k >= 0; k--) {
+          if (!selectableDataList[k].IsSelectable()) continue;
+          prevSelectable = selectableDataList[k].Selectable;
+          break;
+        }
       }
+
       UnityEngine.UI.Selectable nextSelectable = null;
-      for (int k = i + 1; k < selectableDataList.Count; k++) {
-        if (!selectableDataList[k].IsSelectable()) continue;
-        nextSelectable = selectableDataList[k].Selectable;
-        break;
+      if (IsLoop) {
+        for (int k = 1; k < selectableDataList.Count; k++) {
+          int index = (int) Mathf.Repeat(i + k, selectableDataList.Count);
+          if (!selectableDataList[index].IsSelectable()) continue;
+          nextSelectable = selectableDataList[index].Selectable;
+          break;
+        }
+      } else {
+        for (int k = i + 1; k < selectableDataList.Count; k++) {
+          if (!selectableDataList[k].IsSelectable()) continue;
+          nextSelectable = selectableDataList[k].Selectable;
+          break;
+        }
       }
 
       var navigation = selectableDataList[i].Selectable.navigation;
