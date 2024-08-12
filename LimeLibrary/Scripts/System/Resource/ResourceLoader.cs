@@ -156,6 +156,12 @@ public static class ResourceLoader {
     return list.Any();
   }
 
+  public static bool Exists<T>(string address) {
+    var asyncOperationHandle = Addressables.LoadResourceLocationsAsync(address, typeof(T));
+    var locations = asyncOperationHandle.WaitForCompletion();
+    return locations.Any();
+  }
+
 #else
   // Resourcesフォルダ利用想定
 
