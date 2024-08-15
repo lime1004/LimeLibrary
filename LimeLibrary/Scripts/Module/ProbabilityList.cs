@@ -23,6 +23,10 @@ public class ProbabilityList<T> {
     return _probabilityList.Lottery(lotteryNum, randomInstance, isIgnoreLotteryed);
   }
 
+  public void Add(Probability<T> probability) {
+    _probabilityList.Add(probability);
+  }
+
   [OnInspectorInit]
   private void SetProbabilityParameterParameter() {
     foreach (var probability in _probabilityList) {
@@ -43,6 +47,10 @@ public class ProbabilityPreviewList<T> {
 
   public List<T> Lottery(int lotteryNum, RandomInstance randomInstance = null, bool isIgnoreLotteryed = false) {
     return _probabilityList.Lottery(lotteryNum, randomInstance, isIgnoreLotteryed);
+  }
+
+  public void Add(ProbabilityPreview<T> probability) {
+    _probabilityList.Add(probability);
   }
 
   [OnInspectorInit]
