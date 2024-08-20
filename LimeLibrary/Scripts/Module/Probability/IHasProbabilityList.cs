@@ -2,7 +2,7 @@
 namespace LimeLibrary.Module {
 
 public interface IHasProbabilityList<T> {
-  internal ProbabilityList<T> GetProbabilityList();
+  public ProbabilityList<T> GetProbabilityList();
 }
 
 }
