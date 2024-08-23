@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace LimeLibrary.Module {
 
+[CreateAssetMenu(
+  fileName = "LevelTable",
+  menuName = "LimeLibrary/Module/LevelTable")]
 public class LevelTable : DictionaryScriptableObject<int, int> {
   public int GetNextRequiredExperience(int currentLevel) {
     int nextLevel = currentLevel + 1;
