@@ -9,9 +9,8 @@ namespace LimeLibrary.Module {
   menuName = "LimeLibrary/Module/LevelTable")]
 public class LevelTable : DictionaryScriptableObject<int, int> {
   public int GetNextRequiredExperience(int currentLevel) {
-    int nextLevel = currentLevel + 1;
-    if (nextLevel <= 1) return 0;
-    if (Exists(nextLevel)) return Get(nextLevel);
+    if (currentLevel <= 0) return 0;
+    if (Exists(currentLevel)) return Get(currentLevel);
     return GetNextRequiredExperience(currentLevel - 1);
   }
 
@@ -46,7 +45,7 @@ public class LevelTable : DictionaryScriptableObject<int, int> {
     foreach (string[] row in rows) {
       if (row.Length < 2) continue;
       if (int.TryParse(row[0], out int level) && int.TryParse(row[1], out int requiredExperience)) {
-        _dictionary[level + 1] = requiredExperience;
+        _dictionary[level] = requiredExperience;
       }
     }
   }
