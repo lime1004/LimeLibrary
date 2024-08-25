@@ -11,14 +11,19 @@ public class LevelController {
   private int _experience;
 
   public int Level => _level;
+  public int MinLevel => _minLevel;
+  public int MaxLevel => _maxLevel;
   public int Experience => _experience;
 
-  public LevelController(LevelTable levelTable, int minLevel, int maxLevel, int initialLevel, int initialExperience = 0) {
+  public LevelController(LevelTable levelTable, int minLevel, int maxLevel, int initialExperience, int? initialLevel = 0) {
     _levelTable = levelTable;
     _minLevel = minLevel;
     _maxLevel = maxLevel;
-    _level = initialLevel;
     _experience = initialExperience;
+    UpdateLevel();
+    if (initialLevel.HasValue) {
+      SetLevel(initialLevel.Value);
+    }
   }
 
   public ChangeExperienceResult AddExperience(int value) {
