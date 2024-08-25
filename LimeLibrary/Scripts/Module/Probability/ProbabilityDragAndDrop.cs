@@ -1,4 +1,5 @@
 ﻿#if LIME_ODIN_INSPECTOR
+#if UNITY_EDITOR
 using System.Collections.Generic;
 using Sirenix.OdinInspector.Editor;
 using UnityEditor;
@@ -6,7 +7,6 @@ using UnityEngine;
 
 namespace LimeLibrary.Module {
 
-#if UNITY_EDITOR
 public abstract class ProbabilityDragAndDrop<T> : OdinEditor {
   private readonly List<T> _addContentList = new();
 
@@ -64,7 +64,8 @@ public abstract class ProbabilityDragAndDrop<T> : OdinEditor {
     }
   }
 }
-#endif
 
 }
+#endif
+
 #endif
