@@ -26,6 +26,14 @@ public class LevelController {
     }
   }
 
+  public bool IsMaxLevel() {
+    return _level == _maxLevel;
+  }
+
+  public bool IsMinLevel() {
+    return _level == _minLevel;
+  }
+
   public ChangeExperienceResult AddExperience(int value) {
     _experience = Mathf.Max(_experience + value, 0);
     return UpdateLevel();
