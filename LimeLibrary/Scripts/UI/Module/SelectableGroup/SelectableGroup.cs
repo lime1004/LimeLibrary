@@ -25,7 +25,6 @@ public abstract class SelectableGroup {
 
   public bool Enabled { get; set; } = true;
   public bool IsSelectOnMouse { get; set; } = true;
-  public bool IsDeselectOnMouse { get; set; } = true;
   public bool IsLoop { get; set; }
   public int SelectedIndex => _selectedIndex;
   public IObservable<SelectableData> OnSelectObservable => _onSelectSubject;
@@ -55,9 +54,13 @@ public abstract class SelectableGroup {
     parentView.InputObservables.OnChangeInputModeObservable.Subscribe(inputMode => {
       switch (inputMode) {
       case InputMode.MouseKeyboard:
-        if (!IsEnable() || !IsDeselectOnMouse) return;
+        if (!IsEnable()) return;
 
-        Deselect();
+        if (IsSelectOnMouse) {
+          Select();
+        } else {
+          Deselect();
+        }
         break;
       case InputMode.Gamepad:
         if (!IsEnable()) return;
@@ -90,7 +93,7 @@ public abstract class SelectableGroup {
         Deselect();
         break;
       case InputMode.MouseKeyboard: {
-        if (IsDeselectOnMouse) Deselect();
+        if (!IsSelectOnMouse) Deselect();
         break;
       }
       }
