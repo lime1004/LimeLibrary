@@ -24,6 +24,7 @@ public abstract class SelectableGroup {
   private bool _isSelectedByGamepad;
 
   public bool Enabled { get; set; } = true;
+  public bool IsSelectOnMouse { get; set; } = true;
   public bool IsDeselectOnMouse { get; set; } = true;
   public bool IsLoop { get; set; }
   public int SelectedIndex => _selectedIndex;
@@ -70,8 +71,14 @@ public abstract class SelectableGroup {
     parentView.EventObservables.GetObservable(UIViewEventType.Focus).Subscribe(_ => {
       if (!IsEnable()) return;
 
-      if (parentView.InputObservables.CurrentInputMode == InputMode.Gamepad) {
+      switch (parentView.InputObservables.CurrentInputMode) {
+      case InputMode.MouseKeyboard:
+        if (!IsSelectOnMouse) return;
         Select();
+        break;
+      case InputMode.Gamepad:
+        Select();
+        break;
       }
     }).AddTo(parentView.RootObject);
 
