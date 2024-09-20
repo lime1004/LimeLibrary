@@ -147,6 +147,7 @@ public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerEnterHa
   }
 
   private bool IsEnable() {
+    if (this == null) return false;
     if (!enabled) return false;
     if (!gameObject.activeInHierarchy) return false;
     if (!Button.interactable) return false;
