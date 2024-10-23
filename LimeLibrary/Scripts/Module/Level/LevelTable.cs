@@ -17,7 +17,7 @@ public class LevelTable : DictionaryScriptableObject<int, int> {
   public int CalculateLevel(int totalExperience, int maxLevel) {
     int level = 1;
     int totalRequiredExperience = 0;
-    for (int i = 1; i <= maxLevel; i++) {
+    for (int i = 1; i < maxLevel; i++) {
       int requiredExperience = GetNextRequiredExperience(i);
       totalRequiredExperience += requiredExperience;
       if (totalExperience < totalRequiredExperience) break;
