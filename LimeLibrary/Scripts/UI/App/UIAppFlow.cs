@@ -15,6 +15,7 @@ public abstract class UIAppFlow<TState, TContext> where TState : Enum where TCon
   private readonly TContext _context;
 
   private TState _state;
+  private TState _prevState;
 
   protected UIApp UIApp => _uiApp;
   public TContext Context => _context;
@@ -35,6 +36,7 @@ public abstract class UIAppFlow<TState, TContext> where TState : Enum where TCon
 
   public async UniTask Start() {
     _state = GetStartState();
+    _prevState = GetStartState();
     bool isCancel = await OnStart().SuppressCancellationThrow();
     if (!isCancel) isCancel |= await Execute().SuppressCancellationThrow();
     if (!isCancel) await OnEnd().SuppressCancellationThrow();
@@ -66,6 +68,8 @@ public abstract class UIAppFlow<TState, TContext> where TState : Enum where TCon
       }
 
       try {
+        _dictionary[_state].PrevState = _prevState;
+        _prevState = _state;
         _state = await _dictionary[_state].Execute();
       } catch (OperationCanceledException) {
         throw new OperationCanceledException();
