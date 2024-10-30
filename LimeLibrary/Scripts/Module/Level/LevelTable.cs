@@ -2,7 +2,7 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace LimeLibrary.Module.Level {
+namespace LimeLibrary.Module {
 
 [CreateAssetMenu(
   fileName = "LevelTable",

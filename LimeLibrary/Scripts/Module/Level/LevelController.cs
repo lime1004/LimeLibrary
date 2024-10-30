@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace LimeLibrary.Module.Level {
+namespace LimeLibrary.Module {
 
 public class LevelController {
   private readonly LevelTable _levelTable;
