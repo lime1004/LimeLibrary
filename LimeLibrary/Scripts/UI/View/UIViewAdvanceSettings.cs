@@ -14,6 +14,9 @@ public class UIViewAdvanceSettings {
   [SerializeField]
   private int _id;
   public int Id => _id;
+  [SerializeField]
+  private string _name;
+  public string Name => _name;
 }
 
 }
