@@ -83,7 +83,7 @@ public abstract class UIApp : MonoBehaviour, IUI {
   public async UniTask HideAndDestroy(CancellationToken cancellationToken) => await _controller.HideAndDestroy(cancellationToken);
   public void Destroy() => _controller.Destroy(IsApplicationQuitting);
 
-  public T GetView<T>(bool containsSubClass = true, int? id = null) where T : UIView => _controller.GetView<T>(containsSubClass, id);
+  public T GetView<T>(bool containsSubClass = true, int? id = null, string name = null) where T : UIView => _controller.GetView<T>(containsSubClass, id, name);
   public IEnumerable<UIView> GetViewAll() => _controller.Views;
   public bool ExistsView<T>(bool isCheckSubClass = false, bool isCheckInterface = false) where T : UIView => _controller.ExistsView<T>(isCheckSubClass, isCheckInterface);
 
