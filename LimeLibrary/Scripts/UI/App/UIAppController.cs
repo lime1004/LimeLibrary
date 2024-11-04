@@ -135,7 +135,7 @@ internal class UIAppController {
   public T GetView<T>(bool containsSubClass = true, int? id = null, string name = null) where T : UIView {
     foreach (var view in Views) {
       if (id.HasValue && view.AdvanceSettings.Id != id.Value) continue;
-      if (!string.IsNullOrEmpty(name) && view.AdvanceSettings.Name != name) continue;
+      if (name != null && view.AdvanceSettings.Name != name) continue;
       if (containsSubClass && view is T getView) return getView;
       if (!containsSubClass && view.GetType() == typeof(T)) return view as T;
     }
