@@ -31,6 +31,15 @@ public static class TextReplacer {
     var stringBuilder = new StringBuilder(text);
     return stringBuilder.Replace(oldChar, newChar).ToString();
   }
+
+  public static string AddColor(string baseText, string colorCode) {
+    return $"<color=#{colorCode}>{baseText}</color>";
+  }
+
+  public static string AddColor(string baseText, Color color) {
+    string colorCode = ColorUtility.ToHtmlStringRGB(color);
+    return AddColor(baseText, colorCode);
+  }
 }
 
 }
