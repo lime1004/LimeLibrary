@@ -95,6 +95,10 @@ public class LevelController {
   }
 
   public int GetExperienceUntilNextLevel() {
+    return Experience - _levelTable.CalculateTotalExperience(_level);
+  }
+
+  public int GetRequiredExperienceUntilNextLevel() {
     return _levelTable.GetNextRequiredExperience(_level);
   }
 
