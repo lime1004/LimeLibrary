@@ -36,7 +36,7 @@ public class CountCollection<T> {
     _count++;
   }
 
-  public bool IsUnlocked(T content) {
+  public bool Contains(T content) {
     if (_list == null) return false;
     int index = _list.IndexOf(content);
     return index >= 0 && index < _count;
