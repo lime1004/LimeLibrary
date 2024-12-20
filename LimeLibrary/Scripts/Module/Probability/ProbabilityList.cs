@@ -27,6 +27,14 @@ public class ProbabilityList<T> {
     _probabilityList.Add(probability);
   }
 
+  public void Remove(Probability<T> probability) {
+    _probabilityList.Remove(probability);
+  }
+
+  public void Clear() {
+    _probabilityList.Clear();
+  }
+
   [OnInspectorInit]
   private void SetProbabilityParameterParameter() {
     foreach (var probability in _probabilityList) {
@@ -51,6 +59,14 @@ public class ProbabilityPreviewList<T> {
 
   public void Add(ProbabilityPreview<T> probability) {
     _probabilityList.Add(probability);
+  }
+
+  public void Remove(ProbabilityPreview<T> probability) {
+    _probabilityList.Remove(probability);
+  }
+
+  public void Clear() {
+    _probabilityList.Clear();
   }
 
   [OnInspectorInit]
