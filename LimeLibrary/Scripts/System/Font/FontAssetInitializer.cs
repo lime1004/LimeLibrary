@@ -94,6 +94,7 @@ public class FontAssetInitializer : ScriptableObject
 #if UNITY_EDITOR
   public int callbackOrder => 0;
   public void OnPreprocessBuild(BuildReport report) {
+    if (_baseFontAssetReference == null || _baseFontAssetReference.editorAsset == null) return;
     // ベースのフォントアセットのフォールバックを剥がす
     var baseFontAsset = _baseFontAssetReference.editorAsset;
     baseFontAsset.fallbackFontAssetTable.Clear();
