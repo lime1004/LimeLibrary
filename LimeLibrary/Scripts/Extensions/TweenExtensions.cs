@@ -44,18 +44,20 @@ public static class TweenExtensions {
 
   private static async UniTask To<T>(Action<T> setter, float duration, Func<float, T> lerpFunc, EasingType easingType, CancellationToken cancellationToken) {
     float startTime = Time.time;
-    float endTime = startTime + Mathf.Max(duration, float.MinValue);
+    float endTime = startTime + Mathf.Max(duration, float.Epsilon);
 
     while (Time.time < endTime) {
       if (cancellationToken.IsCancellationRequested) break;
 
       float elapsed = Time.time - startTime;
-      float t = Easing.Ease(easingType, elapsed / duration);
+      float t = Mathf.Clamp01(Easing.Ease(easingType, elapsed / duration));
       var value = lerpFunc(t);
       setter(value);
 
       await UniTask.NextFrame(PlayerLoopTiming.Update, cancellationToken);
     }
+
+    setter(lerpFunc(1));
   }
 
   public static async UniTask PlayFadeTween(this CanvasGroup canvasGroup, float endValue, float duration, CancellationToken cancellationToken) {
