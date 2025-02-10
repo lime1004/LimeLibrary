@@ -23,6 +23,7 @@ public class MessageMainWindow : UISingleView {
 
   private CancellationTokenSource _cancellationTokenSource;
   private string _playingText = string.Empty;
+  private bool _isShowingText;
 
   public MessageWindowType MessageWindowType { get; set; }
 
@@ -47,8 +48,15 @@ public class MessageMainWindow : UISingleView {
 
     _text.text = string.Empty;
     _playingText = text;
+    _isShowingText = true;
     float duration = _messageWindowSettings.ShowTextDurationEveryChar * text.Length * durationMultiplier;
-    return await _text.PlayTextTween(text, duration, mergedCancellationTokenToken).SuppressCancellationThrow();
+    bool isCancel = await _text.PlayTextTween(text, duration, mergedCancellationTokenToken).SuppressCancellationThrow();
+    _isShowingText = false;
+    return isCancel;
+  }
+
+  public async UniTask WaitText(CancellationToken cancellationToken) {
+    await UniTask.WaitUntil(() => !_isShowingText, cancellationToken: cancellationToken);
   }
 
   public void SkipText() {
