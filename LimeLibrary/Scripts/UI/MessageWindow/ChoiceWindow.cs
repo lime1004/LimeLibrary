@@ -34,7 +34,7 @@ public class ChoiceWindow : UISingleView {
 
   public bool IsEnableCancel { get; set; }
 
-  protected UniTask OnInitialize() {
+  protected override UniTask OnInitialize(CancellationToken cancellationToken) {
     Animator.RegisterShowHideFadeAnimation(CanvasGroup, 0.1f);
 
     _selectableGroup = new SelectableGroupVertical(this, SelectableGroupSelectMode.Auto);

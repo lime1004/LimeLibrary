@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System.Threading;
+using Cysharp.Threading.Tasks;
 using LimeLibrary.UI.View;
 using TMPro;
 using UnityEngine;
@@ -9,7 +10,7 @@ public class SpeakerWindow : UISingleView {
   [SerializeField]
   private TextMeshProUGUI _text;
 
-  protected UniTask OnInitialize() {
+  protected override UniTask OnInitialize(CancellationToken cancellationToken) {
     Animator.RegisterShowHideFadeAnimation(CanvasGroup, 0.1f);
     return UniTask.CompletedTask;
   }
