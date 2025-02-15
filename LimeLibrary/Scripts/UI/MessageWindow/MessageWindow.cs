@@ -7,8 +7,6 @@ public class MessageWindow : MonoBehaviour {
   [SerializeField]
   private Canvas _canvas;
   [SerializeField]
-  private MessageWindowSettings _messageWindowSettings;
-  [SerializeField]
   private MessageMainWindow _messageMainWindow;
   [SerializeField]
   private KeyWait _keyWait;
