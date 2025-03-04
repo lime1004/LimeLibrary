@@ -8,7 +8,7 @@ using UniRx;
 
 namespace LimeLibrary.UI {
 
-public class AwakeAppUIEvent : Event.Event {
+public class AwakeAppUIEvent : AbstractEvent {
   private string _address;
   private UIAppAwakeType _awakeType;
   private UniTask<UIApp> _createUIAppTask;

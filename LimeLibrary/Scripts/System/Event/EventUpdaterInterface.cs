@@ -1,6 +1,7 @@
 ﻿#if LIME_UNIRX && LIME_UNITASK
 using System;
 using Cysharp.Threading.Tasks;
+using LimeLibrary.Event.Internal;
 using LimeLibrary.Module;
 using UniRx;
 
@@ -12,11 +13,11 @@ namespace LimeLibrary.Event {
 public class EventUpdaterInterface : SingletonMonoBehaviour<EventUpdaterInterface> {
   private EventUpdaterState _state = EventUpdaterState.Idle;
 
-  private readonly Subject<(EventBehaviourType, Event)> _onRequestEventSubject = new();
-  internal IObservable<(EventBehaviourType behaviourType, Event @event)> OnRequestEventObservable => _onRequestEventSubject;
+  private readonly Subject<(EventBehaviourType, IEvent)> _onRequestEventSubject = new();
+  internal IObservable<(EventBehaviourType behaviourType, IEvent @event)> OnRequestEventObservable => _onRequestEventSubject;
 
   internal Func<Type, bool> IsRunningFunc { get; set; }
-  internal Func<Event> GetRunningEventFunc { get; set; }
+  internal Func<AbstractEvent> GetRunningEventFunc { get; set; }
 
   internal void SetState(EventUpdaterState state) {
     _state = state;
@@ -25,7 +26,7 @@ public class EventUpdaterInterface : SingletonMonoBehaviour<EventUpdaterInterfac
   /// <summary>
   /// Eventのリクエスト
   /// </summary>
-  public T RequestGameEvent<T>(EventBehaviourType behaviourType) where T : Event, new() {
+  public T RequestGameEvent<T>(EventBehaviourType behaviourType) where T : AbstractEvent, new() {
     var @event = new T();
     @event.SetCancellationToken(this.GetCancellationTokenOnDestroy());
     _onRequestEventSubject.OnNext((behaviourType, @event));
@@ -49,14 +50,14 @@ public class EventUpdaterInterface : SingletonMonoBehaviour<EventUpdaterInterfac
   /// <summary>
   /// 特定のEventが走っているかどうか
   /// </summary>
-  public bool IsRunning<T>() where T : Event {
+  public bool IsRunning<T>() where T : AbstractEvent {
     return IsRunningFunc?.Invoke(typeof(T)) ?? false;
   }
 
   /// <summary>
   /// 実行中のEventを取得
   /// </summary>
-  public Event GetRunningEvent() {
+  public AbstractEvent GetRunningEvent() {
     return GetRunningEventFunc?.Invoke();
   }
 }

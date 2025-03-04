@@ -12,12 +12,12 @@ namespace LimeLibrary.Event.Internal {
 [RequireComponent(typeof(EventUpdaterInterface))]
 internal class EventUpdater : MonoBehaviour {
   private class EventData {
-    public EventData(Event @event, EventBehaviourType behaviourType) {
+    public EventData(IEvent @event, EventBehaviourType behaviourType) {
       Event = @event;
       BehaviourType = behaviourType;
     }
 
-    public Event Event { get; }
+    public IEvent Event { get; }
     public EventBehaviourType BehaviourType { get; }
     public EventUpdaterState State { get; set; } = EventUpdaterState.Idle;
     public UniTask InitializeTask { get; set; }
@@ -48,11 +48,11 @@ internal class EventUpdater : MonoBehaviour {
     // 実行中のEventを取得
     _interface.GetRunningEventFunc = () => {
       var eventData = GetExecuteEventData();
-      return eventData?.Event;
+      return eventData?.Event as AbstractEvent;
     };
   }
 
-  private void AddEvent(Event @event, EventBehaviourType behaviourType) {
+  private void AddEvent(IEvent @event, EventBehaviourType behaviourType) {
     var eventData = new EventData(@event, behaviourType);
     switch (behaviourType) {
     case EventBehaviourType.Order:

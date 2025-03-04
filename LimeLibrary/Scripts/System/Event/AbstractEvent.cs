@@ -2,11 +2,12 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using LimeLibrary.Event.Internal;
 using UniRx;
 
 namespace LimeLibrary.Event {
 
-public abstract class Event {
+public abstract class AbstractEvent : IEvent {
   private readonly Subject<Unit> _onStartSubject = new();
   private readonly Subject<Unit> _onEndSubject = new();
   private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
