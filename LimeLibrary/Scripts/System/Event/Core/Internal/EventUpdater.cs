@@ -23,10 +23,10 @@ internal class EventUpdater : MonoBehaviour {
     public UniTask InitializeTask { get; set; }
   }
 
-  private readonly Stack<EventData> _interruptGameEventStack = new();
-  private readonly Queue<EventData> _gameEventQueue = new();
+  private readonly Stack<EventData> _interruptEventStack = new();
+  private readonly Queue<EventData> _eventQueue = new();
   private EventUpdaterInterface _interface;
-  private EventData _prevUpdateGameEventData;
+  private EventData _prevUpdateEventData;
 
   private void Awake() {
     _interface = GetComponent<EventUpdaterInterface>();
@@ -57,11 +57,11 @@ internal class EventUpdater : MonoBehaviour {
     switch (behaviourType) {
     case EventBehaviourType.Order:
       // 順次実行
-      _gameEventQueue.Enqueue(eventData);
+      _eventQueue.Enqueue(eventData);
       break;
     case EventBehaviourType.Interrupt:
       // 割り込み
-      _interruptGameEventStack.Push(eventData);
+      _interruptEventStack.Push(eventData);
       break;
     default:
       Assertion.Assert(false, "BehaviourType not supported. " + behaviourType);
@@ -115,16 +115,16 @@ internal class EventUpdater : MonoBehaviour {
           break;
         }
 
-        if (_prevUpdateGameEventData != null && _prevUpdateGameEventData != executeEventData) {
+        if (_prevUpdateEventData != null && _prevUpdateEventData != executeEventData) {
           // 割り込みが入ったのでStartから再開
           _interface.SetState(EventUpdaterState.Initialize);
-          _prevUpdateGameEventData = null;
+          _prevUpdateEventData = null;
           isLoop = true;
           break;
         }
 
         var updateResult = executeEventData.Event.Update();
-        _prevUpdateGameEventData = executeEventData;
+        _prevUpdateEventData = executeEventData;
         switch (updateResult) {
         case EventUpdateResult.Continue:
           isLoop = false;
@@ -148,10 +148,10 @@ internal class EventUpdater : MonoBehaviour {
         // 削除
         switch (executeEventData.BehaviourType) {
         case EventBehaviourType.Interrupt:
-          _interruptGameEventStack.Pop();
+          _interruptEventStack.Pop();
           break;
         case EventBehaviourType.Order:
-          _gameEventQueue.Dequeue();
+          _eventQueue.Dequeue();
           break;
         default:
           Assertion.Assert(false);
@@ -159,10 +159,10 @@ internal class EventUpdater : MonoBehaviour {
         }
 
         executeEventData.Event.End();
-        _prevUpdateGameEventData = null;
+        _prevUpdateEventData = null;
 
-        var nextGameEventData = GetExecuteEventData();
-        _interface.SetState(nextGameEventData?.State ?? EventUpdaterState.Idle);
+        var nextEventData = GetExecuteEventData();
+        _interface.SetState(nextEventData?.State ?? EventUpdaterState.Idle);
         break;
       }
 
@@ -175,11 +175,11 @@ internal class EventUpdater : MonoBehaviour {
 
   private EventData GetExecuteEventData() {
     // 割り込みが優先
-    if (_interruptGameEventStack.Count > 0) {
-      return _interruptGameEventStack.Peek();
+    if (_interruptEventStack.Count > 0) {
+      return _interruptEventStack.Peek();
     }
-    if (_gameEventQueue.Count > 0) {
-      return _gameEventQueue.Peek();
+    if (_eventQueue.Count > 0) {
+      return _eventQueue.Peek();
     }
     return null;
   }
