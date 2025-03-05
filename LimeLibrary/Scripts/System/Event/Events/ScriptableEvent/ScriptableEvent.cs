@@ -11,13 +11,12 @@ public abstract class ScriptableEvent<T> : ScriptableObject where T : IScriptabl
 
   protected T Context { get; private set; }
 
-  protected abstract UniTask<T> CreateContext(CancellationToken cancellationToken);
-
   internal async UniTask Initialize(CancellationToken cancellationToken) {
     Context = await CreateContext(cancellationToken);
   }
 
-  internal abstract UniTask Execute(CancellationToken cancellationToken);
+  protected abstract UniTask<T> CreateContext(CancellationToken cancellationToken);
+  public abstract UniTask Execute(CancellationToken cancellationToken);
 }
 
 }
