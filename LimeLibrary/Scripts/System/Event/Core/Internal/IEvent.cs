@@ -4,7 +4,7 @@ using Cysharp.Threading.Tasks;
 using UniRx;
 
 #if LIME_UNIRX && LIME_UNITASK
-namespace LimeLibrary.Event.Internal {
+namespace LimeLibrary.Event.Core.Internal {
 
 internal interface IEvent {
   public IObservable<Unit> OnStartObservable { get; }

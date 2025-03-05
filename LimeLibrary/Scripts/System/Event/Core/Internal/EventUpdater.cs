@@ -6,7 +6,7 @@ using LimeLibrary.Utility;
 using UniRx;
 using UnityEngine;
 
-namespace LimeLibrary.Event.Internal {
+namespace LimeLibrary.Event.Core.Internal {
 
 [DefaultExecutionOrder(-10)]
 [RequireComponent(typeof(EventUpdaterInterface))]

@@ -1,4 +1,4 @@
-﻿namespace LimeLibrary.Event {
+﻿namespace LimeLibrary.Event.Core {
 
 public enum EventUpdateResult {
   Continue,

@@ -2,10 +2,10 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using LimeLibrary.Event.Internal;
+using LimeLibrary.Event.Core.Internal;
 using UniRx;
 
-namespace LimeLibrary.Event {
+namespace LimeLibrary.Event.Core {
 
 public abstract class AbstractEvent : IEvent {
   private readonly Subject<Unit> _onStartSubject = new();

@@ -1,11 +1,11 @@
 ﻿#if LIME_UNIRX && LIME_UNITASK
 using System;
 using Cysharp.Threading.Tasks;
-using LimeLibrary.Event.Internal;
+using LimeLibrary.Event.Core.Internal;
 using LimeLibrary.Module;
 using UniRx;
 
-namespace LimeLibrary.Event {
+namespace LimeLibrary.Event.Core {
 
 /// <summary>
 /// Eventシステムアクセス用クラス
