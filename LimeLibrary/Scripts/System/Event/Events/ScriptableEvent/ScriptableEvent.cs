@@ -5,10 +5,10 @@ using UnityEngine;
 
 namespace LimeLibrary.Event.Events {
 
-public abstract class ScriptableEvent<T> : ScriptableObject where T : IScriptableEventContext {
+public abstract class ScriptableEvent<T> : ScriptableObject, IScriptableEvent where T : IScriptableEventContext {
   protected T Context { get; private set; }
 
-  internal async UniTask Initialize(CancellationToken cancellationToken) {
+  public async UniTask Initialize(CancellationToken cancellationToken) {
     Context = await CreateContext(cancellationToken);
   }
 
