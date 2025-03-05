@@ -6,9 +6,6 @@ using UnityEngine;
 namespace LimeLibrary.Event.Events {
 
 public abstract class ScriptableEvent<T> : ScriptableObject where T : IScriptableEventContext {
-  [SerializeField]
-  private string _textAddress;
-
   protected T Context { get; private set; }
 
   internal async UniTask Initialize(CancellationToken cancellationToken) {
