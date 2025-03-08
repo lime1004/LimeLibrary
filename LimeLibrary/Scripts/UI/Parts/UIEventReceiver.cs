@@ -4,7 +4,7 @@ using FastEnumUtility;
 using LimeLibrary.Extensions;
 using LimeLibrary.UI.View;
 using LimeLibrary.Utility;
-using UniRx;
+using R3;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -48,7 +48,7 @@ public class UIEventReceiver : MonoBehaviour, IUIParts, ISelectHandler, IPointer
     _isInitialized = true;
   }
 
-  public IObservable<EventReceivedData> GetObservable(EventTriggerType eventTriggerType) {
+  public Observable<EventReceivedData> GetObservable(EventTriggerType eventTriggerType) {
     if (!_isInitialized) {
       Assertion.Assert(false, "Not initialized.");
       return Observable.Never<EventReceivedData>();

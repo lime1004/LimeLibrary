@@ -1,11 +1,10 @@
-﻿using System;
-using LimeLibrary.Extensions;
+﻿using LimeLibrary.Extensions;
 using LimeLibrary.UI.Module.Input;
 using LimeLibrary.UI.View;
 using LimeLibrary.Utility;
 using TMPro;
-using UniRx;
-using UniRx.Triggers;
+using R3;
+using R3.Triggers;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -27,8 +26,8 @@ public class UIInputText : MonoBehaviour, IUIParts, ISubmitHandler {
   public UnityEngine.UI.Selectable Selectable => _dummySelectable;
   public bool IsActivated { get; private set; }
 
-  public IObservable<Unit> OnSubmitObservable => Selectable.OnSubmitAsObservable().AsUnitObservable();
-  public IObservable<Unit> OnPointerClickObservable => Selectable.OnPointerClickAsObservable().AsUnitObservable();
+  public Observable<Unit> OnSubmitObservable => Selectable.OnSubmitAsObservable().AsUnitObservable();
+  public Observable<Unit> OnPointerClickObservable => Selectable.OnPointerClickAsObservable().AsUnitObservable();
 
   public TMP_InputField.ContentType ContentType {
     get => _inputFieldText.contentType;
@@ -58,8 +57,8 @@ public class UIInputText : MonoBehaviour, IUIParts, ISubmitHandler {
 
     // サブミット時、クリック時処理
     Observable.Merge(
-      _dummySelectable.OnSubmitAsObservable(),
-      _dummySelectable.OnPointerClickAsObservable()).Subscribe(_ => {
+      _dummySelectable.OnSubmitAsObservable().AsUnitObservable(),
+      _dummySelectable.OnPointerClickAsObservable().AsUnitObservable()).Subscribe(_ => {
       if (!IsEnable()) return;
 
       _inputFieldText.interactable = true;

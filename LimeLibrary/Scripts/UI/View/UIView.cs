@@ -6,7 +6,7 @@ using LimeLibrary.Text;
 using LimeLibrary.UI.App;
 using LimeLibrary.UI.Parts;
 using LimeLibrary.Utility;
-using UniRx;
+using R3;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -34,8 +34,8 @@ public abstract class UIView : MonoBehaviour, IUIView {
   public UIViewState State => _controller.State;
   public bool IsFocus => _controller.IsFocus;
   public IUIViewEventObservables EventObservables { get; private set; }
-  public IObservable<Unit> OnShowEndObservable => EventObservables.GetObservable(UIViewEventType.ShowEnd);
-  public IObservable<Unit> OnHideEndObservable => EventObservables.GetObservable(UIViewEventType.HideEnd);
+  public Observable<Unit> OnShowEndObservable => EventObservables.GetObservable(UIViewEventType.ShowEnd);
+  public Observable<Unit> OnHideEndObservable => EventObservables.GetObservable(UIViewEventType.HideEnd);
   public IUIInputObservables InputObservables => ParentApp.InputObservables;
   public UIApp ParentApp { get; private set; }
 

@@ -1,10 +1,9 @@
-﻿using System;
-using UniRx;
+﻿using R3;
 
 namespace LimeLibrary.UI.App {
 
 public interface IUIAppEventObservables {
-  public IObservable<Unit> GetObservable(UIAppEventType eventType);
+  public Observable<Unit> GetObservable(UIAppEventType eventType);
 }
 
 }

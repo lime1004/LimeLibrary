@@ -1,9 +1,9 @@
-﻿#if LIME_UNIRX && LIME_UNITASK
+﻿#if LIME_R3 && LIME_UNITASK
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using LimeLibrary.Extensions;
 using LimeLibrary.Utility;
-using UniRx;
+using R3;
 using UnityEngine;
 
 namespace LimeLibrary.Event.Core.Internal {

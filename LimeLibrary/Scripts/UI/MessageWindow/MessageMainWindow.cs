@@ -3,7 +3,7 @@ using Cysharp.Threading.Tasks;
 using LimeLibrary.Extensions;
 using LimeLibrary.UI.View;
 using TMPro;
-using UniRx;
+using R3;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -30,7 +30,7 @@ public class MessageMainWindow : UISingleView {
   protected override UniTask OnInitialize(CancellationToken cancellationToken) {
     Animator.RegisterShowHideFadeAnimation(CanvasGroup, 0.1f);
 
-    EventObservables.GetObservable(UIViewEventType.ShowStart).SubscribeWithState(MessageWindowType, (_, windowType) => {
+    EventObservables.GetObservable(UIViewEventType.ShowStart).Subscribe(MessageWindowType, (_, windowType) => {
       _windowImage.sprite = windowType switch {
         MessageWindowType.System => _systemMessageWindowSprite,
         MessageWindowType.Talk => _talkMessageWindowSprite,

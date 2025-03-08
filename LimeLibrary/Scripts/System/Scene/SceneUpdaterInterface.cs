@@ -1,7 +1,7 @@
-﻿#if LIME_UNIRX
+﻿#if LIME_R3
 using LimeLibrary.Module;
 using System;
-using UniRx;
+using R3;
 
 namespace LimeLibrary.Scene {
 
@@ -14,10 +14,10 @@ public class SceneUpdaterInterface : SingletonMonoBehaviour<SceneUpdaterInterfac
   private SceneState _sceneState;
 
   private readonly Subject<Type> _onChangeSceneTypeSubject = new();
-  public IObservable<Type> OnChangeSceneTypeObservable => _onChangeSceneTypeSubject;
+  public Observable<Type> OnChangeSceneTypeObservable => _onChangeSceneTypeSubject;
 
   private readonly Subject<IScene> _onAddSceneSubject = new();
-  internal IObservable<IScene> OnAddSceneObservable => _onAddSceneSubject;
+  internal Observable<IScene> OnAddSceneObservable => _onAddSceneSubject;
 
   private void OnDestroy() {
     _onChangeSceneTypeSubject.Dispose();

@@ -14,6 +14,7 @@ public class DefineSymbolsManager {
     AddDefineIfNecessary("UnityEngine.AddressableAssets.Addressables", "Unity.Addressables", "LIME_ADDRESSABLES");
     AddDefineIfNecessary("UnityEngine.InputSystem.InputControl", "Unity.InputSystem", "LIME_INPUTSYSTEM");
     AddDefineIfNecessary("UniRx.Observable", "UniRx", "LIME_UNIRX");
+    AddDefineIfNecessary("R3.Observable", "R3", "LIME_R3");
     AddDefineIfNecessary("Cysharp.Threading.Tasks.UniTask", "UniTask", "LIME_UNITASK");
     AddDefineIfNecessary("DG.Tweening.Tween", "DOTween", "LIME_DOTWEEN");
     AddDefineIfNecessary("Steamworks.SteamUtils", "com.rlabrecque.steamworks.net", "LIME_STEAMWORKS");

@@ -1,11 +1,10 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 using LimeLibrary.Input;
 using LimeLibrary.UI.Module.Selectable.SelectableAppearance;
 using LimeLibrary.UI.View;
 using LimeLibrary.Utility;
-using UniRx;
-using UniRx.Triggers;
+using R3;
+using R3.Triggers;
 using UnityEngine.EventSystems;
 
 namespace LimeLibrary.UI.Module.Selectable {
@@ -29,8 +28,8 @@ public class SelectableExtender {
   private readonly SelectableAppearanceDictionary _selectableAppearanceDictionary = new();
   private readonly Subject<AxisEventData> _onMoveSubject = new();
 
-  public IObservable<(ExtendSelectionState from, ExtendSelectionState to)> OnChangeExtendSelectionState => _onChangeExtendSelectionStateSubject;
-  public IObservable<AxisEventData> OnMoveObservable => _onMoveSubject;
+  public Observable<(ExtendSelectionState from, ExtendSelectionState to)> OnChangeExtendSelectionState => _onChangeExtendSelectionStateSubject;
+  public Observable<AxisEventData> OnMoveObservable => _onMoveSubject;
   public bool IsUnclickable { get; set; }
 
   public SelectableExtender(IUIView parentView, UnityEngine.UI.Selectable selectable) {
@@ -49,7 +48,7 @@ public class SelectableExtender {
     }).AddTo(_compositeDisposable);
 
     // 状態変更時処理
-    OnChangeExtendSelectionState.SubscribeWithState(_parentView, (states, view) => {
+    OnChangeExtendSelectionState.Subscribe(_parentView, (states, view) => {
       var (prevState, nextState) = states;
       OnChangeState(view.InputObservables.CurrentInputMode, prevState, nextState);
     }).AddTo(_compositeDisposable);

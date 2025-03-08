@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using FastEnumUtility;
 using LimeLibrary.Utility;
-using UniRx;
+using R3;
 
 namespace LimeLibrary.UI.View {
 
@@ -15,7 +15,7 @@ internal class UIViewEventObservables : IUIViewEventNotifier, IUIViewEventObserv
     }
   }
 
-  public IObservable<Unit> GetObservable(UIViewEventType eventType) {
+  public Observable<Unit> GetObservable(UIViewEventType eventType) {
     if (_subjects.TryGetValue(eventType, out var subject)) {
       return subject;
     }

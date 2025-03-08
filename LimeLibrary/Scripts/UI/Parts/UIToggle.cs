@@ -1,7 +1,7 @@
 ﻿using System;
 using LimeLibrary.Extensions;
 using LimeLibrary.UI.View;
-using UniRx;
+using R3;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -21,7 +21,7 @@ public class UIToggle : MonoBehaviour, IUIParts {
   public RectTransform RectTransform => transform.AsRectTransform();
 
   public Toggle Toggle { get; private set; }
-  public IObservable<bool> OnValueChangeObservable => _onValueChangeSubject;
+  public Observable<bool> OnValueChangeObservable => _onValueChangeSubject;
 
   public void Initialize(IUIView parentView) {
     if (_isInitialized) return;

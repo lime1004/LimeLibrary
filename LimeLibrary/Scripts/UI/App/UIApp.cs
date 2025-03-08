@@ -6,7 +6,7 @@ using Cysharp.Threading.Tasks;
 using LimeLibrary.Text;
 using LimeLibrary.UI.Dialog;
 using LimeLibrary.UI.View;
-using UniRx;
+using R3;
 using UnityEngine;
 
 namespace LimeLibrary.UI.App {
@@ -30,8 +30,8 @@ public abstract class UIApp : MonoBehaviour, IUI {
   public GameObject RootObject => gameObject;
   public UIAppState State => _controller.State;
   public IUICommonInput CommonInput => _commonInput;
-  public IObservable<Unit> OnShowEndObservable => EventObservables.GetObservable(UIAppEventType.ShowEnd);
-  public IObservable<Unit> OnHideEndObservable => EventObservables.GetObservable(UIAppEventType.HideEnd);
+  public Observable<Unit> OnShowEndObservable => EventObservables.GetObservable(UIAppEventType.ShowEnd);
+  public Observable<Unit> OnHideEndObservable => EventObservables.GetObservable(UIAppEventType.HideEnd);
 
   public CancellationToken ObjectCancellationToken => gameObject.GetCancellationTokenOnDestroy();
 

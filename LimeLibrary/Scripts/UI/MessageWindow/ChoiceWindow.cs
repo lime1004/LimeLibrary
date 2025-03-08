@@ -8,7 +8,7 @@ using LimeLibrary.UI.Parts;
 using LimeLibrary.UI.View;
 using LimeLibrary.Utility;
 using TMPro;
-using UniRx;
+using R3;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -79,7 +79,7 @@ public class ChoiceWindow : UISingleView {
   public async UniTask<int> WaitSelect(CancellationToken cancellationToken) {
     var buttonTaskList = _choiceDataList.Select(choiceData => choiceData.Button.Button.OnClickAsync(cancellationToken)).ToList();
     if (IsEnableCancel) {
-      buttonTaskList.Add(_inputReceiver.OnInputObservable.ToUniTask(true, cancellationToken: cancellationToken));
+      buttonTaskList.Add(_inputReceiver.OnInputObservable.FirstAsync(cancellationToken).AsUniTask());
     }
     int result = await UniTask.WhenAny(buttonTaskList);
     if (IsEnableCancel && result == buttonTaskList.Count - 1) {

@@ -4,7 +4,7 @@ using LimeLibrary.Extensions;
 using LimeLibrary.UI.View;
 using LimeLibrary.Utility;
 using TMPro;
-using UniRx;
+using R3;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -35,7 +35,7 @@ public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerEnterHa
   public float LongPressSeconds { get; set; } = 1f;
   public bool IsIgnorePress { get; set; }
   public float PointerDownCounter => _pointerDownCounter;
-  public IObservable<Unit> OnClickObservable => GetEventObservable(UIButtonEventType.Click).AsUnitObservable();
+  public Observable<Unit> OnClickObservable => GetEventObservable(UIButtonEventType.Click).AsUnitObservable();
 
   public void Initialize(IUIView parentView) {
     if (_isInitialized) return;
@@ -97,7 +97,7 @@ public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerEnterHa
     Button.onClick.Invoke();
   }
 
-  public IObservable<BaseEventData> GetEventObservable(UIButtonEventType eventType) {
+  public Observable<BaseEventData> GetEventObservable(UIButtonEventType eventType) {
     if (!_isInitialized) {
       Assertion.Assert(false, "UIButtonが初期化されていません. " + gameObject);
       return Observable.Never<BaseEventData>();

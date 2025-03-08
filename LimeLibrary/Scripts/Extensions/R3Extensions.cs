@@ -1,7 +1,7 @@
-﻿#if LIME_UNIRX
+﻿#if LIME_R3
 using System;
 using LimeLibrary.Utility;
-using UniRx;
+using R3;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
@@ -9,9 +9,9 @@ using Object = UnityEngine.Object;
 namespace LimeLibrary.Extensions {
 
 /// <summary>
-/// UniRxの拡張メソッド
+/// R3の拡張メソッド
 /// </summary>
-public static class UniRxExtensions {
+public static class R3Extensions {
   public enum Lifespan {
     Scene,
     Application,
@@ -65,7 +65,7 @@ public static class UniRxExtensions {
   /// <summary>
   /// ParticleSystemのStop時のObservableを取得
   /// </summary>
-  public static IObservable<Unit> OnParticleSystemStoppedAsObservable(this ParticleSystem particleSystem) {
+  public static Observable<Unit> OnParticleSystemStoppedAsObservable(this ParticleSystem particleSystem) {
     if (particleSystem == null) {
       Assertion.Assert(false);
       return Observable.Empty<Unit>();
@@ -74,7 +74,7 @@ public static class UniRxExtensions {
     return ChangeParticleSystemStopActionCallback(particleSystem);
   }
 
-  private static IObservable<Unit> ChangeParticleSystemStopActionCallback(ParticleSystem particleSystem) {
+  private static Observable<Unit> ChangeParticleSystemStopActionCallback(ParticleSystem particleSystem) {
     var observable = particleSystem.gameObject.OnParticleSystemStoppedAsObservable();
     var mainModule = particleSystem.main;
     switch (mainModule.stopAction) {
@@ -89,7 +89,7 @@ public static class UniRxExtensions {
     return observable;
   }
 
-  private static IObservable<Unit> OnParticleSystemStoppedAsObservable(this GameObject gameObject) {
+  private static Observable<Unit> OnParticleSystemStoppedAsObservable(this GameObject gameObject) {
     if (gameObject == null) {
       Assertion.Assert(false);
       return Observable.Empty<Unit>();
@@ -100,7 +100,7 @@ public static class UniRxExtensions {
   /// <summary>
   /// Buttonを右クリックした時のObservableを取得
   /// </summary>
-  public static IObservable<Unit> OnRightClickAsObservable(this Button button) {
+  public static Observable<Unit> OnRightClickAsObservable(this Button button) {
     return Observable.Create<Unit>(observer => {
       var rightClickHandler = button.gameObject.GetOrAddComponent<ObservableRightClickTrigger>();
       return rightClickHandler.OnRightClickAsObservable().Subscribe(observer).AddTo(button);

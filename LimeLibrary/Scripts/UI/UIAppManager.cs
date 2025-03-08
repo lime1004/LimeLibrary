@@ -6,7 +6,7 @@ using LimeLibrary.Extensions;
 using LimeLibrary.Resource;
 using LimeLibrary.UI.App;
 using LimeLibrary.Utility;
-using UniRx;
+using R3;
 using UnityEngine;
 
 namespace LimeLibrary.UI {

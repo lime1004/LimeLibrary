@@ -1,9 +1,9 @@
-﻿#if LIME_UNIRX && LIME_UNITASK
+﻿#if LIME_R3 && LIME_UNITASK
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using LimeLibrary.Event.Core.Internal;
-using UniRx;
+using R3;
 
 namespace LimeLibrary.Event.Core {
 
@@ -14,9 +14,9 @@ public abstract class AbstractEvent : IEvent {
 
   protected CancellationToken CancellationToken { get; private set; }
 
-  public IObservable<Unit> OnStartObservable => _onStartSubject;
-  public IObservable<Unit> OnEndObservable => _onEndSubject;
-  public UniTask FinishAsync(CancellationToken cancellationToken) => OnEndObservable.ToUniTask(cancellationToken: cancellationToken);
+  public Observable<Unit> OnStartObservable => _onStartSubject;
+  public Observable<Unit> OnEndObservable => _onEndSubject;
+  public UniTask FinishAsync(CancellationToken cancellationToken) => OnEndObservable.FirstAsync(cancellationToken).AsUniTask();
 
   private int _sequence;
 

@@ -1,11 +1,12 @@
-﻿using System;
+﻿#if LIME_R3 && LIME_UNITASK
+using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using LimeLibrary.Event.Core;
 using LimeLibrary.Extensions;
 using LimeLibrary.UI.App;
 using LimeLibrary.Utility;
-using UniRx;
+using R3;
 using UnityEngine;
 
 namespace LimeLibrary.UI {
@@ -27,7 +28,7 @@ public class AwakeUIAppEvent : AbstractEvent {
   }
 
   private readonly Subject<UIApp> _onCreateUIAppSubject = new();
-  public IObservable<UIApp> OnCreateUIAppObservable => _onCreateUIAppSubject;
+  public Observable<UIApp> OnCreateUIAppObservable => _onCreateUIAppSubject;
 
   public void Setup(string address, UIAppAwakeType awakeType) {
     _createType = UIAppCreateType.Address;
@@ -76,7 +77,7 @@ public class AwakeUIAppEvent : AbstractEvent {
         _createdUIApp = _createUIAppTask.GetAwaiter().GetResult();
         _onCreateUIAppSubject.OnNext(_createdUIApp);
         _createdUIApp.Show(CancellationToken).RunHandlingError().Forget();
-        _finishUIAppTask = _createdUIApp.EventObservables.GetObservable(UIAppEventType.Destroy).ToUniTask(true, CancellationToken);
+        _finishUIAppTask = _createdUIApp.EventObservables.GetObservable(UIAppEventType.Destroy).FirstAsync(CancellationToken).AsUniTask();
         AddSeq();
       }
       break;
@@ -101,3 +102,4 @@ public class AwakeUIAppEvent : AbstractEvent {
 }
 
 }
+#endif

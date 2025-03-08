@@ -1,6 +1,6 @@
-﻿#if LIME_UNIRX
-using UniRx;
-using UniRx.Triggers;
+﻿#if LIME_R3
+using R3;
+using R3.Triggers;
 using UnityEngine;
 
 namespace LimeLibrary.Extensions {

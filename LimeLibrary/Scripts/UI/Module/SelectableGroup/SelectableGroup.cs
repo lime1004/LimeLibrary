@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using LimeLibrary.Input;
 using LimeLibrary.UI.Module.Input;
 using LimeLibrary.UI.View;
 using LimeLibrary.Utility;
-using UniRx;
-using UniRx.Triggers;
+using R3;
+using R3.Triggers;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -27,8 +26,8 @@ public abstract class SelectableGroup {
   public bool IsSelectOnMouse { get; set; } = true;
   public bool IsLoop { get; set; }
   public int SelectedIndex => _selectedIndex;
-  public IObservable<SelectableData> OnSelectObservable => _onSelectSubject;
-  public IObservable<SelectableData> OnDeselectObservable => _onDeselectSubject;
+  public Observable<SelectableData> OnSelectObservable => _onSelectSubject;
+  public Observable<SelectableData> OnDeselectObservable => _onDeselectSubject;
 
   protected SelectableGroup(IUIView parentView, SelectableGroupSelectMode selectMode, IReadOnlyCollection<string> inputBindingPathList = null) {
     _parentView = parentView;

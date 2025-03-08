@@ -1,4 +1,4 @@
-﻿#if LIME_UNIRX && LIME_UNITASK
+﻿#if LIME_R3 && LIME_UNITASK
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using LimeLibrary.Event.Core;

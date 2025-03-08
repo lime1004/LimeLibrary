@@ -4,7 +4,7 @@ using LimeLibrary.Extensions;
 using LimeLibrary.Input;
 using LimeLibrary.UI.View;
 using LimeLibrary.Utility;
-using UniRx;
+using R3;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;

@@ -1,6 +1,5 @@
-﻿#if LIME_UNIRX
-using System;
-using UniRx;
+﻿#if LIME_R3
+using R3;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -9,7 +8,7 @@ namespace LimeLibrary.Extensions {
 public class ObservableRightClickTrigger : MonoBehaviour, IPointerClickHandler {
   private readonly Subject<Unit> _onRightClickSubject = new Subject<Unit>();
 
-  public IObservable<Unit> OnRightClickAsObservable() {
+  public Observable<Unit> OnRightClickAsObservable() {
     return _onRightClickSubject;
   }
 

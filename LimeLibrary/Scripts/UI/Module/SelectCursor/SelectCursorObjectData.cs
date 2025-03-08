@@ -1,6 +1,6 @@
 ﻿using LimeLibrary.Extensions;
-using UniRx;
-using UniRx.Triggers;
+using R3;
+using R3.Triggers;
 using UnityEngine;
 
 namespace LimeLibrary.UI.Module.SelectCursor {

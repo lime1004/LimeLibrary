@@ -4,7 +4,7 @@ using Cysharp.Threading.Tasks;
 using LimeLibrary.Extensions;
 using LimeLibrary.UI.Parts;
 using LimeLibrary.Utility;
-using UniRx;
+using R3;
 using UnityEngine;
 
 namespace LimeLibrary.UI.View {
@@ -27,8 +27,8 @@ public class UISingleView : MonoBehaviour, IUIView {
   public bool IsFocus => _controller.IsFocus;
 
   public IUIViewEventObservables EventObservables { get; private set; }
-  public IObservable<Unit> OnShowEndObservable => EventObservables.GetObservable(UIViewEventType.ShowEnd);
-  public IObservable<Unit> OnHideEndObservable => EventObservables.GetObservable(UIViewEventType.HideEnd);
+  public Observable<Unit> OnShowEndObservable => EventObservables.GetObservable(UIViewEventType.ShowEnd);
+  public Observable<Unit> OnHideEndObservable => EventObservables.GetObservable(UIViewEventType.HideEnd);
   public IUIInputObservables InputObservables { get; private set; } = new UIInputObservables();
 
   public CancellationToken ObjectCancellationToken => gameObject.GetCancellationTokenOnDestroy();

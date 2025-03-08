@@ -4,8 +4,8 @@ using Cysharp.Threading.Tasks;
 using LimeLibrary.Extensions;
 using LimeLibrary.UI.Parts;
 using LimeLibrary.UI.View;
-using UniRx;
-using UniRx.Triggers;
+using R3;
+using R3.Triggers;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -23,7 +23,7 @@ public class UIFloatViewController : IDisposable {
 
   private bool _isMouseOver;
 
-  public IObservable<IUIView> OnShowFloatViewObservable => _onShowFloatViewSubject;
+  public Observable<IUIView> OnShowFloatViewObservable => _onShowFloatViewSubject;
   public bool Enabled { get; set; } = true;
 
   public UIFloatViewController(IUIView parentView, UnityEngine.UI.Selectable targetSelectable, IUIView floatView, InputAction mousePosition) {

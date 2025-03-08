@@ -1,12 +1,11 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using LimeLibrary.Attribute;
 using LimeLibrary.Module;
 using LimeLibrary.Utility;
 using UnityEngine;
 
-#if LIME_UNIRX
-using UniRx;
+#if LIME_R3
+using R3;
 #endif
 
 #if LIME_UNITASK
@@ -38,11 +37,11 @@ public class InputModeUpdater : SingletonMonoBehaviour<InputModeUpdater> {
   public InputMode InputMode => _inputMode;
   public ControllerType ControllerType => _controllerType;
 
-#if LIME_UNIRX
+#if LIME_R3
   private readonly Subject<InputMode> _onChangeInputModeSubject = new();
   private readonly Subject<InputDevice> _onUseDeviceSubject = new();
-  public IObservable<InputMode> OnChangeInputModeObservable => _onChangeInputModeSubject;
-  public IObservable<InputDevice> OnUseDeviceObservable => _onUseDeviceSubject;
+  public Observable<InputMode> OnChangeInputModeObservable => _onChangeInputModeSubject;
+  public Observable<InputDevice> OnUseDeviceObservable => _onUseDeviceSubject;
 #endif
 
   protected override void Awake() {
@@ -100,7 +99,7 @@ public class InputModeUpdater : SingletonMonoBehaviour<InputModeUpdater> {
       break;
     }
 
-#if LIME_UNIRX
+#if LIME_R3
     _onUseDeviceSubject.OnNext(device);
 #endif
   }
@@ -124,7 +123,7 @@ public class InputModeUpdater : SingletonMonoBehaviour<InputModeUpdater> {
     Cursor.visible = false;
     UpdateControllerType();
     _inputMode = InputMode.Gamepad;
-#if LIME_UNIRX
+#if LIME_R3
     _onChangeInputModeSubject.OnNext(InputMode.Gamepad);
 #endif
   }
@@ -134,7 +133,7 @@ public class InputModeUpdater : SingletonMonoBehaviour<InputModeUpdater> {
     _inputMode = InputMode.MouseKeyboard;
     _controllerType = ControllerType.None;
     _inputGamepadName = string.Empty;
-#if LIME_UNIRX
+#if LIME_R3
     _onChangeInputModeSubject.OnNext(InputMode.MouseKeyboard);
 #endif
   }

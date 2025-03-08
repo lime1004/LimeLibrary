@@ -6,7 +6,7 @@ using LimeLibrary.Extensions;
 using LimeLibrary.UI.Parts;
 using LimeLibrary.UI.View;
 using LimeLibrary.Utility;
-using UniRx;
+using R3;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -53,7 +53,7 @@ public class UIDialogController {
 
     // 非表示時にリストから削除
     UniTask.Create(async () => {
-      await view.EventObservables.GetObservable(UIViewEventType.HideEnd).ToUniTask(true, view.RootObject.GetCancellationTokenOnDestroy());
+      await view.EventObservables.GetObservable(UIViewEventType.HideEnd).FirstAsync(view.RootObject.GetCancellationTokenOnDestroy()).AsUniTask();
       Terminate(view);
     }).RunHandlingError().Forget();
   }
@@ -107,7 +107,7 @@ public class UIDialogController {
       uiButton.Initialize(dialogData.UIView);
       uiButton.DisableNavigation();
       // 背景クリック時閉じる処理
-      uiButton.GetEventObservable(UIButtonEventType.PointerUp).FirstOrDefault().Subscribe(_ => {
+      uiButton.GetEventObservable(UIButtonEventType.PointerUp).Take(1).Subscribe(_ => {
         dialogData.UIView.Hide(gameObject.GetCancellationTokenOnDestroy()).RunHandlingError().Forget();
       }).AddTo(gameObject);
     } else {

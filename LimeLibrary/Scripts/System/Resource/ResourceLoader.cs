@@ -133,8 +133,8 @@ public static class ResourceLoader {
 
   private static DynamicResource<T> ToDynamicResource<T>(T resource, AsyncOperationHandle<T> handle) where T : class {
     var dynamicResource = new DynamicResource<T>(resource, handle);
-#if LIME_UNIRX
-    dynamicResource.AddTo(UniRxExtensions.Lifespan.Application);
+#if LIME_R3
+    dynamicResource.AddTo(R3Extensions.Lifespan.Application);
 #endif
     return dynamicResource;
   }
@@ -228,8 +228,8 @@ public static class ResourceLoader {
 
   private static DynamicResource<T> ToDynamicResource<T>(T resource) where T : class {
     var dynamicResource = new DynamicResource<T>(resource);
-#if LIME_UNIRX
-    dynamicResource.AddTo(UniRxExtensions.Lifespan.Application);
+#if LIME_R3
+    dynamicResource.AddTo(R3Extensions.Lifespan.Application);
 #endif
     return dynamicResource;
   }

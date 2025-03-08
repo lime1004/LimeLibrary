@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using LimeLibrary.Utility;
-#if LIME_UNIRX
-using UniRx;
+#if LIME_R3
+using R3;
 #endif
 
 namespace LimeLibrary.Module {
@@ -49,11 +49,11 @@ public class StateMachine<TStateId, TContext, TEventType> where TStateId : Enum,
 
   public TStateId NowStateId { get; private set; }
 
-#if LIME_UNIRX
+#if LIME_R3
   private readonly Subject<TStateId> _onEnterSubject = new();
   private readonly Subject<TStateId> _onExitSubject = new();
-  public IObservable<TStateId> OnEnterObservable => _onEnterSubject;
-  public IObservable<TStateId> OnExitObservable => _onExitSubject;
+  public Observable<TStateId> OnEnterObservable => _onEnterSubject;
+  public Observable<TStateId> OnExitObservable => _onExitSubject;
 #endif
 
   public IReadOnlyDictionary<TStateId, IState<TStateId, TContext, TEventType>> StateHashTable =>
@@ -105,7 +105,7 @@ public class StateMachine<TStateId, TContext, TEventType> where TStateId : Enum,
       if (IsStopTransitionNextState && !_requestStateId.HasValue) return;
       _stateHashTable[NowStateId].Enter(context, NowStateId);
 
-#if LIME_UNIRX
+#if LIME_R3
       _onEnterSubject.OnNext(NowStateId);
 #endif
       _isFirst = false;
@@ -122,14 +122,14 @@ public class StateMachine<TStateId, TContext, TEventType> where TStateId : Enum,
 
     _stateHashTable[NowStateId].Exit(context);
 
-#if LIME_UNIRX
+#if LIME_R3
     _onExitSubject.OnNext(NowStateId);
 #endif
     if (_stateHashTable.TryGetValue(newStateId.Value, out var value)) {
       NowStateId = newStateId.Value;
       value.Enter(context, NowStateId);
 
-#if LIME_UNIRX
+#if LIME_R3
       _onEnterSubject.OnNext(newStateId.Value);
 #endif
     } else {
@@ -144,7 +144,7 @@ public class StateMachine<TStateId, TContext, TEventType> where TStateId : Enum,
   public void ExitState(TContext context) {
     _stateHashTable[NowStateId].Exit(context);
 
-#if LIME_UNIRX
+#if LIME_R3
     _onExitSubject.OnNext(NowStateId);
 #endif
   }
@@ -152,7 +152,7 @@ public class StateMachine<TStateId, TContext, TEventType> where TStateId : Enum,
   public void TransitionState(TStateId stateId, TContext context) {
     _stateHashTable[NowStateId].Exit(context);
 
-#if LIME_UNIRX
+#if LIME_R3
     _onExitSubject.OnNext(NowStateId);
 #endif
     if (!_stateHashTable.ContainsKey(stateId)) {
@@ -163,7 +163,7 @@ public class StateMachine<TStateId, TContext, TEventType> where TStateId : Enum,
     var fromStateId = NowStateId;
     _stateHashTable[stateId].Enter(context, fromStateId);
 
-#if LIME_UNIRX
+#if LIME_R3
     _onEnterSubject.OnNext(stateId);
 #endif
     NowStateId = stateId;

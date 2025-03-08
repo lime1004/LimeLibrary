@@ -1,7 +1,7 @@
 ﻿using System;
 using LimeLibrary.Extensions;
 using LimeLibrary.UI.View;
-using UniRx;
+using R3;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,7 +15,7 @@ public class UISlider : MonoBehaviour, IUIParts {
   public RectTransform RectTransform => transform.AsRectTransform();
 
   public Slider Slider { get; private set; }
-  public IObservable<float> OnChangeValueObservable => Slider.OnValueChangedAsObservable();
+  public Observable<float> OnChangeValueObservable => Slider.OnValueChangedAsObservable();
 
   public void Initialize(IUIView parentView) {
     if (_isInitialized) return;

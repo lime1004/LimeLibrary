@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using LimeLibrary.Input;
 using LimeLibrary.UI.View;
 using LimeLibrary.Utility;
-using UniRx;
-using UniRx.Triggers;
+using R3;
+using R3.Triggers;
 using UnityEngine.InputSystem;
 
 namespace LimeLibrary.UI.Module.Input {
@@ -15,7 +15,7 @@ public class UIInputReceiver : IDisposable {
   private readonly Subject<InputAction.CallbackContext> _onInputSubject = new();
 
   public bool Enabled { get; set; } = true;
-  public IObservable<InputAction.CallbackContext> OnInputObservable => _onInputSubject;
+  public Observable<InputAction.CallbackContext> OnInputObservable => _onInputSubject;
 
   public UIInputReceiver(IUI parentUI, InputInteractionType inputInteractionType, int? behaviourType = null) :
     this(parentUI, InputInteractionBuilder.GetInteractions(inputInteractionType, behaviourType)) { }
@@ -31,7 +31,7 @@ public class UIInputReceiver : IDisposable {
     // 親Viewの表示非表示にInputの有効化/無効化を行う
     parentUI.OnShowEndObservable.Subscribe(_ => EnableInputAction()).AddTo(parentUI.RootObject);
     parentUI.OnHideEndObservable.Subscribe(_ => DisableInputAction()).AddTo(parentUI.RootObject);
-    parentUI.RootObject.OnDestroyAsObservable().FirstOrDefault().Subscribe(_ => Dispose());
+    parentUI.RootObject.OnDestroyAsObservable().Take(1).Subscribe(_ => Dispose());
 
     _inputAction = new InputAction("UIInputReceiver", InputActionType.Button, interactions: interactions);
     EnableInputAction();

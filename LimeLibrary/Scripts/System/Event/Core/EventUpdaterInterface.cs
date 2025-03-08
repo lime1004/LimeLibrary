@@ -1,9 +1,9 @@
-﻿#if LIME_UNIRX && LIME_UNITASK
+﻿#if LIME_R3 && LIME_UNITASK
 using System;
 using Cysharp.Threading.Tasks;
 using LimeLibrary.Event.Core.Internal;
 using LimeLibrary.Module;
-using UniRx;
+using R3;
 
 namespace LimeLibrary.Event.Core {
 
@@ -14,7 +14,7 @@ public class EventUpdaterInterface : SingletonMonoBehaviour<EventUpdaterInterfac
   private EventUpdaterState _state = EventUpdaterState.Idle;
 
   private readonly Subject<(EventBehaviourType, IEvent)> _onRequestEventSubject = new();
-  internal IObservable<(EventBehaviourType behaviourType, IEvent @event)> OnRequestEventObservable => _onRequestEventSubject;
+  internal Observable<(EventBehaviourType behaviourType, IEvent @event)> OnRequestEventObservable => _onRequestEventSubject;
 
   internal Func<Type, bool> IsRunningFunc { get; set; }
   internal Func<AbstractEvent> GetRunningEventFunc { get; set; }
