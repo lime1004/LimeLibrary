@@ -16,6 +16,7 @@ public class SelectCursor : ISelectCursor {
   public bool IsNextMoveImmediate { get; set; }
   public bool IsInvalidEnable { get; set; }
   public SelectCursorMoveOption MoveOption { get; } = new();
+  public IReadOnlyList<SelectCursorObjectData> CursorObjectDataList => _cursorObjectDataList;
 
   public SelectCursor(IUIView parentView, bool isNextMoveImmediateFirst = true) {
     _parentView = parentView;
