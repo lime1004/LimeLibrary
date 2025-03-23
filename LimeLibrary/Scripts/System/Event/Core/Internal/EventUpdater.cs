@@ -103,8 +103,15 @@ internal class EventUpdater : MonoBehaviour {
         }
         if (executeEventData.InitializeTask.GetAwaiter().IsCompleted) {
           executeEventData.Event.Start();
-          _interface.SetState(EventUpdaterState.Update);
           executeEventData.State = EventUpdaterState.Update;
+
+          if (GetExecuteEventData() != executeEventData) {
+            // 割り込みが入ったのでStartから再開
+            _interface.SetState(EventUpdaterState.Initialize);
+            isLoop = true;
+          } else {
+            _interface.SetState(EventUpdaterState.Update);
+          }
         }
         break;
       }
