@@ -1,12 +1,13 @@
-﻿using LimeLibrary.Input;
+﻿using LimeLibrary.Input.InputController;
+using LimeLibrary.Input.InputMode;
 using R3;
 
 namespace LimeLibrary.UI {
 
 public interface IUIInputObservables {
-  public InputMode CurrentInputMode { get; }
-  public ControllerType CurrentControllerType { get; }
-  public Observable<InputMode> OnChangeInputModeObservable { get; }
+  public IInputMode CurrentInputMode { get; }
+  public InputControllerType CurrentControllerType { get; }
+  public Observable<IInputMode> OnChangeInputModeObservable { get; }
 }
 
 }

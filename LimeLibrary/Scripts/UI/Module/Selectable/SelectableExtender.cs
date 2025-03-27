@@ -10,8 +10,8 @@ using UnityEngine.EventSystems;
 namespace LimeLibrary.UI.Module.Selectable {
 
 public class SelectableExtender {
-  protected IUIView _parentView;
-  protected UnityEngine.UI.Selectable _selectable;
+  protected readonly IUIView _parentView;
+  protected readonly UnityEngine.UI.Selectable _selectable;
 
   private readonly CompositeDisposable _compositeDisposable = new();
   private readonly Subject<(ExtendSelectionState, ExtendSelectionState)> _onChangeExtendSelectionStateSubject = new();
@@ -50,19 +50,19 @@ public class SelectableExtender {
     // 状態変更時処理
     OnChangeExtendSelectionState.Subscribe(_parentView, (states, view) => {
       var (prevState, nextState) = states;
-      OnChangeState(view.InputObservables.CurrentInputMode, prevState, nextState);
+      OnChangeState(view.InputObservables.CurrentInputMode.Name, prevState, nextState);
     }).AddTo(_compositeDisposable);
 
     // InputMode変更時処理
     _parentView.InputObservables.OnChangeInputModeObservable.Subscribe(inputMode => {
       var appearanceDataList = _selectableAppearanceDictionary.GetSelectableAppearanceDataList(ExtendSelectionState);
       foreach (var selectableAppearanceData in appearanceDataList) {
-        if (selectableAppearanceData.IsEnableInputMode(inputMode)) {
+        if (selectableAppearanceData.IsEnableInputMode(inputMode.Name)) {
           selectableAppearanceData.Apply();
         }
       }
       foreach (var selectableAppearanceData in appearanceDataList) {
-        if (!selectableAppearanceData.IsEnableInputMode(inputMode)) {
+        if (!selectableAppearanceData.IsEnableInputMode(inputMode.Name)) {
           selectableAppearanceData.Revert();
         }
       }
@@ -73,7 +73,7 @@ public class SelectableExtender {
     ExtendSelectionState = ExtendSelectionState.Normal;
   }
 
-  public void AddSelectableAppearance(ExtendSelectionState extendSelectionState, SelectableAppearance.SelectableAppearance selectableAppearance, InputMode inputMode, params InputMode[] additionalInputModes) {
+  public void AddSelectableAppearance(ExtendSelectionState extendSelectionState, SelectableAppearance.SelectableAppearance selectableAppearance, string inputMode, params string[] additionalInputModes) {
     _selectableAppearanceDictionary.AddAppearance(extendSelectionState, selectableAppearance, inputMode);
     _selectableAppearanceDictionary.AddAppearance(extendSelectionState, selectableAppearance, additionalInputModes);
   }
@@ -84,7 +84,7 @@ public class SelectableExtender {
 
   public void ApplySelectableAppearance() {
     var selectableAppearanceDataList = _selectableAppearanceDictionary.GetSelectableAppearanceDataList(ExtendSelectionState);
-    var inputMode = _parentView.InputObservables.CurrentInputMode;
+    string inputMode = _parentView.InputObservables.CurrentInputMode.Name;
     foreach (var selectableAppearanceData in selectableAppearanceDataList) {
       if (selectableAppearanceData.IsEnableInputMode(inputMode)) {
         selectableAppearanceData.Apply();
@@ -92,7 +92,7 @@ public class SelectableExtender {
     }
   }
 
-  private void OnChangeState(InputMode inputMode, ExtendSelectionState prevState, ExtendSelectionState nextState) {
+  private void OnChangeState(string inputMode, ExtendSelectionState prevState, ExtendSelectionState nextState) {
     var prevAppearanceDataList = _selectableAppearanceDictionary.GetSelectableAppearanceDataList(prevState);
     foreach (var selectableAppearanceData in prevAppearanceDataList) {
       if (selectableAppearanceData.IsEnableInputMode(inputMode)) {

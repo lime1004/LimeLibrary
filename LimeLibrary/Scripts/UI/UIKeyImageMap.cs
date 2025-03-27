@@ -1,5 +1,6 @@
 ﻿using System;
 using LimeLibrary.Input;
+using LimeLibrary.Input.InputController;
 using LimeLibrary.Module;
 using LimeLibrary.Utility;
 using UnityEngine;
@@ -14,58 +15,37 @@ public class UIKeyImageMap : ScriptableObject {
   private class InputBindingImageDictionary : SerializedDictionary<InputBindingType, Sprite> { }
 
   [Serializable]
-  private class ControllerInputBindingImageDictionary : SerializedDictionary<ControllerType, InputBindingImageDictionary> { }
+  private class ControllerInputBindingImageDictionary : SerializedDictionary<InputControllerType, InputBindingImageDictionary> { }
 
   [SerializeField]
-  private ControllerInputBindingImageDictionary _dictionary;
+  private InputBindingImageDictionary _defaultDictionary;
 
-  public bool ContainsImage(InputBindingType inputBindingType, ControllerType controllerType) {
-    return _dictionary.ContainsKey(controllerType) &&
-      _dictionary[controllerType].ContainsKey(inputBindingType);
+  [SerializeField]
+  private ControllerInputBindingImageDictionary _overwriteDictionary;
+
+  public bool ContainsImage(InputBindingType inputBindingType, InputControllerType controllerType) {
+    return _defaultDictionary.ContainsKey(inputBindingType) ||
+      (_overwriteDictionary.ContainsKey(controllerType) && _overwriteDictionary[controllerType].ContainsKey(inputBindingType));
   }
 
-  public bool ContainsImage(string inputBindingPath) {
-    foreach (var (_, dictionary) in _dictionary) {
-      foreach (var (bindingType, _) in dictionary) {
-        string path = InputBindingPath.Get(bindingType);
-        if (path == inputBindingPath) {
-          return true;
-        }
-      }
-    }
-    return false;
+  public bool ContainsImage(string inputBindingPath, InputControllerType controllerType) {
+    return ContainsImage(InputBindingPath.From(inputBindingPath), controllerType);
   }
 
-  public bool ContainsImage(string inputBindingPath, ControllerType controllerType) {
-    if (!_dictionary.ContainsKey(controllerType)) return false;
-    foreach (var (type, _) in _dictionary[controllerType]) {
-      string path = InputBindingPath.Get(type);
-      if (path == inputBindingPath) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public Sprite GetImage(InputBindingType inputBindingType, ControllerType controllerType) {
+  public Sprite GetImage(InputBindingType inputBindingType, InputControllerType controllerType) {
     if (!ContainsImage(inputBindingType, controllerType)) {
       Assertion.Assert(false, "Image is not registered. " + inputBindingType + ":" + controllerType);
       return null;
     }
-    return _dictionary[controllerType][inputBindingType];
+    if (_overwriteDictionary.ContainsKey(controllerType) && _overwriteDictionary[controllerType].ContainsKey(inputBindingType)) {
+      return _overwriteDictionary[controllerType][inputBindingType];
+    } else {
+      return _defaultDictionary[inputBindingType];
+    }
   }
 
-  public Sprite GetImage(string inputBindingPath, ControllerType controllerType) {
-    if (!_dictionary.ContainsKey(controllerType)) return null;
-    foreach (var (type, sprite) in _dictionary[controllerType]) {
-      string path = InputBindingPath.Get(type);
-      if (path == inputBindingPath) {
-        return sprite;
-      }
-    }
-
-    Assertion.Assert(false, "画像が登録されていません. " + inputBindingPath + ":" + controllerType);
-    return null;
+  public Sprite GetImage(string inputBindingPath, InputControllerType controllerType) {
+    return GetImage(InputBindingPath.From(inputBindingPath), controllerType);
   }
 }
 

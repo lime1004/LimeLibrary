@@ -23,7 +23,6 @@ public abstract class SelectableGroup {
   private bool _isSelectedByGamepad;
 
   public bool Enabled { get; set; } = true;
-  public bool IsSelectOnMouse { get; set; } = true;
   public bool IsLoop { get; set; }
   public int SelectedIndex => _selectedIndex;
   public Observable<SelectableData> OnSelectObservable => _onSelectSubject;
@@ -51,21 +50,12 @@ public abstract class SelectableGroup {
   private void SetupAutoSelect(IUIView parentView) {
     // 入力切り替え時処理登録
     parentView.InputObservables.OnChangeInputModeObservable.Subscribe(inputMode => {
-      switch (inputMode) {
-      case InputMode.MouseKeyboard:
-        if (!IsEnable()) return;
+      if (!IsEnable()) return;
 
-        if (IsSelectOnMouse) {
-          Select();
-        } else {
-          Deselect();
-        }
-        break;
-      case InputMode.Gamepad:
-        if (!IsEnable()) return;
-
+      if (inputMode.IsSelectOnChangeInputMode) {
         Select();
-        break;
+      } else {
+        Deselect();
       }
     }).AddTo(parentView.RootObject);
 
@@ -73,28 +63,16 @@ public abstract class SelectableGroup {
     parentView.EventObservables.GetObservable(UIViewEventType.Focus).Subscribe(_ => {
       if (!IsEnable()) return;
 
-      switch (parentView.InputObservables.CurrentInputMode) {
-      case InputMode.MouseKeyboard:
-        if (!IsSelectOnMouse) return;
+      if (parentView.InputObservables.CurrentInputMode.IsSelectOnFocusUIView) {
         Select();
-        break;
-      case InputMode.Gamepad:
-        Select();
-        break;
       }
     }).AddTo(parentView.RootObject);
 
     parentView.EventObservables.GetObservable(UIViewEventType.Unfocus).Subscribe(_ => {
       if (!IsEnable()) return;
 
-      switch (parentView.InputObservables.CurrentInputMode) {
-      case InputMode.Gamepad:
+      if (parentView.InputObservables.CurrentInputMode.IsDeselectOnUnfocusUIView) {
         Deselect();
-        break;
-      case InputMode.MouseKeyboard: {
-        if (!IsSelectOnMouse) Deselect();
-        break;
-      }
       }
     }).AddTo(parentView.RootObject);
   }

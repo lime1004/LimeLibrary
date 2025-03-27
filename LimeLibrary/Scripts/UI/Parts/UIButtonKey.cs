@@ -1,8 +1,10 @@
 ﻿using FastEnumUtility;
 using LimeLibrary.Extensions;
 using LimeLibrary.Input;
+using LimeLibrary.Input.InputMode;
 using LimeLibrary.UI.View;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 namespace LimeLibrary.UI.Parts {
@@ -39,24 +41,24 @@ public class UIButtonKey : MonoBehaviour, IUIParts {
     _isInitialized = true;
   }
 
-  public void BindInput(string inputBindingPath, InputMode inputMode, bool isOverwrite = false) {
+  public void BindInput(string inputBindingPath, string inputMode, bool isOverwrite = false) {
     if (isOverwrite) _uiButton.ClearInputBinding();
     BindInputInternal(inputBindingPath, inputMode);
   }
 
-  public void BindInput(InputBindingType inputBindingType, InputMode inputMode, bool isOverwrite = false) {
+  public void BindInput(InputBindingType inputBindingType, string inputMode, bool isOverwrite = false) {
     if (isOverwrite) _uiButton.ClearInputBinding();
     BindInputInternal(InputBindingPath.Get(inputBindingType), inputMode);
   }
 
   public void BindInput(InputAction inputAction, bool isOverwrite = false) {
     if (isOverwrite) _uiButton.ClearInputBinding();
-    foreach (var inputMode in FastEnum.GetValues<InputMode>()) {
-      BindInput(_inputBindingPathGetter.GetInputBindingPath(inputAction, inputMode), inputMode, false);
+    foreach (var inputMode in InputModeUpdater.Instance.InputModeList) {
+      BindInput(_inputBindingPathGetter.GetInputBindingPath(inputAction, inputMode), inputMode.Name, false);
     }
   }
 
-  private void BindInputInternal(string inputBindingPath, InputMode inputMode) {
+  private void BindInputInternal(string inputBindingPath, string inputMode) {
     if (string.IsNullOrEmpty(inputBindingPath)) return;
     _uiButton.AddInputBinding(inputBindingPath);
     _keyImage.BindInput(inputBindingPath, inputMode);

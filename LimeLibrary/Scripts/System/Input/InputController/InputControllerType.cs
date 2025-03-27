@@ -1,6 +1,6 @@
-﻿namespace LimeLibrary.Input {
+﻿namespace LimeLibrary.Input.InputController {
 
-public enum ControllerType {
+public enum InputControllerType {
   /// <summary>
   /// コントローラーなし
   /// </summary>

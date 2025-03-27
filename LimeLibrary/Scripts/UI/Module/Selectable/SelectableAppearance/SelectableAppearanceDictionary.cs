@@ -15,7 +15,7 @@ internal class SelectableAppearanceDictionary {
     }
   }
 
-  public void AddAppearance(ExtendSelectionState extendSelectionState, SelectableAppearance selectableAppearance, params InputMode[] enableInputModes) {
+  public void AddAppearance(ExtendSelectionState extendSelectionState, SelectableAppearance selectableAppearance, params string[] enableInputModes) {
     _dictionary[extendSelectionState].Add(new SelectableAppearanceData(selectableAppearance, enableInputModes));
   }
 

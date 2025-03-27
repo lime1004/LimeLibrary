@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using FastEnumUtility;
 using LimeLibrary.Extensions;
 using LimeLibrary.Input;
+using LimeLibrary.Input.InputMode;
 using LimeLibrary.UI.View;
 using LimeLibrary.Utility;
 using R3;
@@ -18,7 +18,7 @@ public class UIKeyImage : MonoBehaviour, IUIParts {
   [SerializeField]
   private InputBindingPathGetter _inputBindingPathGetter;
 
-  private readonly Dictionary<InputMode, string> _inputBindingPathDictionary = new();
+  private readonly Dictionary<string, string> _inputBindingPathDictionary = new();
 
   private Image _image;
   private bool _isInitialized;
@@ -35,17 +35,17 @@ public class UIKeyImage : MonoBehaviour, IUIParts {
 
     _image = GetComponent<Image>();
 
-    foreach (var inputMode in FastEnum.GetValues<InputMode>()) {
-      _inputBindingPathDictionary.Add(inputMode, null);
+    foreach (var inputMode in InputModeUpdater.Instance.InputModeList) {
+      _inputBindingPathDictionary.Add(inputMode.Name, null);
     }
 
     // InputMode変更時の処理
-    parentView.InputObservables.OnChangeInputModeObservable.Subscribe(ApplyImage).AddTo(this);
+    parentView.InputObservables.OnChangeInputModeObservable.Subscribe(inputMode => ApplyImage(inputMode.Name)).AddTo(this);
 
     // View表示時処理登録
     parentView.OnShowEndObservable.Subscribe(_ => {
       var currentInputMode = parentView.InputObservables.CurrentInputMode;
-      ApplyImage(currentInputMode);
+      ApplyImage(currentInputMode.Name);
     }).AddTo(this);
 
     _isInitialized = true;
@@ -55,10 +55,10 @@ public class UIKeyImage : MonoBehaviour, IUIParts {
     _image = image;
   }
 
-  public void BindInput(string inputBindingPath, InputMode inputMode) {
+  public void BindInput(string inputBindingPath, string inputMode) {
     _inputBindingPathDictionary[inputMode] = inputBindingPath;
 
-    ApplyImage(ParentView.InputObservables.CurrentInputMode);
+    ApplyImage(ParentView.InputObservables.CurrentInputMode.Name);
   }
 
   public void BindInput(InputAction inputAction) {
@@ -67,16 +67,16 @@ public class UIKeyImage : MonoBehaviour, IUIParts {
       return;
     }
 
-    foreach (var inputMode in FastEnum.GetValues<InputMode>()) {
-      BindInput(_inputBindingPathGetter.GetInputBindingPath(inputAction, inputMode), inputMode);
+    foreach (var inputMode in InputModeUpdater.Instance.InputModeList) {
+      BindInput(_inputBindingPathGetter.GetInputBindingPath(inputAction, inputMode), inputMode.Name);
     }
   }
 
-  public void BindInput(InputBindingType inputBindingType, InputMode inputMode) {
+  public void BindInput(InputBindingType inputBindingType, string inputMode) {
     BindInput(InputBindingPath.Get(inputBindingType), inputMode);
   }
 
-  private void ApplyImage(InputMode inputMode) {
+  private void ApplyImage(string inputMode) {
     if (_image == null) return;
 
     string inputBindingPath = _inputBindingPathDictionary[inputMode];
