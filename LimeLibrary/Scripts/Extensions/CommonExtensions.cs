@@ -36,7 +36,7 @@ public static class CommonExtensions {
   /// 指定されたインデックスに要素が存在するか
   /// </summary>
   public static bool IsDefinedAt<T>(this IReadOnlyCollection<T> list, int index) {
-    return index < list.Count;
+    return index >= 0 && index < list.Count;
   }
 
   /// <summary>
