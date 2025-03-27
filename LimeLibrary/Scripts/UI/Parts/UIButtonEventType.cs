@@ -3,6 +3,9 @@
 public enum UIButtonEventType {
   Click,
   Select,
+  PointerLeftClick,
+  PointerRightClick,
+  PointerMiddleClick,
   PointerEnter,
   PointerExit,
   PointerDown,

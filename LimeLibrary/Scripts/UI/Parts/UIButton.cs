@@ -13,7 +13,7 @@ using UnityEngine.UI;
 namespace LimeLibrary.UI.Parts {
 
 [RequireComponent(typeof(Button))]
-public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler, ISubmitHandler {
+public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler, ISubmitHandler {
   private InputAction _inputAction;
 
   private readonly Dictionary<UIButtonEventType, Subject<BaseEventData>> _eventSubjects = new();
@@ -29,7 +29,7 @@ public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerEnterHa
   public RectTransform RectTransform => transform.AsRectTransform();
   public IUIView ParentView { get; private set; }
 
-  public UnityEngine.UI.Button Button { get; private set; }
+  public Button Button { get; private set; }
   public TextMeshProUGUI Text { get; private set; }
 
   public float LongPressSeconds { get; set; } = 1f;
@@ -41,7 +41,7 @@ public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerEnterHa
     if (_isInitialized) return;
 
     ParentView = parentView;
-    Button = GetComponent<UnityEngine.UI.Button>();
+    Button = GetComponent<Button>();
     Text = GetComponentInChildren<TextMeshProUGUI>(true);
 
     Button.OnClickAsObservable().Subscribe(_ => {
@@ -175,6 +175,18 @@ public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerEnterHa
   public void OnSelect(BaseEventData eventData) {
     if (!IsEnable()) return;
     _eventSubjects[UIButtonEventType.Select].OnNext(eventData);
+  }
+
+  public void OnPointerClick(PointerEventData eventData) {
+    if (!IsEnable()) return;
+
+    UIButtonEventType? eventType = eventData.button switch {
+      PointerEventData.InputButton.Left => UIButtonEventType.PointerLeftClick,
+      PointerEventData.InputButton.Right => UIButtonEventType.PointerRightClick,
+      PointerEventData.InputButton.Middle => UIButtonEventType.PointerMiddleClick,
+      _ => null
+    };
+    if (eventType.HasValue) _eventSubjects[eventType.Value].OnNext(eventData);
   }
 
   public void OnPointerEnter(PointerEventData eventData) {
