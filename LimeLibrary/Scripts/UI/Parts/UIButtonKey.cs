@@ -39,18 +39,18 @@ public class UIButtonKey : MonoBehaviour, IUIParts {
     _isInitialized = true;
   }
 
-  public void BindInput(string inputBindingPath, InputMode inputMode, bool isClear = true) {
-    if (isClear) _uiButton.ClearInputBinding();
+  public void BindInput(string inputBindingPath, InputMode inputMode, bool isOverwrite = false) {
+    if (isOverwrite) _uiButton.ClearInputBinding();
     BindInputInternal(inputBindingPath, inputMode);
   }
 
-  public void BindInput(InputBindingType inputBindingType, InputMode inputMode) {
-    _uiButton.ClearInputBinding();
+  public void BindInput(InputBindingType inputBindingType, InputMode inputMode, bool isOverwrite = false) {
+    if (isOverwrite) _uiButton.ClearInputBinding();
     BindInputInternal(InputBindingPath.Get(inputBindingType), inputMode);
   }
 
-  public void BindInput(InputAction inputAction) {
-    _uiButton.ClearInputBinding();
+  public void BindInput(InputAction inputAction, bool isOverwrite = false) {
+    if (isOverwrite) _uiButton.ClearInputBinding();
     foreach (var inputMode in FastEnum.GetValues<InputMode>()) {
       BindInput(_inputBindingPathGetter.GetInputBindingPath(inputAction, inputMode), inputMode, false);
     }
