@@ -45,7 +45,7 @@ public class ImGuiSearchBox {
       UpdateResultList();
     }
 
-    if (ImGuiNET.ImGui.BeginListBox("", ListBoxSize)) {
+    if (ImGuiNET.ImGui.BeginListBox($"##{_label}ListBox", ListBoxSize)) {
       for (int n = 0; n < _resultList.Count; n++) {
         if (ImGuiNET.ImGui.Selectable(_resultList[n], false)) {
           _inputText = _resultList[n];
