@@ -26,6 +26,9 @@ public class DefaultGamepad : InputModeScriptableObject {
 
   public override void OnExitInputMode() { }
 
+  public override void OnUpdate() { }
+  public override void OnLateUpdate() { }
+
   public override string[] GetControlPaths() {
     return new[] {
       nameof(Gamepad),
