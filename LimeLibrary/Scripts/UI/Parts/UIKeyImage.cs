@@ -45,6 +45,7 @@ public class UIKeyImage : MonoBehaviour, IUIParts {
     // View表示時処理登録
     parentView.OnShowEndObservable.Subscribe(_ => {
       var currentInputMode = parentView.InputObservables.CurrentInputMode;
+      if (currentInputMode == null) return;
       ApplyImage(currentInputMode.Name);
     }).AddTo(this);
 
@@ -58,7 +59,10 @@ public class UIKeyImage : MonoBehaviour, IUIParts {
   public void BindInput(string inputBindingPath, string inputMode) {
     _inputBindingPathDictionary[inputMode] = inputBindingPath;
 
-    ApplyImage(ParentView.InputObservables.CurrentInputMode.Name);
+    var currentInputMode = ParentView.InputObservables.CurrentInputMode;
+    if (currentInputMode == null) return;
+
+    ApplyImage(currentInputMode.Name);
   }
 
   public void BindInput(InputAction inputAction) {

@@ -50,7 +50,9 @@ public class SelectableExtender {
     // 状態変更時処理
     OnChangeExtendSelectionState.Subscribe(_parentView, (states, view) => {
       var (prevState, nextState) = states;
-      OnChangeState(view.InputObservables.CurrentInputMode.Name, prevState, nextState);
+      var currentInputMode = view.InputObservables.CurrentInputMode;
+      if (currentInputMode == null) return;
+      OnChangeState(currentInputMode.Name, prevState, nextState);
     }).AddTo(_compositeDisposable);
 
     // InputMode変更時処理
@@ -84,9 +86,10 @@ public class SelectableExtender {
 
   public void ApplySelectableAppearance() {
     var selectableAppearanceDataList = _selectableAppearanceDictionary.GetSelectableAppearanceDataList(ExtendSelectionState);
-    string inputMode = _parentView.InputObservables.CurrentInputMode.Name;
+    var currentInputMode = _parentView.InputObservables.CurrentInputMode;
+    if (currentInputMode == null) return;
     foreach (var selectableAppearanceData in selectableAppearanceDataList) {
-      if (selectableAppearanceData.IsEnableInputMode(inputMode)) {
+      if (selectableAppearanceData.IsEnableInputMode(currentInputMode.Name)) {
         selectableAppearanceData.Apply();
       }
     }

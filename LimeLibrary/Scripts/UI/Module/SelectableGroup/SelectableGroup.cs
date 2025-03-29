@@ -63,7 +63,10 @@ public abstract class SelectableGroup {
     parentView.EventObservables.GetObservable(UIViewEventType.Focus).Subscribe(_ => {
       if (!IsEnable()) return;
 
-      if (parentView.InputObservables.CurrentInputMode.IsSelectOnFocusUIView) {
+      var currentInputMode = parentView.InputObservables.CurrentInputMode;
+      if (currentInputMode == null) return;
+
+      if (currentInputMode.IsSelectOnFocusUIView) {
         Select();
       }
     }).AddTo(parentView.RootObject);
@@ -71,7 +74,10 @@ public abstract class SelectableGroup {
     parentView.EventObservables.GetObservable(UIViewEventType.Unfocus).Subscribe(_ => {
       if (!IsEnable()) return;
 
-      if (parentView.InputObservables.CurrentInputMode.IsDeselectOnUnfocusUIView) {
+      var currentInputMode = parentView.InputObservables.CurrentInputMode;
+      if (currentInputMode == null) return;
+
+      if (currentInputMode.IsDeselectOnUnfocusUIView) {
         Deselect();
       }
     }).AddTo(parentView.RootObject);
