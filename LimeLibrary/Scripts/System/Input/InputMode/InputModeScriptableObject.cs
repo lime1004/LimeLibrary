@@ -21,6 +21,10 @@ public abstract class InputModeScriptableObject : ScriptableObject, IInputMode {
 
   public abstract void OnEnterInputMode();
   public abstract void OnExitInputMode();
+
+  public abstract void OnUpdate();
+  public abstract void OnLateUpdate();
+
   public abstract string[] GetControlPaths();
 
 }

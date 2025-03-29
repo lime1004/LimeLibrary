@@ -91,6 +91,18 @@ public class InputModeUpdater : SingletonMonoBehaviour<InputModeUpdater> {
     _onUseDeviceSubject.OnNext(device);
 #endif
   }
+
+  private void Update() {
+    if (_inputModeList.IsDefinedAt(_currentInputModeIndex)) {
+      _inputModeList[_currentInputModeIndex].OnUpdate();
+    }
+  }
+
+  private void LateUpdate() {
+    if (_inputModeList.IsDefinedAt(_currentInputModeIndex)) {
+      _inputModeList[_currentInputModeIndex].OnLateUpdate();
+    }
+  }
 }
 #endif
 
