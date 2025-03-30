@@ -17,6 +17,8 @@ public class UIKeyImage : MonoBehaviour, IUIParts {
   private UIKeyImageMap _uiKeyImageDictionary;
   [SerializeField]
   private InputBindingPathGetter _inputBindingPathGetter;
+  [SerializeField]
+  private InputAction _bindInputAction;
 
   private readonly Dictionary<string, string> _inputBindingPathDictionary = new();
 
@@ -48,6 +50,11 @@ public class UIKeyImage : MonoBehaviour, IUIParts {
       if (currentInputMode == null) return;
       ApplyImage(currentInputMode.Name);
     }).AddTo(this);
+
+    // InputActionが設定されている場合はInputActionをバインド
+    if (_bindInputAction != null) {
+      BindInput(_bindInputAction);
+    }
 
     _isInitialized = true;
   }
