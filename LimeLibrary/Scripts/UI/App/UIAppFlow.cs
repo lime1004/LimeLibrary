@@ -69,6 +69,8 @@ public abstract class UIAppFlow<TState, TContext> where TState : Enum where TCon
 
       try {
         _dictionary[_state].PrevState = _prevState;
+        _dictionary[_state].CurrentState = _state;
+
         _prevState = _state;
         _state = await _dictionary[_state].Execute();
       } catch (OperationCanceledException) {

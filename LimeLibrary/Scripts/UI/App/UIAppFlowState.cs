@@ -11,6 +11,7 @@ public abstract class UIAppFlowState<TState, TContext> where TState : Enum where
   protected CancellationToken CancellationToken => Context.CancellationTokenSource.Token;
 
   public TContext Context { get; set; }
+  public TState CurrentState { get; set; }
   public TState PrevState { get; set; }
 
   public abstract void Initialize();
