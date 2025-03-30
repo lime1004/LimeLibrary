@@ -18,7 +18,7 @@ public class UIKeyImage : MonoBehaviour, IUIParts {
   [SerializeField]
   private InputBindingPathGetter _inputBindingPathGetter;
   [SerializeField]
-  private InputAction _bindInputAction;
+  private InputActionReference _bindInputAction;
 
   private readonly Dictionary<string, string> _inputBindingPathDictionary = new();
 
