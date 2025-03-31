@@ -24,6 +24,10 @@ public class UIText : MonoBehaviour, IUIParts {
     _isInitialized = true;
   }
 
+  public string GetText() {
+    return Text.text;
+  }
+
   public void SetText(string text) {
     text ??= string.Empty;
 
