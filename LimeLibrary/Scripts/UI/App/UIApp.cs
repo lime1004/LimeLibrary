@@ -98,10 +98,10 @@ public abstract class UIApp : MonoBehaviour, IUI {
 
   public async UniTask ShowDialog(IUIView view, UIDialogOption dialogOption, CancellationToken cancellationToken) => await _dialogController.Show(view, dialogOption, cancellationToken);
 
-  public void CreateFlow<TFlow>(Func<TFlow> createFunc, bool isStartOnFirstShow = true) where TFlow : IUIAppFlow {
+  public void CreateFlow<TFlow>(Func<UIApp, TFlow> createFunc, bool isStartOnFirstShow = true) where TFlow : IUIAppFlow {
     if (createFunc == null) return;
 
-    var flow = createFunc();
+    var flow = createFunc(this);
 
     if (isStartOnFirstShow) {
       EventObservables.GetObservable(UIAppEventType.ShowStart).Take(1).Subscribe(flow, (_, flow) => {
