@@ -8,7 +8,7 @@ using LimeLibrary.Utility;
 
 namespace LimeLibrary.UI {
 
-public abstract class UIAppFlow<TState, TContext> where TState : Enum where TContext : UIAppFlowContext, new() {
+public abstract class UIAppFlow<TState, TContext> : IUIAppFlow where TState : Enum where TContext : UIAppFlowContext, new() {
   private readonly Dictionary<TState, UIAppFlowState<TState, TContext>> _dictionary = new();
   private readonly UIApp _uiApp;
   private readonly CancellationTokenSource _cancellationTokenSource;

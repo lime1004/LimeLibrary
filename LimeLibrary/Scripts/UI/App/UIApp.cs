@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using LimeLibrary.Extensions;
 using LimeLibrary.Text;
 using LimeLibrary.UI.Dialog;
 using LimeLibrary.UI.View;
@@ -96,6 +97,18 @@ public abstract class UIApp : MonoBehaviour, IUI {
   }
 
   public async UniTask ShowDialog(IUIView view, UIDialogOption dialogOption, CancellationToken cancellationToken) => await _dialogController.Show(view, dialogOption, cancellationToken);
+
+  public void CreateFlow<TFlow>(Func<TFlow> createFunc, bool isStartOnFirstShow = true) where TFlow : IUIAppFlow {
+    if (createFunc == null) return;
+
+    var flow = createFunc();
+
+    if (isStartOnFirstShow) {
+      EventObservables.GetObservable(UIAppEventType.ShowStart).Take(1).Subscribe(flow, (_, flow) => {
+        flow.Start().RunHandlingError().Forget();
+      }).AddTo(this);
+    }
+  }
 
   private void OnDestroy() => _controller.Destroy(IsApplicationQuitting);
   private void OnApplicationQuit() => IsApplicationQuitting = true;
