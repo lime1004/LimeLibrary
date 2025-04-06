@@ -40,14 +40,6 @@ public abstract class SelectableGroup {
       break;
     }
 
-    parentView.OnHideEndObservable.Subscribe(_ => Deselect()).AddTo(parentView.RootObject);
-  }
-
-  private bool IsEnable() {
-    return Enabled && _parentView.IsEnable();
-  }
-
-  private void SetupAutoSelect(IUIView parentView) {
     // 入力切り替え時処理登録
     parentView.InputObservables.OnChangeInputModeObservable.Subscribe(inputMode => {
       if (!IsEnable()) return;
@@ -59,6 +51,14 @@ public abstract class SelectableGroup {
       }
     }).AddTo(parentView.RootObject);
 
+    parentView.OnHideEndObservable.Subscribe(_ => Deselect()).AddTo(parentView.RootObject);
+  }
+
+  private bool IsEnable() {
+    return Enabled && _parentView.IsEnable();
+  }
+
+  private void SetupAutoSelect(IUIView parentView) {
     // Focus変更時処理登録
     parentView.EventObservables.GetObservable(UIViewEventType.Focus).Subscribe(_ => {
       if (!IsEnable()) return;
