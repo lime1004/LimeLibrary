@@ -44,7 +44,7 @@ internal class UIViewController {
 
   public async UniTask Show(UIViewShowOption showOption, CancellationToken cancellationToken) {
     if (State is UIViewState.Show or UIViewState.Showing && !showOption.IsForce) {
-      if (showOption.IsFocus) Focus();
+      if (showOption.FocusMode is not UIViewFocusMode.None) Focus();
       return;
     }
 
@@ -66,7 +66,10 @@ internal class UIViewController {
 
     State = UIViewState.Show;
 
-    if (showOption.IsFocus) Focus();
+    if (showOption.FocusMode is not UIViewFocusMode.None) {
+      if (showOption.FocusMode is UIViewFocusMode.FocusNextFrame) await UniTask.NextFrame(cancellationToken: mergedTokenSource.Token);
+      Focus();
+    }
 
     _eventNotifier.Notify(UIViewEventType.ShowEnd);
   }

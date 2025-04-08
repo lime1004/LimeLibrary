@@ -68,7 +68,7 @@ internal class UIAppController {
     foreach (var view in _showViews) {
       showTask.Add(view.Show(new UIViewShowOption {
         IsImmediate = showOption.IsImmediate,
-        IsFocus = false,
+        FocusMode = UIViewFocusMode.None,
       }, mergedTokenSource.Token));
     }
     await showTask;
