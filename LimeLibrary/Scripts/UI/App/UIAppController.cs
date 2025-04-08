@@ -68,16 +68,22 @@ internal class UIAppController {
     foreach (var view in _showViews) {
       showTask.Add(view.Show(new UIViewShowOption {
         IsImmediate = showOption.IsImmediate,
-        FocusMode = UIViewFocusMode.None,
+        FocusMode = UIFocusMode.None,
       }, mergedTokenSource.Token));
     }
     await showTask;
 
     // フォーカス処理
-    var focusOrderedViews = _showViews.OrderBy(view => view.AdvanceSettings.FocusPriority).ToList();
-    foreach (var view in focusOrderedViews) {
-      if (view == focusOrderedViews[0]) view.Focus();
-      else view.Unfocus();
+    if (showOption.FocusMode is not UIFocusMode.None) {
+      if (showOption.FocusMode is UIFocusMode.FocusNextFrame) {
+        await UniTask.NextFrame(cancellationToken: cancellationToken);
+      }
+
+      var focusOrderedViews = _showViews.OrderBy(view => view.AdvanceSettings.FocusPriority).ToList();
+      foreach (var view in focusOrderedViews) {
+        if (view == focusOrderedViews[0]) view.Focus();
+        else view.Unfocus();
+      }
     }
 
     State = UIAppState.Show;
