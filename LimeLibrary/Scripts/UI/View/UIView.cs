@@ -72,6 +72,8 @@ public abstract class UIView : MonoBehaviour, IUIView {
       Animator.PlayImmediate(animationIdGetter.DefaultAnimationID);
     }
 
+    await OnInitialize(cancellationToken);
+
     // 初期化時挙動の実行
     switch (_initializeBehaviour) {
     case UIInitializeBehaviour.Hide:
@@ -84,8 +86,6 @@ public abstract class UIView : MonoBehaviour, IUIView {
       Assertion.Assert(false, _initializeBehaviour);
       break;
     }
-
-    await OnInitialize(cancellationToken);
 
     IsInitialized = true;
   }
