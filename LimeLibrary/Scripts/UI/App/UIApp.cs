@@ -98,8 +98,8 @@ public abstract class UIApp : MonoBehaviour, IUI {
 
   public async UniTask ShowDialog(IUIView view, UIDialogOption dialogOption, CancellationToken cancellationToken) => await _dialogController.Show(view, dialogOption, cancellationToken);
 
-  public void CreateFlow<TFlow>(Func<UIApp, TFlow> createFunc, bool isStartOnFirstShow = true) where TFlow : IUIAppFlow {
-    if (createFunc == null) return;
+  public TFlow CreateFlow<TFlow>(Func<UIApp, TFlow> createFunc, bool isStartOnFirstShow = true) where TFlow : class, IUIAppFlow {
+    if (createFunc == null) return null;
 
     var flow = createFunc(this);
 
@@ -108,6 +108,8 @@ public abstract class UIApp : MonoBehaviour, IUI {
         flow.Start().RunHandlingError().Forget();
       }).AddTo(this);
     }
+
+    return flow;
   }
 
   private void OnDestroy() => _controller.Destroy(IsApplicationQuitting);
