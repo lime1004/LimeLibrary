@@ -216,7 +216,12 @@ public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerClickHa
     _eventSubjects[UIButtonEventType.Submit].OnNext(eventData);
   }
 
+  private bool _disposed;
+
   public void Dispose() {
+    if (_disposed) return;
+    _disposed = true;
+
     if (_inputAction != null) {
       _inputAction.performed -= OnPerformed;
       _inputAction.Dispose();
