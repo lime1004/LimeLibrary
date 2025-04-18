@@ -13,7 +13,7 @@ using UnityEngine.UI;
 namespace LimeLibrary.UI.Parts {
 
 [RequireComponent(typeof(Button))]
-public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler, ISubmitHandler {
+public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler, ISubmitHandler, IDisposable {
   private InputAction _inputAction;
 
   private readonly Dictionary<UIButtonEventType, Subject<BaseEventData>> _eventSubjects = new();
@@ -40,6 +40,8 @@ public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerClickHa
   public void Initialize(IUIView parentView) {
     if (_isInitialized) return;
 
+    _compositeDisposable.Clear();
+
     ParentView = parentView;
     Button = GetComponent<Button>();
     Text = GetComponentInChildren<TextMeshProUGUI>(true);
@@ -58,14 +60,13 @@ public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerClickHa
 
   private void InitializeInputAction() {
     _inputAction?.Dispose();
-    _compositeDisposable?.Clear();
 
     _inputAction = new InputAction("Button", InputActionType.Button);
     _inputAction.Enable();
     _inputAction.performed += OnPerformed;
 
-    ParentView.EventObservables.GetObservable(UIViewEventType.Focus).Subscribe(_ => _inputAction.Enable()).AddTo(this).AddTo(_compositeDisposable);
-    ParentView.EventObservables.GetObservable(UIViewEventType.Unfocus).Subscribe(_ => _inputAction.Disable()).AddTo(this).AddTo(_compositeDisposable);
+    ParentView.EventObservables.GetObservable(UIViewEventType.Focus).Subscribe(_ => _inputAction.Enable()).AddTo(_compositeDisposable);
+    ParentView.EventObservables.GetObservable(UIViewEventType.Unfocus).Subscribe(_ => _inputAction.Disable()).AddTo(_compositeDisposable);
   }
 
   public void SetClickEnabledFunc(Func<bool> func) {
@@ -85,12 +86,7 @@ public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerClickHa
   }
 
   private void OnDestroy() {
-    if (_inputAction == null) return;
-
-    _inputAction.performed -= OnPerformed;
-    _inputAction.Dispose();
-
-    _compositeDisposable.Dispose();
+    Dispose();
   }
 
   public void Click() {
@@ -113,7 +109,9 @@ public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerClickHa
     _eventSubjects.Clear();
 
     foreach (UIButtonEventType eventType in Enum.GetValues(typeof(UIButtonEventType))) {
-      _eventSubjects.Add(eventType, new Subject<BaseEventData>());
+      var subject = new Subject<BaseEventData>();
+      subject.AddTo(_compositeDisposable);
+      _eventSubjects.Add(eventType, subject);
     }
   }
 
@@ -216,6 +214,15 @@ public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerClickHa
   public void OnSubmit(BaseEventData eventData) {
     if (!IsEnable()) return;
     _eventSubjects[UIButtonEventType.Submit].OnNext(eventData);
+  }
+
+  public void Dispose() {
+    if (_inputAction != null) {
+      _inputAction.performed -= OnPerformed;
+      _inputAction.Dispose();
+    }
+
+    _compositeDisposable.Dispose();
   }
 }
 
