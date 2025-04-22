@@ -3,6 +3,10 @@ using LimeLibrary.UI.View;
 using TMPro;
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace LimeLibrary.UI.Parts {
 
 [RequireComponent(typeof(TextMeshProUGUI))]
@@ -51,6 +55,19 @@ public class UIText : MonoBehaviour, IUIParts {
   public void SetFont(TMP_FontAsset fontAsset) {
     Text.font = fontAsset;
   }
+
+#if UNITY_EDITOR
+  [MenuItem("GameObject/UI/UIText")]
+  public static void CreateUIText() {
+    var activeGameObject = Selection.activeGameObject;
+
+    var createGameObject = new GameObject();
+    createGameObject.name = "UIText";
+    createGameObject.transform.SetParent(activeGameObject.transform, false);
+    createGameObject.AddComponent<TextMeshProUGUI>();
+    createGameObject.AddComponent<UIText>();
+  }
+#endif
 }
 
 }
