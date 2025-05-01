@@ -2,6 +2,7 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using LimeLibrary.Event.Core;
+using LimeLibrary.Extensions;
 using LimeLibrary.Resource;
 
 namespace LimeLibrary.Event.Events {
@@ -21,7 +22,7 @@ public class ExecuteScriptableEvent : AbstractEvent {
   public override void Start() {
     base.Start();
 
-    _executeTask = _scriptableEventResource.Resource.Execute(CancellationToken);
+    _executeTask = _scriptableEventResource.Resource.Execute(CancellationToken).RunHandlingError();
   }
 
   public override EventUpdateResult Update() {
