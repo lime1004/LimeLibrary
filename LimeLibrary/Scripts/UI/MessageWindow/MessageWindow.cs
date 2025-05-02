@@ -8,7 +8,7 @@ public class MessageWindow : MonoBehaviour {
   [SerializeField]
   private Canvas _canvas;
   [SortingLayer]
-  private SortingLayer _sortingLayer;
+  private int _sortingLayer;
   [SerializeField]
   private MessageMainWindow _messageMainWindow;
   [SerializeField]
@@ -28,7 +28,7 @@ public class MessageWindow : MonoBehaviour {
 
     // Canvas
     _canvas.worldCamera = uiCamera;
-    _canvas.sortingLayerName = _sortingLayer.name;
+    _canvas.sortingLayerID = _sortingLayer;
 
     // 各パーツ
     var cancellationToken = gameObject.GetCancellationTokenOnDestroy();
