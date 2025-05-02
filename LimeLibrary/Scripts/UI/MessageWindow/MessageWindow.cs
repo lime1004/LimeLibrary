@@ -7,7 +7,7 @@ namespace LimeLibrary.UI.MessageWindow {
 public class MessageWindow : MonoBehaviour {
   [SerializeField]
   private Canvas _canvas;
-  [SortingLayer]
+  [SerializeField, SortingLayer]
   private int _sortingLayer;
   [SerializeField]
   private MessageMainWindow _messageMainWindow;
