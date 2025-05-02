@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using LimeLibrary.Attribute;
 using UnityEngine;
 
 namespace LimeLibrary.UI.MessageWindow {
@@ -6,6 +7,8 @@ namespace LimeLibrary.UI.MessageWindow {
 public class MessageWindow : MonoBehaviour {
   [SerializeField]
   private Canvas _canvas;
+  [SortingLayer]
+  private SortingLayer _sortingLayer;
   [SerializeField]
   private MessageMainWindow _messageMainWindow;
   [SerializeField]
@@ -25,7 +28,7 @@ public class MessageWindow : MonoBehaviour {
 
     // Canvas
     _canvas.worldCamera = uiCamera;
-    _canvas.sortingLayerName = "UI";
+    _canvas.sortingLayerName = _sortingLayer.name;
 
     // 各パーツ
     var cancellationToken = gameObject.GetCancellationTokenOnDestroy();
@@ -34,6 +37,14 @@ public class MessageWindow : MonoBehaviour {
       _keyWait.Initialize(cancellationToken),
       _choiceWindow.Initialize(cancellationToken),
       _speakerWindow.Initialize(cancellationToken));
+  }
+
+  public void SetCanvasSortingLayer(string sortingLayerName) {
+    _canvas.sortingLayerID = SortingLayer.NameToID(sortingLayerName);
+  }
+
+  public void SetCanvasSortingOrder(int sortingOrder) {
+    _canvas.sortingOrder = sortingOrder;
   }
 }
 
