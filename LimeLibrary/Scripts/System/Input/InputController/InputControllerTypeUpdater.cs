@@ -1,4 +1,4 @@
-﻿using LimeLibrary.Attribute;
+﻿using LimeLibrary.Attributes;
 using LimeLibrary.Module;
 using UnityEngine;
 using UnityEngine.InputSystem;

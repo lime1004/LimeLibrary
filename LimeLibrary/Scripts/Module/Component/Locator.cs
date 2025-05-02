@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using LimeLibrary.Attribute;
+using LimeLibrary.Attributes;
 using LimeLibrary.Extensions;
 using UnityEngine;
 #if UNITY_EDITOR

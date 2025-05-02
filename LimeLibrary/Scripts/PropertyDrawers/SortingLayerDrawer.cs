@@ -1,12 +1,12 @@
 ﻿#if UNITY_EDITOR
-using LimeLibrary.Attribute;
+using LimeLibrary.Attributes;
 using UnityEngine;
 using UnityEditor;
 
-namespace LimeLibrary.PropertyDrawer {
+namespace LimeLibrary.PropertyDrawers {
 
 [CustomPropertyDrawer(typeof(SortingLayerAttribute))]
-public class SortingLayerDrawer : UnityEditor.PropertyDrawer {
+public class SortingLayerDrawer : PropertyDrawer {
   public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
     if (property.propertyType == SerializedPropertyType.Integer) {
       string[] layerNames = GetSortingLayerNames();

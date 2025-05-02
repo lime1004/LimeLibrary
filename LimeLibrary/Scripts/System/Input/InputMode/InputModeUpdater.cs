@@ -7,7 +7,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using LimeLibrary.Attribute;
+using LimeLibrary.Attributes;
 using LimeLibrary.Extensions;
 using LimeLibrary.Module;
 using R3;

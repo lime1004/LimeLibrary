@@ -1,9 +1,7 @@
-﻿using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+﻿using UnityEditor;
+using UnityEngine;
 
-namespace LimeLibrary.Attribute {
+namespace LimeLibrary.Attributes {
 
 public class ReadOnlyAttribute : PropertyAttribute { }
 

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace LimeLibrary.Attribute {
+namespace LimeLibrary.Attributes {
 
 public class SortingLayerAttribute : PropertyAttribute { }
 

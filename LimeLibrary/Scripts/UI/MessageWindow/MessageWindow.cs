@@ -1,5 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
-using LimeLibrary.Attribute;
+using LimeLibrary.Attributes;
 using UnityEngine;
 
 namespace LimeLibrary.UI.MessageWindow {
