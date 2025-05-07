@@ -12,16 +12,21 @@ namespace LimeLibrary.Module {
 public class RandomInstance {
   private readonly Random _random;
 
+  public int Seed { get; }
+  public int Count { get; private set; }
+
   public RandomInstance() : this(RandomUtility.ValueInt()) { }
 
   public RandomInstance(int seed) {
     _random = new Random(seed);
+    Seed = seed;
   }
 
   /// <summary>
   /// 値取得
   /// </summary>
   public int Value() {
+    Count++;
     return _random.Next();
   }
 
@@ -30,6 +35,7 @@ public class RandomInstance {
   /// n < max
   /// </summary>
   public int Next(int max) {
+    Count++;
     return _random.Next(max);
   }
 
@@ -38,6 +44,7 @@ public class RandomInstance {
   /// min <= n < max
   /// </summary>
   public int Range(int min, int max) {
+    Count++;
     return _random.Next(min, max);
   }
 
@@ -46,6 +53,7 @@ public class RandomInstance {
   /// range.x <= n <= range.y
   /// </summary>
   public int Range(Vector2Int range, bool isInclusiveY = true) {
+    Count++;
     return isInclusiveY ? _random.Next(range.x, range.y + 1) : _random.Next(range.x, range.y);
   }
 
@@ -54,6 +62,7 @@ public class RandomInstance {
   /// min <= n < max
   /// </summary>
   public float Range(float min, float max) {
+    Count++;
     float sub = max - min;
     float rand = (float) _random.NextDouble();
     return min + sub * rand;
