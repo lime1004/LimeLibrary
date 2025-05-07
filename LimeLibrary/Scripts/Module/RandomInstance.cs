@@ -10,7 +10,7 @@ namespace LimeLibrary.Module {
 /// インスタンス化できる乱数クラス
 /// </summary>
 public class RandomInstance {
-  private readonly Random _random;
+  private Random _random;
 
   public int Seed { get; }
   public int Count { get; private set; }
@@ -20,6 +20,24 @@ public class RandomInstance {
   public RandomInstance(int seed) {
     _random = new Random(seed);
     Seed = seed;
+  }
+
+  public RandomInstance(int seed, int count) {
+    _random = new Random(seed);
+    Seed = seed;
+    SetCount(count);
+  }
+
+  public RandomInstance(RandomInstance randomInstance) {
+    _random = new Random(randomInstance.Seed);
+    Seed = randomInstance.Seed;
+    SetCount(randomInstance.Count);
+  }
+
+  public void SetCount(int count) {
+    _random = new Random(Seed);
+    Count = 0;
+    for (int i = 0; i < count; i++) Value();
   }
 
   /// <summary>
