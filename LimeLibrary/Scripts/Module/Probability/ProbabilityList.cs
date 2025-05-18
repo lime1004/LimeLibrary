@@ -13,7 +13,7 @@ namespace LimeLibrary.Module {
 public class ProbabilityList<T> {
   [SerializeField, LabelText("確率リスト"), OnValueChanged("SetProbabilityParameterParameter", true)]
   private List<Probability<T>> _probabilityList = new();
-  public IReadOnlyList<Probability<T>> List => _probabilityList;
+  public List<Probability<T>> List => _probabilityList;
 
   public T Lottery(RandomInstance randomInstance = null) {
     return _probabilityList.Lottery(randomInstance);
