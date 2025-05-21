@@ -1,10 +1,10 @@
-﻿#if UNITY_EDITOR
-using LimeLibrary.Attributes;
+﻿using LimeLibrary.Attributes;
 using UnityEngine;
 using UnityEditor;
 
 namespace LimeLibrary.PropertyDrawers {
 
+#if UNITY_EDITOR
 [CustomPropertyDrawer(typeof(SortingLayerAttribute))]
 public class SortingLayerDrawer : PropertyDrawer {
   public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
