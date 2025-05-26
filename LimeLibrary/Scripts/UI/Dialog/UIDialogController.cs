@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using LimeLibrary.Extensions;
@@ -14,7 +13,7 @@ using UnityEngine.UI;
 namespace LimeLibrary.UI.Dialog {
 
 public class UIDialogController {
-  private readonly Stack<UIDialogData> _dialogDataStack = new(8);
+  private readonly List<UIDialogData> _dialogDataList = new(8);
   private readonly IEnumerable<IUIView> _allViews;
 
   private GameObject _backGroundGameObject;
@@ -24,15 +23,27 @@ public class UIDialogController {
     _allViews = allViews;
   }
 
-  public bool ExistsDialog() => _dialogDataStack.Any();
+  public bool ExistsDialog() => _dialogDataList.Count > 0;
+  public IUIView GetTopDialog() => ExistsDialog() ? _dialogDataList[^1].UIView : null;
 
-  public IUIView GetTopDialog() => ExistsDialog() ? _dialogDataStack.Peek().UIView : null;
+  public bool ExistsDialog(IUIView view) {
+    foreach (var dialogData in _dialogDataList) {
+      if (dialogData.UIView == view) return true;
+    }
+    return false;
+  }
 
   public async UniTask Show(IUIView view, UIDialogOption dialogOption, CancellationToken cancellationToken) {
-    _dialogDataStack.Push(new UIDialogData(view, dialogOption));
+    if (ExistsDialog(view)) {
+      Assertion.Assert(false, $"Dialog is already shown: {view.RootObject.name}");
+      return;
+    }
+
+    var dialogData = new UIDialogData(view, dialogOption);
 
     // 既存の表示ViewのUnfocus
-    foreach (var showedView in _allViews.Where(uiView => uiView.State == UIViewState.Show)) {
+    foreach (var showedView in _allViews) {
+      if (showedView.State != UIViewState.Show) continue;
       showedView.Unfocus();
     }
 
@@ -43,41 +54,43 @@ public class UIDialogController {
     if (_backGroundGameObject == null) {
       _backGroundGameObject = UnityUtility.CreateGameObject("PopupBackground");
     }
-    SetupBackGround(_backGroundGameObject, _dialogDataStack.Peek());
+    SetupBackGround(_backGroundGameObject, dialogData);
 
     // 最前面に表示（ポップアップ用背景より前）
     view.SetSortingOrderFront();
 
+    _dialogDataList.Add(dialogData);
+
     // 表示
     await view.Show(cancellationToken);
 
-    // 非表示時にリストから削除
-    UniTask.Create(async () => {
-      await view.EventObservables.GetObservable(UIViewEventType.HideEnd).FirstAsync(view.RootObject.GetCancellationTokenOnDestroy()).AsUniTask();
-      Terminate(view);
-    }).RunHandlingError().Forget();
+    // 非表示時処理
+    view.EventObservables.GetObservable(UIViewEventType.HideStart).Take(1).Subscribe(view, (_, view) => OnHideStart(view)).AddTo(view.ObjectCancellationToken);
+    view.EventObservables.GetObservable(UIViewEventType.HideEnd).Take(1).Subscribe(_ => OnHideEnd()).AddTo(view.ObjectCancellationToken);
   }
 
-  private void Terminate(IUIView uiView) {
-    if (!_dialogDataStack.Any() || _dialogDataStack.Peek().UIView != uiView) {
-      return;
-    }
+  private void OnHideStart(IUIView uiView) {
+    _dialogDataList.RemoveAll(data => data.UIView == uiView);
+  }
 
-    _dialogDataStack.Pop();
-
-    if (_dialogDataStack.Any()) {
-      SetupBackGround(_backGroundGameObject, _dialogDataStack.Peek());
+  private void OnHideEnd() {
+    // 背景画像処理
+    if (_dialogDataList.Count > 0) {
+      SetupBackGround(_backGroundGameObject, _dialogDataList[^1]);
     } else {
       DisableBackGround(_backGroundGameObject).RunHandlingError().Forget();
     }
-    // 既存のViewの復帰
-    if (_dialogDataStack.Any()) {
-      var otherUiView = _dialogDataStack.Peek().UIView;
-      otherUiView.Focus();
-      otherUiView.SetSortingOrderFront();
+
+    // Focus処理
+    if (_dialogDataList.Count > 0) {
+      // 先頭のダイアログにFocus
+      var otherDialog = _dialogDataList[^1].UIView;
+      otherDialog.Focus();
+      otherDialog.SetSortingOrderFront();
     } else {
-      var showedViews = _allViews.Where(view => view.State == UIViewState.Show);
-      foreach (var showedUiView in showedViews) {
+      // 既存の表示ViewにFocus
+      foreach (var showedUiView in _allViews) {
+        if (showedUiView.State != UIViewState.Show) continue;
         showedUiView.Focus();
       }
     }
