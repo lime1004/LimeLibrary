@@ -15,7 +15,7 @@ public class LevelController {
   public int MaxLevel => _maxLevel;
   public int Experience => _experience;
 
-  public LevelController(LevelTable levelTable, int minLevel, int maxLevel, int initialExperience, int? initialLevel = 0) {
+  public LevelController(LevelTable levelTable, int minLevel, int maxLevel, int initialExperience, int? initialLevel = null) {
     _levelTable = levelTable;
     _minLevel = minLevel;
     _maxLevel = maxLevel;
