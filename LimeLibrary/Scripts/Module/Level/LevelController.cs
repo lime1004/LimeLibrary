@@ -94,19 +94,61 @@ public class LevelController {
     _level = Mathf.Clamp(level, _minLevel, _maxLevel);
   }
 
-  public int GetExperienceUntilNextLevel() {
-    return Experience - _levelTable.CalculateTotalExperience(_level);
+  /// <summary>
+  /// 現在の経験値（差分）
+  /// 現在のレベルに必要な経験値を0とした場合の現在の経験値
+  /// </summary>
+  public int GetCurrentExperienceDiff() {
+    int totalExperienceForCurrentLevel = _levelTable.CalculateTotalExperience(_level);
+    return _experience - totalExperienceForCurrentLevel;
   }
 
-  public int GetRequiredExperienceUntilNextLevel() {
+  /// <summary>
+  /// 次のレベルに必要な累計経験値
+  /// </summary>
+  public int GetTotalExperienceForNextLevel() {
+    return _levelTable.CalculateTotalExperience(_level + 1);
+  }
+
+  /// <summary>
+  /// 次のレベルに必要な差分経験値（差分、現在の経験値は計算に入れない）
+  /// 現在のレベルから次のレベルへの差分経験値
+  /// </summary>
+  public int GetDiffExperienceForNextLevel() {
+    if (IsMaxLevel()) return 0;
     return _levelTable.GetNextRequiredExperience(_level);
   }
 
-  public float GetExperienceRateUntilNextLevel() {
-    int nextRequiredExperience = _levelTable.GetNextRequiredExperience(_level);
-    int totalRequiredExperience = _levelTable.CalculateTotalExperience(_level);
-    int currentExperience = _experience - totalRequiredExperience;
-    return 1f - ((float) currentExperience / nextRequiredExperience);
+  /// <summary>
+  /// 次のレベルに必要な残り経験値（差分、現在の経験値から算出）
+  /// </summary>
+  public int GetRemainingExperienceForNextLevel() {
+    if (IsMaxLevel()) return 0;
+    int diffExperience = GetDiffExperienceForNextLevel();
+    int currentDiffExperience = GetCurrentExperienceDiff();
+    return diffExperience - currentDiffExperience;
+  }
+
+  /// <summary>
+  /// 現在の経験値率（差分）
+  /// 現在の差分経験値 / 次のレベルに必要な差分経験値
+  /// </summary>
+  public float GetCurrentExperienceRate() {
+    if (IsMaxLevel()) return 1f;
+    int diffExperience = GetDiffExperienceForNextLevel();
+    if (diffExperience == 0) return 0f;
+
+    int currentDiffExperience = GetCurrentExperienceDiff();
+    return (float) currentDiffExperience / diffExperience;
+  }
+
+  /// <summary>
+  /// 次のレベルに必要な残り経験値率（差分、現在の経験値から算出）
+  /// 次のレベルに必要な残り経験値 / 次のレベルに必要な差分経験値
+  /// </summary>
+  public float GetRemainingExperienceRate() {
+    if (IsMaxLevel()) return 0f;
+    return 1f - GetCurrentExperienceRate();
   }
 }
 
