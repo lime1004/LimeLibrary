@@ -22,6 +22,7 @@ public class UISingleView : MonoBehaviour, IUIView {
   public RectTransform RectTransform => _controller.RectTransform;
   public Canvas Canvas => _controller.Canvas;
   public CanvasGroup CanvasGroup => _controller.CanvasGroup;
+  public Camera CanvasCamera { get; private set; }
 
   public UIViewState State => _controller.State;
   public bool IsFocus => _controller.IsFocus;
@@ -32,6 +33,10 @@ public class UISingleView : MonoBehaviour, IUIView {
   public IUIInputObservables InputObservables { get; private set; } = new UIInputObservables();
 
   public CancellationToken ObjectCancellationToken => gameObject.GetCancellationTokenOnDestroy();
+
+  public void OnEnable() {
+    CanvasCamera = GetComponent<Canvas>().worldCamera;
+  }
 
   public void SetInputObservable(IUIInputObservables inputObservables) => InputObservables = inputObservables;
 
@@ -95,7 +100,7 @@ public class UISingleView : MonoBehaviour, IUIView {
   public void SetAnchoredPosition(Vector2 anchoredPosition) => _controller.SetAnchoredPosition(anchoredPosition);
 
   public void SetSortingOrderFront() => _controller.SetSortingOrderFront();
-  
+
   public void Destroy() => OnDestroyView();
 }
 

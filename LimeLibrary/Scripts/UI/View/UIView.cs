@@ -29,6 +29,7 @@ public abstract class UIView : MonoBehaviour, IUIView {
   public Canvas Canvas => _controller.Canvas;
   public CanvasGroup CanvasGroup => _controller.CanvasGroup;
   public CanvasScaler CanvasScaler => _controller.CanvasScaler;
+  public Camera CanvasCamera { get; private set; }
 
   public bool IsInitialized { get; private set; }
   public UIViewState State => _controller.State;
@@ -40,6 +41,10 @@ public abstract class UIView : MonoBehaviour, IUIView {
   public UIApp ParentApp { get; private set; }
 
   public CancellationToken ObjectCancellationToken => gameObject.GetCancellationTokenOnDestroy();
+
+  public void OnEnable() {
+    CanvasCamera = GetComponent<Canvas>().worldCamera;
+  }
 
   public T GetParentApp<T>() where T : UIApp {
     return ParentApp as T;

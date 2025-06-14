@@ -7,6 +7,7 @@ namespace LimeLibrary.UI.View {
 public interface IUIView : IUI {
   public RectTransform RectTransform { get; }
   public Canvas Canvas { get; }
+  public Camera CanvasCamera { get; }
   public UIViewState State { get; }
   public bool IsFocus { get; }
   public IUIViewEventObservables EventObservables { get; }
