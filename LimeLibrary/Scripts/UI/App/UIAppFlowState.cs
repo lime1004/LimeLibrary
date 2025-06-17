@@ -18,6 +18,7 @@ public abstract class UIAppFlowState<TState, TContext> where TState : Enum where
 
   public virtual void PreExecute() {
     _cancellationTokenSource = new CancellationTokenSource();
+    _cancellationTokenSource.RegisterRaiseCancelOnDestroy(UIApp);
   }
 
   public virtual void PostExecute() {
