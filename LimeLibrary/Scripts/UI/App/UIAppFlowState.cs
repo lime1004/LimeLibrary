@@ -23,7 +23,6 @@ public abstract class UIAppFlowState<TState, TContext> where TState : Enum where
 
   public virtual void PostExecute() {
     _cancellationTokenSource?.Cancel();
-    _cancellationTokenSource?.Dispose();
     _cancellationTokenSource = null;
   }
 
