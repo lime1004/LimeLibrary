@@ -72,7 +72,9 @@ public abstract class UIAppFlow<TState, TContext> : IUIAppFlow where TState : En
         _dictionary[_state].CurrentState = _state;
 
         _prevState = _state;
+        _dictionary[_state].PreExecute();
         _state = await _dictionary[_state].Execute();
+        _dictionary[_state].PostExecute();
       } catch (OperationCanceledException) {
         throw new OperationCanceledException();
       } catch (Exception e) {

@@ -7,12 +7,24 @@ using LimeLibrary.UI.View;
 namespace LimeLibrary.UI {
 
 public abstract class UIAppFlowState<TState, TContext> where TState : Enum where TContext : UIAppFlowContext {
+  private CancellationTokenSource _cancellationTokenSource;
+
   protected UIApp UIApp => Context.UIApp;
-  protected CancellationToken CancellationToken => Context.CancellationTokenSource.Token;
+  protected CancellationToken CancellationToken => _cancellationTokenSource?.Token ?? CancellationToken.None;
 
   public TContext Context { get; set; }
   public TState CurrentState { get; set; }
   public TState PrevState { get; set; }
+
+  public virtual void PreExecute() {
+    _cancellationTokenSource = new CancellationTokenSource();
+  }
+
+  public virtual void PostExecute() {
+    _cancellationTokenSource?.Cancel();
+    _cancellationTokenSource?.Dispose();
+    _cancellationTokenSource = null;
+  }
 
   public abstract void Initialize();
   public abstract UniTask<TState> Execute();
