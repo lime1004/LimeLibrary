@@ -67,14 +67,20 @@ public abstract class UIAppFlow<TState, TContext> : IUIAppFlow where TState : En
         break;
       }
 
+      bool isTransitState = false;
       try {
         _dictionary[_state].PrevState = _prevState;
         _dictionary[_state].CurrentState = _state;
 
         _prevState = _state;
         _dictionary[_state].PreExecute();
-        _state = await _dictionary[_state].Execute();
+        var nextState = await _dictionary[_state].Execute();
         _dictionary[_state].PostExecute();
+
+        if (!nextState.Equals(_state)) {
+          isTransitState = true;
+          _state = nextState;
+        }
       } catch (OperationCanceledException) {
         throw new OperationCanceledException();
       } catch (Exception e) {
@@ -82,7 +88,8 @@ public abstract class UIAppFlow<TState, TContext> : IUIAppFlow where TState : En
       }
 
       if (_cancellationTokenSource.IsCancellationRequested) throw new OperationCanceledException();
-      await UniTask.NextFrame(cancellationToken: _cancellationTokenSource.Token);
+
+      if (!isTransitState) await UniTask.NextFrame(cancellationToken: _cancellationTokenSource.Token);
     }
   }
 }
