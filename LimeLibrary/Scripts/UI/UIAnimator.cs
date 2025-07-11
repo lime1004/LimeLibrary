@@ -1,49 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using LimeLibrary.Extensions;
-using LimeLibrary.Utility;
 using UnityEngine;
 
 namespace LimeLibrary.UI {
 
 public class UIAnimator {
-  private readonly Dictionary<string, Animation> _animationList = new(32);
+  private readonly List<Animation> _animationList = new(32);
 
   public async UniTask Play(string id, CancellationToken cancellationToken) {
-    if (_animationList.TryGetValue(id, out var animation)) {
-      await animation.Play(cancellationToken);
-    }
+    await _animationList.Where(animation => animation.ID == id).Select(animation => animation.Play(cancellationToken));
   }
 
   public void PlayImmediate(string id) {
-    if (_animationList.TryGetValue(id, out var animation)) {
+    foreach (var animation in _animationList) {
+      if (animation.ID != id) continue;
       animation.PlayImmediate();
     }
   }
 
   public void Stop(string id) {
-    if (_animationList.TryGetValue(id, out var animation)) {
+    foreach (var animation in _animationList) {
+      if (animation.ID != id) continue;
       animation.Stop();
     }
   }
 
   public bool Exists(string id) {
-    return _animationList.ContainsKey(id);
+    return _animationList.Any(animation => animation.ID == id);
   }
 
   public void Register(string id, Func<CancellationToken, UniTask> animationFunc, Action animationImmediate = null, bool isOverwrite = false) {
-    if (_animationList.TryGetValue(id, out var value)) {
-      if (isOverwrite) {
-        value.Func = animationFunc;
-        value.AnimationImmediate = animationImmediate;
-      } else {
-        Assertion.Assert(false, $"Animation ID {id} is already registered.");
-      }
-    } else {
-      _animationList.Add(id, new Animation(id, animationFunc, animationImmediate));
-    }
+    _animationList.Add(new Animation(id, animationFunc, animationImmediate));
   }
 
   public void RegisterDefaultAnimation(Action animation, bool isOverwrite = false) {
