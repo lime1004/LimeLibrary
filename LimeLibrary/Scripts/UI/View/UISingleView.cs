@@ -1,7 +1,7 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using LimeLibrary.Extensions;
+using LimeLibrary.UI.Animation;
 using LimeLibrary.UI.Parts;
 using LimeLibrary.Utility;
 using R3;
@@ -41,28 +41,19 @@ public class UISingleView : MonoBehaviour, IUIView {
   public void SetInputObservable(IUIInputObservables inputObservables) => InputObservables = inputObservables;
 
   public async UniTask Initialize(CancellationToken cancellationToken) {
-    // AnimationIdGetterの生成
-    var animationIdGetter = new UIAnimationIdGetter();
-
     // Animatorの生成
-    Animator = new UIAnimator();
-    Animator.SetAnimationIdGetter(animationIdGetter);
+    Animator = GetComponent<UIAnimator>();
 
     // EventObservablesの生成
     var observables = new UIViewEventObservables();
     EventObservables = observables;
 
     // Controllerの生成
-    _controller = new UIViewController(gameObject, observables, Animator, animationIdGetter);
+    _controller = new UIViewController(gameObject, observables, Animator);
 
     // UIPartsの初期化
     foreach (var uiParts in RootObject.GetComponentsInChildren<IUIParts>(true)) {
       uiParts.Initialize(this);
-    }
-
-    // Defaultアニメーション再生
-    if (Animator.Exists(animationIdGetter.DefaultAnimationID)) {
-      Animator.PlayImmediate(animationIdGetter.DefaultAnimationID);
     }
 
     // 初期化時挙動の実行
@@ -98,6 +89,9 @@ public class UISingleView : MonoBehaviour, IUIView {
 
   public void SetPosition(Vector2 position) => _controller.SetPosition(position);
   public void SetAnchoredPosition(Vector2 anchoredPosition) => _controller.SetAnchoredPosition(anchoredPosition);
+
+  public void SetShowAnimationId(string showAnimationId) => _controller.ShowAnimationId = showAnimationId;
+  public void SetHideAnimationId(string hideAnimationId) => _controller.HideAnimationId = hideAnimationId;
 
   public void SetSortingOrderFront() => _controller.SetSortingOrderFront();
 

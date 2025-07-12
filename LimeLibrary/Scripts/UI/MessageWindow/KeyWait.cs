@@ -14,8 +14,6 @@ public class KeyWait : UISingleView {
   private Vector2 _keyWaitPosition;
 
   protected UniTask OnInitialize() {
-    Animator.RegisterShowHideFadeAnimation(CanvasGroup, 0.1f);
-
     _keyWaitPosition = transform.AsRectTransform().anchoredPosition;
 
     return UniTask.CompletedTask;

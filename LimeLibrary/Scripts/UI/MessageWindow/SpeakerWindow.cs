@@ -11,7 +11,6 @@ public class SpeakerWindow : UISingleView {
   private TextMeshProUGUI _text;
 
   protected override UniTask OnInitialize(CancellationToken cancellationToken) {
-    Animator.RegisterShowHideFadeAnimation(CanvasGroup, 0.1f);
     return UniTask.CompletedTask;
   }
 

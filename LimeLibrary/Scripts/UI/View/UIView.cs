@@ -1,8 +1,8 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using LimeLibrary.Extensions;
 using LimeLibrary.Text;
+using LimeLibrary.UI.Animation;
 using LimeLibrary.UI.App;
 using LimeLibrary.UI.Parts;
 using LimeLibrary.Utility;
@@ -53,28 +53,19 @@ public abstract class UIView : MonoBehaviour, IUIView {
   public async UniTask Initialize(UIApp parentApp, CancellationToken cancellationToken) {
     ParentApp = parentApp;
 
-    // AnimationIdGetterの生成
-    var animationIdGetter = new UIAnimationIdGetter();
-
     // Animatorの生成
-    Animator = new UIAnimator();
-    Animator.SetAnimationIdGetter(animationIdGetter);
+    Animator = GetComponent<UIAnimator>();
 
     // Eventの生成
     var observables = new UIViewEventObservables();
     EventObservables = observables;
 
     // Controllerの生成
-    _controller = new UIViewController(gameObject, observables, Animator, animationIdGetter);
+    _controller = new UIViewController(gameObject, observables, Animator);
 
     // UIPartsの初期化
     foreach (var uiParts in RootObject.GetComponentsInChildren<IUIParts>(true)) {
       uiParts.Initialize(this);
-    }
-
-    // Defaultアニメーション再生
-    if (Animator.Exists(animationIdGetter.DefaultAnimationID)) {
-      Animator.PlayImmediate(animationIdGetter.DefaultAnimationID);
     }
 
     await OnInitialize(cancellationToken);
@@ -130,6 +121,8 @@ public abstract class UIView : MonoBehaviour, IUIView {
   public string GetUIText(string label) => ParentApp.GetUIText(label);
   public string GetText<TDataTable, TData>(TextQuery<TDataTable, TData> textQuery, string label) where TDataTable : ITable<TData> where TData : struct, ITextData => ParentApp.GetText(textQuery, label);
 
+  public void SetShowAnimationId(string showAnimationId) => _controller.ShowAnimationId = showAnimationId;
+  public void SetHideAnimationId(string hideAnimationId) => _controller.HideAnimationId = hideAnimationId;
 }
 
 }

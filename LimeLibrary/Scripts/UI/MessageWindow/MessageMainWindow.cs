@@ -28,8 +28,6 @@ public class MessageMainWindow : UISingleView {
   public MessageWindowType MessageWindowType { get; set; }
 
   protected override UniTask OnInitialize(CancellationToken cancellationToken) {
-    Animator.RegisterShowHideFadeAnimation(CanvasGroup, 0.1f);
-
     EventObservables.GetObservable(UIViewEventType.ShowStart).Subscribe(MessageWindowType, (_, windowType) => {
       _windowImage.sprite = windowType switch {
         MessageWindowType.System => _systemMessageWindowSprite,

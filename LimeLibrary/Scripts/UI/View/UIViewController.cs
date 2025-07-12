@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using LimeLibrary.Extensions;
+using LimeLibrary.UI.Animation;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,7 +10,6 @@ namespace LimeLibrary.UI.View {
 internal class UIViewController {
   private readonly IUIViewEventNotifier _eventNotifier;
   private readonly UIAnimator _animator;
-  private readonly UIAnimationIdGetter _animationIdGetter;
 
   public GameObject RootObject { get; }
   public RectTransform RectTransform { get; }
@@ -20,7 +20,10 @@ internal class UIViewController {
   public UIViewState State { get; private set; } = UIViewState.Hide;
   public bool IsFocus { get; private set; } = false;
 
-  public UIViewController(GameObject rootObject, IUIViewEventNotifier eventNotifier, UIAnimator animator, UIAnimationIdGetter animationIdGetter) {
+  public string ShowAnimationId { get; set; } = "Show";
+  public string HideAnimationId { get; set; } = "Hide";
+
+  public UIViewController(GameObject rootObject, IUIViewEventNotifier eventNotifier, UIAnimator animator) {
     RootObject = rootObject;
     RectTransform = rootObject.transform.AsRectTransform();
     Canvas = rootObject.GetComponent<Canvas>();
@@ -28,7 +31,6 @@ internal class UIViewController {
     CanvasScaler = rootObject.GetComponent<CanvasScaler>();
     _eventNotifier = eventNotifier;
     _animator = animator;
-    _animationIdGetter = animationIdGetter;
   }
 
   public bool IsEnable() {
@@ -55,12 +57,14 @@ internal class UIViewController {
 
     _eventNotifier.Notify(UIViewEventType.ShowStart);
 
-    if (_animator.Exists(_animationIdGetter.ShowAnimationID)) {
-      _animator.Stop(_animationIdGetter.HideAnimationID);
-      if (showOption.IsImmediate) {
-        _animator.PlayImmediate(_animationIdGetter.ShowAnimationID);
-      } else {
-        await _animator.Play(_animationIdGetter.ShowAnimationID, mergedTokenSource.Token);
+    if (_animator) {
+      if (_animator.Exists(ShowAnimationId)) {
+        _animator.Stop(HideAnimationId);
+        if (showOption.IsImmediate) {
+          _animator.PlayImmediate(ShowAnimationId);
+        } else {
+          await _animator.Play(ShowAnimationId, mergedTokenSource.Token);
+        }
       }
     }
 
@@ -84,12 +88,14 @@ internal class UIViewController {
 
     _eventNotifier.Notify(UIViewEventType.HideStart);
 
-    if (_animator.Exists(_animationIdGetter.HideAnimationID)) {
-      _animator.Stop(_animationIdGetter.ShowAnimationID);
-      if (hideOption.IsImmediate) {
-        _animator.PlayImmediate(_animationIdGetter.HideAnimationID);
-      } else {
-        await _animator.Play(_animationIdGetter.HideAnimationID, mergedTokenSource.Token);
+    if (_animator) {
+      if (_animator.Exists(HideAnimationId)) {
+        _animator.Stop(ShowAnimationId);
+        if (hideOption.IsImmediate) {
+          _animator.PlayImmediate(HideAnimationId);
+        } else {
+          await _animator.Play(HideAnimationId, mergedTokenSource.Token);
+        }
       }
     }
 
