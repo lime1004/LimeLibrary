@@ -17,7 +17,8 @@ public class CustomFuncPlayer : IUIAnimationPlayer {
   private CancellationTokenSource _cancellationTokenSource;
   private UniTask _animationTask;
 
-  public CustomFuncPlayer(Func<bool, CancellationToken, UniTask> func) {
+  public CustomFuncPlayer(string id, Func<bool, CancellationToken, UniTask> func) {
+    _id = id;
     _func = func;
   }
 
