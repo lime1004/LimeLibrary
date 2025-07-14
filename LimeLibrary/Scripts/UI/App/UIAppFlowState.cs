@@ -29,8 +29,8 @@ public abstract class UIAppFlowState<TState, TContext> where TState : Enum where
   public abstract void Initialize();
   public abstract UniTask<TState> Execute();
 
-  protected TView GetView<TView>() where TView : UIView {
-    return UIApp.GetView<TView>();
+  protected TView GetView<TView>(bool containsSubClass = true, int? id = null, string name = null) where TView : UIView {
+    return UIApp.GetView<TView>(containsSubClass: containsSubClass, id: id, name: name);
   }
 
   protected void RequestEnd() {
