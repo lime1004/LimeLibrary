@@ -55,6 +55,7 @@ internal class SceneUpdater : MonoBehaviour {
     case SceneState.CreateWait: {
       if (_sceneCreateTask.GetAwaiter().IsCompleted) {
         _interface.SetSceneState(SceneState.Running);
+        _interface.OnStartScene(GetScene(_interface.GetNowSceneType()));
       }
       break;
     }
@@ -66,6 +67,7 @@ internal class SceneUpdater : MonoBehaviour {
         var requestSceneType = _interface.GetRequestSceneId();
 
         var scene = GetScene(_interface.GetNowSceneType());
+        _interface.OnEndScene(GetScene(_interface.GetNowSceneType()));
         scene?.Destroy(requestSceneType);
         scene?.Dispose();
 

@@ -14,45 +14,43 @@ public class SceneUpdaterInterface : SingletonMonoBehaviour<SceneUpdaterInterfac
   private SceneState _sceneState;
 
   private readonly Subject<Type> _onChangeSceneTypeSubject = new();
-  public Observable<Type> OnChangeSceneTypeObservable => _onChangeSceneTypeSubject;
-
   private readonly Subject<IScene> _onAddSceneSubject = new();
+  private readonly Subject<IScene> _onStartSceneSubject = new();
+  private readonly Subject<IScene> _onEndSceneSubject = new();
+
+  public Observable<Type> OnChangeSceneTypeObservable => _onChangeSceneTypeSubject;
   internal Observable<IScene> OnAddSceneObservable => _onAddSceneSubject;
+  public Observable<IScene> OnStartSceneObservable => _onStartSceneSubject;
+  public Observable<IScene> OnEndSceneObservable => _onEndSceneSubject;
 
   private void OnDestroy() {
     _onChangeSceneTypeSubject.Dispose();
+    _onAddSceneSubject.Dispose();
+    _onStartSceneSubject.Dispose();
+    _onEndSceneSubject.Dispose();
   }
 
-  /// <summary>
-  /// Sceneの追加
-  /// </summary>
   public void AddScene(IScene scene) => _onAddSceneSubject.OnNext(scene);
 
-  /// <summary>
-  /// Scene変更リクエスト
-  /// </summary>
   public void RequestChangeScene<T>() => _requestSceneType = typeof(T);
+
+  public Type GetNowSceneType() => _nowSceneType;
+
+  public SceneState GetSceneState() => _sceneState;
 
   internal void ResetRequest() => _requestSceneType = null;
   internal bool IsRequested() => _requestSceneType != null;
   internal Type GetRequestSceneId() => _requestSceneType;
-
-  /// <summary>
-  /// 現在のSceneのTypeを取得
-  /// </summary>
-  public Type GetNowSceneType() => _nowSceneType;
 
   internal void SetNowSceneType(Type sceneId) {
     _nowSceneType = sceneId;
     _onChangeSceneTypeSubject.OnNext(sceneId);
   }
 
-  /// <summary>
-  /// 現在のSceneの状態を取得
-  /// </summary>
-  public SceneState GetSceneState() => _sceneState;
-
   internal void SetSceneState(SceneState sceneState) => _sceneState = sceneState;
+
+  internal void OnStartScene(IScene scene) => _onStartSceneSubject.OnNext(scene);
+  internal void OnEndScene(IScene scene) => _onEndSceneSubject.OnNext(scene);
 }
 
 }
