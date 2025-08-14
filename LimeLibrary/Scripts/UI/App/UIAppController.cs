@@ -123,6 +123,7 @@ internal class UIAppController {
 
   public void Destroy(bool isApplicationQuitDestroy) {
     if (State == UIAppState.Destroy) return;
+    State = UIAppState.Destroy;
 
     foreach (var view in Views) {
       view.OnDestroyView();
@@ -134,8 +135,6 @@ internal class UIAppController {
       UIAppEventType.NormalDestroy);
 
     if (!isApplicationQuitDestroy) Object.Destroy(RootObject);
-
-    State = UIAppState.Destroy;
   }
 
   public T GetView<T>(bool containsSubClass = true, int? id = null, string name = null) where T : UIView {
