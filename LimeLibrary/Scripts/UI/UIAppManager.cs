@@ -60,12 +60,15 @@ public class UIAppManager : MonoBehaviour {
       return null;
     }
     // 削除時にリストから削除
-    uiApp.EventObservables.GetObservable(UIAppEventType.Destroy).Subscribe(_ => OnDestroyUIApp(uiApp)).AddTo(gameObject);
+    uiApp.EventObservables.GetObservable(UIAppEventType.Destroy).
+      Take(1).
+      Subscribe(_ => OnDestroyUIApp(uiApp)).
+      AddTo(gameObject);
 
     // Appの初期化
     if (isInitialize) await uiApp.InitializeAsync(cancellationToken);
     // 即時表示
-    if (isShow) await uiApp.Show(default);
+    if (isShow) await uiApp.Show(cancellationToken);
 
     return uiApp;
   }

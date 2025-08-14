@@ -51,7 +51,7 @@ internal class UIAppController {
   }
 
   public async UniTask Show(UIAppShowOption showOption, CancellationToken cancellationToken) {
-    if (State is UIAppState.Show or UIAppState.Showing) return;
+    if (State is UIAppState.Show or UIAppState.Showing or UIAppState.Destroy) return;
 
     _cancellationTokenSourceOnShowHide?.Cancel();
     _cancellationTokenSourceOnShowHide = new CancellationTokenSource();
@@ -73,10 +73,13 @@ internal class UIAppController {
     }
     await showTask;
 
+    // Stateが変わっていれば処理を中断
+    if (State is not UIAppState.Showing) return;
+
     // フォーカス処理
     if (showOption.FocusMode is not UIFocusMode.None) {
       if (showOption.FocusMode is UIFocusMode.FocusNextFrame) {
-        await UniTask.NextFrame(cancellationToken: cancellationToken);
+        await UniTask.NextFrame(cancellationToken: mergedTokenSource.Token);
       }
 
       var focusOrderedViews = _showViews.OrderBy(view => view.AdvanceSettings.FocusPriority).ToList();
@@ -92,7 +95,7 @@ internal class UIAppController {
   }
 
   public async UniTask Hide(UIAppHideOption hideOption, CancellationToken cancellationToken) {
-    if (State is UIAppState.Hide or UIAppState.Hiding) return;
+    if (State is UIAppState.Hide or UIAppState.Hiding or UIAppState.Destroy) return;
 
     _cancellationTokenSourceOnShowHide?.Cancel();
     _cancellationTokenSourceOnShowHide = new CancellationTokenSource();
@@ -111,6 +114,9 @@ internal class UIAppController {
       }, mergedTokenSource.Token));
     }
     await hideTaskList;
+
+    // Stateが変わっていれば処理を中断
+    if (State is not UIAppState.Hiding) return;
 
     State = UIAppState.Hide;
     _eventNotifier.Notify(UIAppEventType.HideEnd);
