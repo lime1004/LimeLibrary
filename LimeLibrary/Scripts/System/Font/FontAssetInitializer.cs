@@ -57,6 +57,7 @@ public class FontAssetInitializer : ScriptableObject
 
     // フォールバックのフォントアセットの設定  
     baseFontAsset.fallbackFontAssetTable.Clear();
+    TMP_Settings.fallbackFontAssets.Clear();
     bool isEditor = Application.installMode == ApplicationInstallMode.Editor;
     foreach (var fallbackFontAssetReference in fontAssetData.FallbackFontAssetReferenceList) {
       var fallbackFontAsset = (TMP_FontAsset) fallbackFontAssetReference.Asset;
@@ -77,6 +78,7 @@ public class FontAssetInitializer : ScriptableObject
       }
 
       baseFontAsset.fallbackFontAssetTable.Add(fallbackFontAsset);
+      TMP_Settings.fallbackFontAssets.Add(fallbackFontAsset);
     }
 
     // 解放処理
