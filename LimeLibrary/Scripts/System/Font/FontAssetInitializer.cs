@@ -27,7 +27,7 @@ public class FontAssetInitializer : ScriptableObject
 #endif
 {
   [SerializeField]
-  private AssetReferenceT<TMP_FontAsset> _baseFontAssetReference;
+  private TMP_FontAsset _baseFontAsset;
   [SerializeField]
   private FontAssetDataDictionary _fontAssetDataDictionary;
 
@@ -44,10 +44,6 @@ public class FontAssetInitializer : ScriptableObject
   public async UniTask Initialize(Language language, CancellationToken cancellationToken) {
     if (!_fontAssetDataDictionary.TryGetValue(language, out var fontAssetData)) return;
 
-    // ベースのフォントアセットのロード
-    await _baseFontAssetReference.LoadAssetAsync().ToUniTask(cancellationToken: cancellationToken);
-    var baseFontAsset = (TMP_FontAsset) _baseFontAssetReference.Asset;
-
     // フォールバックのフォントアセットのロード
     var fallbackFontAssetTaskList = new List<UniTask>();
     foreach (var fallbackFontAssetReference in fontAssetData.FallbackFontAssetReferenceList) {
@@ -56,8 +52,7 @@ public class FontAssetInitializer : ScriptableObject
     await fallbackFontAssetTaskList;
 
     // フォールバックのフォントアセットの設定  
-    baseFontAsset.fallbackFontAssetTable.Clear();
-    TMP_Settings.fallbackFontAssets.Clear();
+    _baseFontAsset.fallbackFontAssetTable.Clear();
     bool isEditor = Application.installMode == ApplicationInstallMode.Editor;
     foreach (var fallbackFontAssetReference in fontAssetData.FallbackFontAssetReferenceList) {
       var fallbackFontAsset = (TMP_FontAsset) fallbackFontAssetReference.Asset;
@@ -77,16 +72,13 @@ public class FontAssetInitializer : ScriptableObject
           source.isMultiAtlasTexturesEnabled);
       }
 
-      baseFontAsset.fallbackFontAssetTable.Add(fallbackFontAsset);
-      TMP_Settings.fallbackFontAssets.Add(fallbackFontAsset);
+      _baseFontAsset.fallbackFontAssetTable.Add(fallbackFontAsset);
     }
 
     // 解放処理
     var fontDisposerObject = new GameObject("FontDisposer");
     DontDestroyOnLoad(fontDisposerObject);
     fontDisposerObject.OnDestroyAsObservable().Subscribe(x => {
-      if (isEditor) Resources.UnloadAsset(baseFontAsset);
-      if (_baseFontAssetReference.Asset) _baseFontAssetReference.ReleaseAsset();
       foreach (var fallbackFontAssetReference in fontAssetData.FallbackFontAssetReferenceList) {
         if (fallbackFontAssetReference.Asset) fallbackFontAssetReference.ReleaseAsset();
       }
@@ -96,10 +88,9 @@ public class FontAssetInitializer : ScriptableObject
 #if UNITY_EDITOR
   public int callbackOrder => 0;
   public void OnPreprocessBuild(BuildReport report) {
-    if (_baseFontAssetReference == null || _baseFontAssetReference.editorAsset == null) return;
+    if (_baseFontAsset == null) return;
     // ベースのフォントアセットのフォールバックを剥がす
-    var baseFontAsset = _baseFontAssetReference.editorAsset;
-    baseFontAsset.fallbackFontAssetTable.Clear();
+    _baseFontAsset.fallbackFontAssetTable.Clear();
   }
 #endif
 }
