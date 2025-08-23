@@ -27,8 +27,6 @@ public class FontAssetInitializer : ScriptableObject
 #endif
 {
   [SerializeField]
-  private TMP_FontAsset _baseFontAsset;
-  [SerializeField]
   private FontAssetDataDictionary _fontAssetDataDictionary;
 
   [Serializable]
@@ -52,7 +50,7 @@ public class FontAssetInitializer : ScriptableObject
     await fallbackFontAssetTaskList;
 
     // フォールバックのフォントアセットの設定  
-    _baseFontAsset.fallbackFontAssetTable.Clear();
+    TMP_Settings.fallbackFontAssets.Clear();
     bool isEditor = Application.installMode == ApplicationInstallMode.Editor;
     foreach (var fallbackFontAssetReference in fontAssetData.FallbackFontAssetReferenceList) {
       var fallbackFontAsset = (TMP_FontAsset) fallbackFontAssetReference.Asset;
@@ -72,7 +70,7 @@ public class FontAssetInitializer : ScriptableObject
           source.isMultiAtlasTexturesEnabled);
       }
 
-      _baseFontAsset.fallbackFontAssetTable.Add(fallbackFontAsset);
+      TMP_Settings.fallbackFontAssets.Add(fallbackFontAsset);
     }
 
     // 解放処理
@@ -88,9 +86,8 @@ public class FontAssetInitializer : ScriptableObject
 #if UNITY_EDITOR
   public int callbackOrder => 0;
   public void OnPreprocessBuild(BuildReport report) {
-    if (_baseFontAsset == null) return;
-    // ベースのフォントアセットのフォールバックを剥がす
-    _baseFontAsset.fallbackFontAssetTable.Clear();
+    // グローバルフォールバックを剥がす
+    TMP_Settings.fallbackFontAssets.Clear();
   }
 #endif
 }
