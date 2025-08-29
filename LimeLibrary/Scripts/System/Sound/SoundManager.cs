@@ -1,6 +1,7 @@
 ﻿#if LIME_UNITASK
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using LimeLibrary.Module;
 using Cysharp.Threading.Tasks;
 using LimeLibrary.Sound.Internal;
@@ -16,13 +17,14 @@ public class SoundManager : SingletonMonoBehaviour<SoundManager> {
     TKitType kitType,
     ISoundInitializer initializer,
     ISoundTerminator terminator,
-    ISoundCreator creator)
+    ISoundCreator creator,
+    CancellationToken cancellationToken)
     where TKitType : Enum {
     if (ExistsSoundKit(kitType)) {
       Assertion.Assert(false, $"SoundKit is already added. Type: {kitType}");
     }
     var soundKit = new SoundKit(initializer, terminator, creator, _masterVolumeData, gameObject);
-    await soundKit.Initialize();
+    await soundKit.Initialize(cancellationToken);
     _soundKitDictionary.Add(kitType.ToString(), soundKit);
   }
 
@@ -46,7 +48,7 @@ public class SoundManager : SingletonMonoBehaviour<SoundManager> {
     }
     return _soundKitDictionary[kitType.ToString()];
   }
-  
+
   public SoundData Play<TKitType>(TKitType kitType, string id, float fadeDuration = 0f, SoundPlayType playType = SoundPlayType.Default) where TKitType : Enum {
     var soundKit = GetSoundKit(kitType);
     return soundKit?.Play(id, fadeDuration, playType);

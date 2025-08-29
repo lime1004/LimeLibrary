@@ -63,9 +63,9 @@ internal class SoundKit {
     BindGameObject = bindGameObject;
   }
 
-  public async UniTask Initialize() {
+  public async UniTask Initialize(CancellationToken cancellationToken) {
     if (Initializer == null) return;
-    await Initializer.Initialize();
+    await Initializer.Initialize(cancellationToken);
   }
 
   internal SoundData Play(string id, float fadeDuration = 0f, SoundPlayType playType = SoundPlayType.Default) {
