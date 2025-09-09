@@ -24,8 +24,8 @@ public class SoundManager : SingletonMonoBehaviour<SoundManager> {
       Assertion.Assert(false, $"SoundKit is already added. Type: {kitType}");
     }
     var soundKit = new SoundKit(initializer, terminator, creator, _masterVolumeData, gameObject);
-    await soundKit.Initialize(cancellationToken);
     _soundKitDictionary.Add(kitType.ToString(), soundKit);
+    await soundKit.Initialize(cancellationToken);
   }
 
   public void RemoveSoundKitWithTerminate<TKitType>(TKitType kitType) where TKitType : Enum {
