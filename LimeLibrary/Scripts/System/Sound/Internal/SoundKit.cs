@@ -68,7 +68,7 @@ internal class SoundKit {
     await Initializer.Initialize(cancellationToken);
   }
 
-  internal SoundData Play(string id, float fadeDuration = 0f, SoundPlayType playType = SoundPlayType.Default) {
+  internal SoundData Play(string id, float fadeDuration = 0f, float delay = 0f, SoundPlayType playType = SoundPlayType.Default) {
     SoundData soundData;
     switch (playType) {
     case SoundPlayType.Default:
@@ -90,6 +90,7 @@ internal class SoundKit {
     UpdateVolume(soundData, MasterVolumeData);
 
     soundData.FadeDuration = fadeDuration;
+    soundData.DelaySeconds = delay;
     soundData.Play();
 
     WaitStopAndDestroy(soundData, BindGameObject.GetCancellationTokenOnDestroy()).RunHandlingError().Forget();

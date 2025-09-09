@@ -1,4 +1,5 @@
 ﻿#if LIME_UNITASK
+using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using LimeLibrary.Extensions;
@@ -13,6 +14,7 @@ public class SoundData {
 
   internal float MasterVolume { get; set; } = 1f;
   public float FadeDuration { get; set; }
+  public float DelaySeconds { get; set; }
   public float Volume { get; private set; } = 1f;
 
   public SoundData(ISoundSource soundSource) {
@@ -31,6 +33,8 @@ public class SoundData {
 
   private async UniTask PlayAsync(CancellationToken cancellationToken = default) {
     if (_soundSource == null) return;
+
+    await UniTask.Delay(TimeSpan.FromSeconds(DelaySeconds), cancellationToken: cancellationToken);
 
     if (_soundSource.IsPaused()) {
       _soundSource.SetPause(false);

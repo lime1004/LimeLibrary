@@ -49,9 +49,9 @@ public class SoundManager : SingletonMonoBehaviour<SoundManager> {
     return _soundKitDictionary[kitType.ToString()];
   }
 
-  public SoundData Play<TKitType>(TKitType kitType, string id, float fadeDuration = 0f, SoundPlayType playType = SoundPlayType.Default) where TKitType : Enum {
+  public SoundData Play<TKitType>(TKitType kitType, string id, float fadeDuration = 0f, float delay = 0f, SoundPlayType playType = SoundPlayType.Default) where TKitType : Enum {
     var soundKit = GetSoundKit(kitType);
-    return soundKit?.Play(id, fadeDuration, playType);
+    return soundKit?.Play(id, fadeDuration, delay, playType);
   }
 
   public void Pause<TKitType>(TKitType kitType, string id) where TKitType : Enum {
