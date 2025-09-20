@@ -5,6 +5,7 @@ using System.Threading;
 using LimeLibrary.Module;
 using Cysharp.Threading.Tasks;
 using LimeLibrary.Sound.Internal;
+using LimeLibrary.Sound.Module;
 using LimeLibrary.Utility;
 
 namespace LimeLibrary.Sound {
@@ -12,6 +13,7 @@ namespace LimeLibrary.Sound {
 public class SoundManager : SingletonMonoBehaviour<SoundManager> {
   private readonly Dictionary<string, SoundKit> _soundKitDictionary = new(8);
   private readonly VolumeData _masterVolumeData = new();
+  private readonly List<ISoundModule> _soundModuleList = new();
 
   public async UniTask AddSoundKitWithInitialize<TKitType>(
     TKitType kitType,
@@ -94,6 +96,11 @@ public class SoundManager : SingletonMonoBehaviour<SoundManager> {
       soundKit.UpdateVolume(_masterVolumeData);
     }
   }
+
+  public void AddSoundModule(ISoundModule soundModule) => _soundModuleList.Add(soundModule);
+  public void RemoveSoundModule(ISoundModule soundModule) => _soundModuleList.Remove(soundModule);
+  public void ClearSoundModule() => _soundModuleList.Clear();
+  public T GetSoundModule<T>() where T : class, ISoundModule => _soundModuleList.Find(x => x is T) as T;
 }
 
 }
