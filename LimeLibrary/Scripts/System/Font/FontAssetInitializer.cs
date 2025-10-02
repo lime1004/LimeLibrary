@@ -39,8 +39,13 @@ public class FontAssetInitializer : ScriptableObject
   [Serializable]
   private class FontAssetDataDictionary : SerializedDictionary<Language, FontAssetData> { }
 
+  private GameObject _fontDisposerObject;
+
   public async UniTask Initialize(Language language, CancellationToken cancellationToken) {
     if (!_fontAssetDataDictionary.TryGetValue(language, out var fontAssetData)) return;
+
+    // 解放用のGameObjectがあれば削除して解放
+    if (_fontDisposerObject) Destroy(_fontDisposerObject);
 
     // フォールバックのフォントアセットのロード
     var fallbackFontAssetTaskList = new List<UniTask>();
@@ -73,10 +78,10 @@ public class FontAssetInitializer : ScriptableObject
       TMP_Settings.fallbackFontAssets.Add(fallbackFontAsset);
     }
 
-    // 解放処理
-    var fontDisposerObject = new GameObject("FontDisposer");
-    DontDestroyOnLoad(fontDisposerObject);
-    fontDisposerObject.OnDestroyAsObservable().Subscribe(x => {
+    // 解放処理登録
+    _fontDisposerObject = new GameObject("FontDisposer");
+    DontDestroyOnLoad(_fontDisposerObject);
+    _fontDisposerObject.OnDestroyAsObservable().Subscribe(x => {
       foreach (var fallbackFontAssetReference in fontAssetData.FallbackFontAssetReferenceList) {
         if (fallbackFontAssetReference.Asset) fallbackFontAssetReference.ReleaseAsset();
       }
