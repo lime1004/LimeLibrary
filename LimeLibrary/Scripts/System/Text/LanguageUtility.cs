@@ -8,7 +8,7 @@ using Steamworks;
 namespace LimeLibrary.Text {
 
 public static class LanguageUtility {
-  public static Language GetDeviceLanguage() {
+  public static Language? GetDeviceLanguage() {
     // TODO Switch版対応
 #if LIME_STEAMWORKS
     if (SteamManager.Initialized) {
@@ -18,7 +18,7 @@ public static class LanguageUtility {
     return ConvertFromSystemLanguage(Application.systemLanguage);
   }
 
-  public static Language ConvertFromSteamLanguage(string steamLanguage) {
+  public static Language? ConvertFromSteamLanguage(string steamLanguage) {
     return steamLanguage switch {
       "arabic" => Language.Arabic,
       "bulgarian" => Language.Bulgarian,
@@ -50,11 +50,13 @@ public static class LanguageUtility {
       "vietnamese" => Language.Vietnamese,
       "schinese" => Language.ChineseSimplified,
       "tchinese" => Language.ChineseTraditional,
-      _ => Language.English
+      _ => null
     };
   }
 
-  public static Language ConvertFromISO639(string code) {
+  public static Language? ConvertFromISO639(string code) {
+    if (string.IsNullOrWhiteSpace(code)) return null;
+    code = code.Trim().ToLowerInvariant();
     return code switch {
       "ar" => Language.Arabic,
       "bg" => Language.Bulgarian,
@@ -103,11 +105,11 @@ public static class LanguageUtility {
       "vi" => Language.Vietnamese,
       "zh-cn" => Language.ChineseSimplified,
       "zh-tw" => Language.ChineseTraditional,
-      _ => Language.English
+      _ => null
     };
   }
 
-  public static Language ConvertFromSystemLanguage(SystemLanguage systemLanguage) {
+  public static Language? ConvertFromSystemLanguage(SystemLanguage systemLanguage) {
     return systemLanguage switch {
       SystemLanguage.Arabic => Language.Arabic,
       SystemLanguage.Bulgarian => Language.Bulgarian,
@@ -137,7 +139,7 @@ public static class LanguageUtility {
       SystemLanguage.Vietnamese => Language.Vietnamese,
       SystemLanguage.ChineseSimplified => Language.ChineseSimplified,
       SystemLanguage.ChineseTraditional => Language.ChineseTraditional,
-      _ => Language.English
+      _ => null
     };
   }
 
