@@ -4,6 +4,7 @@ namespace LimeLibrary.Debug.ImGui {
 
 public class MenuContentGroup : IMenuContent {
   private readonly List<IMenuContent> _menuContents = new();
+  public IReadOnlyList<IMenuContent> MenuContents => _menuContents;
 
   public string Label { get; }
 
@@ -34,6 +35,10 @@ public class MenuContentGroup : IMenuContent {
 
   public void AddMenuContent(IMenuContent menuContent) {
     _menuContents.Add(menuContent);
+  }
+
+  public void RemoveMenuContent(IMenuContent menuContent) {
+    _menuContents.Remove(menuContent);
   }
 }
 

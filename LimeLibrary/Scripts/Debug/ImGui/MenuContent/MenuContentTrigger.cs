@@ -6,7 +6,7 @@ public class MenuContentTrigger : IMenuContent {
   public string Label { get; }
   public string Shortcut { get; set; } = string.Empty;
   public bool Enabled { get; set; } = true;
-  public bool Triggered { get; private set; }
+  public bool Triggered { get; set; }
   public Action<bool> OnTriggered { get; set; }
 
   public MenuContentTrigger(string label, bool triggered = false) {
