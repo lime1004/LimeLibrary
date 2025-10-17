@@ -29,7 +29,7 @@ public abstract class ServiceLocator<T> : SingletonMonoBehaviour<T> where T : Mo
 
       // 実装しているインターフェースも登録
       foreach (var i in type.GetInterfaces()) {
-        _serviceDictionary.Add(i, instance);
+        _serviceDictionary.TryAdd(i, instance);
       }
     }
   }
