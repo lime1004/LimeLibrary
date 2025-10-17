@@ -19,8 +19,18 @@ public abstract class ServiceLocator<T> : SingletonMonoBehaviour<T> where T : Mo
     }
     if (isOverwrite && ExistInstance<TInstance>()) {
       _serviceDictionary[type] = instance;
+
+      // 実装しているインターフェースも登録
+      foreach (var i in type.GetInterfaces()) {
+        _serviceDictionary[i] = instance;
+      }
     } else {
       _serviceDictionary.Add(type, instance);
+
+      // 実装しているインターフェースも登録
+      foreach (var i in type.GetInterfaces()) {
+        _serviceDictionary.Add(i, instance);
+      }
     }
   }
 
