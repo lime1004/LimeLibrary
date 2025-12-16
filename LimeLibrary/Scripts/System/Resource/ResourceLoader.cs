@@ -112,7 +112,7 @@ public static class ResourceLoader {
   /// <summary>
   /// リソースのラベルによる同期ロード
   /// </summary>
-  public static DynamicResource<IList<T>> LoadWithLabel<T>(string label) where T : class {
+  public static DynamicResource<IList<T>> LoadWithLabel<T>(string label) where T : Object {
     var asyncOperationHandle = Addressables.LoadAssetsAsync<T>((object) label, null);
     var resourceList = asyncOperationHandle.WaitForCompletion();
     if (AssertIfFailed(asyncOperationHandle, label)) return new DynamicResource<IList<T>>(null);
@@ -123,7 +123,7 @@ public static class ResourceLoader {
   /// <summary>
   /// リソースのラベルによる非同期ロード
   /// </summary>
-  public static async UniTask<DynamicResource<IList<T>>> LoadAsyncWithLabel<T>(string label, CancellationToken cancellationToken) where T : class {
+  public static async UniTask<DynamicResource<IList<T>>> LoadAsyncWithLabel<T>(string label, CancellationToken cancellationToken) where T : Object {
     var asyncOperationHandle = Addressables.LoadAssetsAsync<T>((object) label, null);
     var resourceList = await asyncOperationHandle.WithCancellation(cancellationToken);
     if (AssertIfFailed(asyncOperationHandle, label)) return new DynamicResource<IList<T>>(null);
