@@ -26,7 +26,7 @@ public class ColorStacker {
       if (finalColor == null) {
         finalColor = stackColor;
       } else {
-        finalColor *= stackColor;
+        finalColor = finalColor.Value * stackColor;
       }
     }
     return finalColor ?? Color.white;
