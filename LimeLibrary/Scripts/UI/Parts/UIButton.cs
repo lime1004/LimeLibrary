@@ -14,6 +14,9 @@ namespace LimeLibrary.UI.Parts {
 
 [RequireComponent(typeof(Button))]
 public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler, ISubmitHandler, IDisposable {
+  [SerializeField]
+  private TextMeshProUGUI _text;
+
   private InputAction _inputAction;
 
   private readonly Dictionary<UIButtonEventType, Subject<BaseEventData>> _eventSubjects = new();
@@ -44,7 +47,7 @@ public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerClickHa
 
     ParentView = parentView;
     Button = GetComponent<Button>();
-    Text = GetComponentInChildren<TextMeshProUGUI>(true);
+    Text = _text != null ? _text : GetComponentInChildren<TextMeshProUGUI>(true);
 
     Button.OnClickAsObservable().Subscribe(_ => {
       if (!IsEnable()) return;
