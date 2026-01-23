@@ -63,9 +63,32 @@ public class UIInputReceiver : IDisposable {
   }
 
   public void AddInputBinding(InputAction inputAction, string interactions = "") {
-    var bindingPaths = inputAction.GetInputBindingPaths();
-    foreach (string bindingPath in bindingPaths) {
-      AddInputBinding(bindingPath, interactions);
+    if (inputAction == null) {
+      Assertion.Assert(false, "InputAction is null.");
+      return;
+    }
+
+    var bindings = inputAction.bindings;
+
+    for (int i = 0; i < bindings.Count; i++) {
+      var binding = bindings[i];
+
+      if (binding.isComposite) {
+        // Composite バインディングの処理
+        var compositeBuilder = _inputAction.AddCompositeBinding(binding.path, interactions);
+
+        // Composite の子要素を追加
+        i++;
+        while (i < bindings.Count && bindings[i].isPartOfComposite) {
+          var partBinding = bindings[i];
+          compositeBuilder.With(partBinding.name, partBinding.path);
+          i++;
+        }
+        i--;
+      } else if (!binding.isPartOfComposite) {
+        // 通常のバインディング
+        _inputAction.AddBinding(binding.path, interactions: interactions);
+      }
     }
   }
 
