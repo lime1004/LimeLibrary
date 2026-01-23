@@ -17,6 +17,10 @@ public class UIInputReceiver : IDisposable {
   public bool Enabled { get; set; } = true;
   public Observable<InputAction.CallbackContext> OnInputObservable => _onInputSubject;
 
+  public Observable<TValue> OnValueObservable<TValue>() where TValue : struct {
+    return Observable.EveryUpdate().Where(_ => IsEnable() && _inputAction.enabled).Select(_ => _inputAction.ReadValue<TValue>());
+  }
+
   public UIInputReceiver(IUI parentUI, InputInteractionType inputInteractionType, int? behaviourType = null) :
     this(parentUI, InputActionType.Button, InputInteractionBuilder.GetInteractions(inputInteractionType, behaviourType)) { }
 
