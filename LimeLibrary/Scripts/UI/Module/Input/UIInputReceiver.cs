@@ -18,9 +18,9 @@ public class UIInputReceiver : IDisposable {
   public Observable<InputAction.CallbackContext> OnInputObservable => _onInputSubject;
 
   public UIInputReceiver(IUI parentUI, InputInteractionType inputInteractionType, int? behaviourType = null) :
-    this(parentUI, InputInteractionBuilder.GetInteractions(inputInteractionType, behaviourType)) { }
+    this(parentUI, InputActionType.Button, InputInteractionBuilder.GetInteractions(inputInteractionType, behaviourType)) { }
 
-  public UIInputReceiver(IUI parentUI, string interactions = "") {
+  public UIInputReceiver(IUI parentUI, InputActionType inputActionType = InputActionType.Button, string interactions = "") {
     if (parentUI == null) {
       Assertion.Assert(false, "ParentUI is null.");
       return;
@@ -33,7 +33,7 @@ public class UIInputReceiver : IDisposable {
     parentUI.OnHideEndObservable.Subscribe(_ => DisableInputAction()).AddTo(parentUI.RootObject);
     parentUI.RootObject.OnDestroyAsObservable().Take(1).Subscribe(_ => Dispose());
 
-    _inputAction = new InputAction("UIInputReceiver", InputActionType.Button, interactions: interactions);
+    _inputAction = new InputAction("UIInputReceiver", inputActionType, interactions: interactions);
     EnableInputAction();
 
     // Input時処理登録
