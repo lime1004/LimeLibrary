@@ -20,8 +20,6 @@ public class Copyright {
     builder.Append($"{_name}");
     builder.Append("\n");
   }
-
-  public Copyright(string year, string name) => (_year, _name) = (year, name);
 }
 
 }

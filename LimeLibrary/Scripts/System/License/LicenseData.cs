@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace LimeLibrary.License {
 
@@ -11,15 +11,10 @@ public class LicenseData {
   private string _targetName;
   public string TargetName => _targetName;
 
-  [SerializeField, FormerlySerializedAs("_copyright")]
-  private string _copyright_;
-  public string Copyright_ => _copyright_;
-
   [SerializeField]
-  private string _year;
-  public string Year => _year;
-
-  [SerializeField]
+#if LIME_ODIN_INSPECTOR
+  [HideLabel]
+#endif
   private Copyright _copyright;
   public Copyright Copyright => _copyright;
 
@@ -30,10 +25,6 @@ public class LicenseData {
   [SerializeField]
   private LicenseType _licenseType;
   public LicenseType LicenseType => _licenseType;
-
-  public void OnValidate() {
-    _copyright = new Copyright(_year, _copyright_);
-  }
 }
 
 }
