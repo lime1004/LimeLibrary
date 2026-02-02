@@ -25,11 +25,9 @@ public class LicenseStringBuilder {
     if (!string.IsNullOrEmpty(licenseData.TargetName)) {
       builder.AppendLine(licenseData.TargetName);
     }
-    if (!string.IsNullOrEmpty(licenseData.Copyright)) {
-      builder.Append("Copyright (c) ");
-      builder.Append($"{licenseData.Year} ");
-      builder.Append($"{licenseData.Copyright}");
-      builder.Append("\n");
+    licenseData.Copyright.Append(builder);
+    foreach (var copyright in licenseData.AdditionalCopyrights) {
+      copyright.Append(builder);
     }
     builder.Append("\n");
     builder.AppendLine(GetLicenceString(licenseData.LicenseType));
