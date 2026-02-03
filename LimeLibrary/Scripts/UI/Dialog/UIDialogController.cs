@@ -70,12 +70,13 @@ public class UIDialogController {
   }
 
   private void OnHideStart(IUIView uiView) {
+    var currentDialogData = _dialogDataList[^1];
+
     _dialogDataList.RemoveAll(data => data.UIView == uiView);
 
     // 背景画像処理
-    var currentDialogData = _dialogDataList[^1];
     if (_dialogDataList.Count > 0) {
-      SetupBackGround(_backGroundGameObject, currentDialogData);
+      SetupBackGround(_backGroundGameObject, _dialogDataList[^1]);
     } else {
       DisableBackGround(_backGroundGameObject, currentDialogData).RunHandlingError().Forget();
     }
