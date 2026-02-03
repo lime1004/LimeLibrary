@@ -71,16 +71,17 @@ public class UIDialogController {
 
   private void OnHideStart(IUIView uiView) {
     _dialogDataList.RemoveAll(data => data.UIView == uiView);
+
+    // 背景画像処理
+    var currentDialogData = _dialogDataList[^1];
+    if (_dialogDataList.Count > 0) {
+      SetupBackGround(_backGroundGameObject, currentDialogData);
+    } else {
+      DisableBackGround(_backGroundGameObject, currentDialogData).RunHandlingError().Forget();
+    }
   }
 
   private void OnHideEnd() {
-    // 背景画像処理
-    if (_dialogDataList.Count > 0) {
-      SetupBackGround(_backGroundGameObject, _dialogDataList[^1]);
-    } else {
-      DisableBackGround(_backGroundGameObject).RunHandlingError().Forget();
-    }
-
     // Focus処理
     if (_dialogDataList.Count > 0) {
       // 先頭のダイアログにFocus
@@ -108,7 +109,7 @@ public class UIDialogController {
     PlayBackGroundAnimation(gameObject,
       new Color(0f, 0f, 0, 0f),
       dialogData.DialogOption.BackgroundColor,
-      0.2f,
+      dialogData.DialogOption.BackgroundAnimationDuration,
       gameObject.GetCancellationTokenOnDestroy()).RunHandlingError().Forget();
 
     // ボタン追加
@@ -139,12 +140,12 @@ public class UIDialogController {
     }
   }
 
-  private async UniTask DisableBackGround(GameObject gameObject) {
+  private async UniTask DisableBackGround(GameObject gameObject, UIDialogData dialogData) {
     // 背景イメージアニメーション
     await PlayBackGroundAnimation(gameObject,
       null,
       new Color(0f, 0f, 0, 0f),
-      0.2f,
+      dialogData.DialogOption.BackgroundAnimationDuration,
       gameObject.GetCancellationTokenOnDestroy());
 
     gameObject.SetActive(false);
