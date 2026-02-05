@@ -33,6 +33,65 @@ public class InputBindingPathGetter : ScriptableObject {
     return bindings.Select(binding => binding.hasOverrides ? binding.overridePath : binding.path);
   }
 
+  public string GetCompositePartBindingPath(InputAction inputAction, IInputMode inputMode, string partName) {
+    string groupName = GetOrCacheGroupName(inputMode);
+
+    var bindings = inputAction.bindings;
+    bool inTargetComposite = false;
+
+    for (int i = 0; i < bindings.Count; i++) {
+      var binding = bindings[i];
+
+      // コンポジット親を見つけたらグループをチェック
+      if (binding.isComposite) {
+        inTargetComposite = ContainsGroup(binding.groups, groupName);
+        continue;
+      }
+
+      // 対象コンポジット内のパーツで、名前が一致するものを返す
+      if (inTargetComposite && binding.isPartOfComposite) {
+        if (string.Equals(binding.name, partName, StringComparison.OrdinalIgnoreCase)) {
+          return binding.hasOverrides ? binding.overridePath : binding.path;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  public IReadOnlyDictionary<string, string> GetCompositePartBindingPaths(InputAction inputAction, IInputMode inputMode) {
+    string groupName = GetOrCacheGroupName(inputMode);
+    var result = new Dictionary<string, string>();
+
+    var bindings = inputAction.bindings;
+    bool inTargetComposite = false;
+
+    for (int i = 0; i < bindings.Count; i++) {
+      var binding = bindings[i];
+
+      if (binding.isComposite) {
+        inTargetComposite = ContainsGroup(binding.groups, groupName);
+        continue;
+      }
+
+      if (inTargetComposite && binding.isPartOfComposite) {
+        string path = binding.hasOverrides ? binding.overridePath : binding.path;
+        result[binding.name.ToLower()] = path;
+      }
+    }
+
+    return result;
+  }
+
+  private string GetOrCacheGroupName(IInputMode inputMode) {
+    if (_groupNameDictionary.TryGetValue(inputMode.Name, out string value)) {
+      return value;
+    }
+    string groupName = GetGroupName(inputMode);
+    _groupNameDictionary.Add(inputMode.Name, groupName);
+    return groupName;
+  }
+
   private bool ContainsGroup(string groups, string groupName) {
     return groups.Split(";").Any(group => group == groupName);
   }
