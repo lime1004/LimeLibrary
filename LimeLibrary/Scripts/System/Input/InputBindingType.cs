@@ -50,6 +50,12 @@ public enum InputBindingType {
   CapsLock = 56,
   Backspace = 57,
   Enter = 58,
+  LeftShift = 160,
+  RightShift = 161,
+  LeftControl = 162,
+  RightControl = 163,
+  LeftAlt = 164,
+  RightAlt = 165,
   W = 60,
   A = 61,
   S = 62,
@@ -134,7 +140,9 @@ public enum InputBindingType {
   /// </summary>
   LeftClick = 200,
   RightClick = 201,
+  MiddleClick = 203,
   MousePointer = 202,
+  MouseScrollWheel = 204,
 }
 
 }

@@ -57,6 +57,12 @@ public static class InputBindingPath {
     { InputBindingType.CapsLock, $"{Keyboard}capsLock" },
     { InputBindingType.Backspace, $"{Keyboard}backspace" },
     { InputBindingType.Enter, $"{Keyboard}enter" },
+    { InputBindingType.LeftShift, $"{Keyboard}leftShift" },
+    { InputBindingType.RightShift, $"{Keyboard}rightShift" },
+    { InputBindingType.LeftControl, $"{Keyboard}leftCtrl" },
+    { InputBindingType.RightControl, $"{Keyboard}rightCtrl" },
+    { InputBindingType.LeftAlt, $"{Keyboard}leftAlt" },
+    { InputBindingType.RightAlt, $"{Keyboard}rightAlt" },
 
     { InputBindingType.W, $"{Keyboard}w" },
     { InputBindingType.A, $"{Keyboard}a" },
@@ -144,7 +150,9 @@ public static class InputBindingPath {
 
     { InputBindingType.LeftClick, $"{Mouse}leftButton" },
     { InputBindingType.RightClick, $"{Mouse}rightButton" },
+    { InputBindingType.MiddleClick, $"{Mouse}middleButton" },
     { InputBindingType.MousePointer, $"{Mouse}position" },
+    { InputBindingType.MouseScrollWheel, $"{Mouse}scroll" },
   };
 
   public static string Get(InputBindingType inputBindingType) {
