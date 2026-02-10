@@ -52,6 +52,27 @@ public abstract class ServiceLocator<T> : SingletonMonoBehaviour<T> where T : Mo
   }
 
   /// <summary>
+  /// インスタンスを削除
+  /// </summary>
+  public void RemoveInstance<TInstance>(TInstance instance) where TInstance : class {
+    var type = typeof(TInstance);
+    if (!ExistInstance<TInstance>()) {
+      return;
+    }
+
+    if (_serviceDictionary[type] != instance) return;
+
+    _serviceDictionary.Remove(type);
+
+    // 実装しているインターフェースも削除
+    foreach (var i in type.GetInterfaces()) {
+      if (_serviceDictionary.TryGetValue(i, out var value) && value == instance) {
+        _serviceDictionary.Remove(i);
+      }
+    }
+  }
+
+  /// <summary>
   /// インスタンスを取得
   /// </summary>
   public TInstance GetInstance<TInstance>() where TInstance : class {
