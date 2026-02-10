@@ -29,6 +29,13 @@ public class UIAnimator : MonoBehaviour {
     }
   }
 
+  public void Pause(string id) {
+    foreach (var player in _playerList) {
+      if (player.Id != id) continue;
+      player.Pause();
+    }
+  }
+
   public void Stop(string id) {
     foreach (var player in _playerList) {
       if (player.Id != id) continue;
