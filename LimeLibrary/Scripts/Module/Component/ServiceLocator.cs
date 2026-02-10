@@ -44,6 +44,11 @@ public abstract class ServiceLocator<T> : SingletonMonoBehaviour<T> where T : Mo
       return;
     }
     _serviceDictionary.Remove(type);
+
+    // 実装しているインターフェースも削除
+    foreach (var i in type.GetInterfaces()) {
+      _serviceDictionary.Remove(i);
+    }
   }
 
   /// <summary>
