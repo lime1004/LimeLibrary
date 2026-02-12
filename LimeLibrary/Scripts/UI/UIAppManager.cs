@@ -30,7 +30,7 @@ public class UIAppManager : MonoBehaviour {
   }
 
   private readonly Stack<List<UIAppData>> _appDataListStack = new();
-  private readonly List<UIApp> _residentAppList = new();
+  private readonly List<UIAppData> _residentAppDataList = new();
 
   public async UniTask<T> CreateAppAsync<T>(string address, UIAppAwakeType appAwakeType, CancellationToken cancellationToken, bool isInitialize = true, bool isShow = true) where T : UIApp {
     return await CreateAppAsync(address, appAwakeType, cancellationToken, isInitialize, isShow) as T;
@@ -92,7 +92,7 @@ public class UIAppManager : MonoBehaviour {
       _appDataListStack.Peek().Add(new UIAppData(uiApp, address));
       break;
     case UIAppAwakeType.Resident:
-      _residentAppList.Add(uiApp);
+      _residentAppDataList.Add(new UIAppData(uiApp, address));
       break;
     default:
       Assertion.Assert(false);
@@ -101,8 +101,7 @@ public class UIAppManager : MonoBehaviour {
   }
 
   private void OnDestroyUIApp(UIApp destroyedUiApp) {
-    if (_residentAppList.Contains(destroyedUiApp)) {
-      _residentAppList.Remove(destroyedUiApp);
+    if (_residentAppDataList.RemoveAll(data => data.UIApp == destroyedUiApp) > 0) {
       return;
     }
 
@@ -133,9 +132,9 @@ public class UIAppManager : MonoBehaviour {
   }
 
   public void OnUpdate() {
-    foreach (var residentApp in _residentAppList) {
-      if (!residentApp.IsInitialized) continue;
-      residentApp.OnUpdate();
+    foreach (var residentUiAppData in _residentAppDataList) {
+      if (!residentUiAppData.UIApp.IsInitialized) continue;
+      residentUiAppData.UIApp.OnUpdate();
     }
 
     if (_appDataListStack.Count != 0) {
@@ -148,6 +147,12 @@ public class UIAppManager : MonoBehaviour {
   }
 
   public UIApp GetUIApp(string address, bool isIncludeInactive = false) {
+    foreach (var residentUiAppData in _residentAppDataList) {
+      if (residentUiAppData.Address == address) {
+        return residentUiAppData.UIApp;
+      }
+    }
+
     if (!isIncludeInactive) {
       foreach (var uiAppData in _appDataListStack.Peek()) {
         if (uiAppData.Address == address) {
@@ -168,6 +173,12 @@ public class UIAppManager : MonoBehaviour {
   }
 
   public T GetUIApp<T>(bool isIncludeInactive = false) where T : UIApp {
+    foreach (var residentUiAppData in _residentAppDataList) {
+      if (residentUiAppData.UIApp is T targetUIApp) {
+        return targetUIApp;
+      }
+    }
+
     if (!isIncludeInactive) {
       foreach (var uiAppData in _appDataListStack.Peek()) {
         if (uiAppData.UIApp is T targetUIApp) {
@@ -187,7 +198,10 @@ public class UIAppManager : MonoBehaviour {
   }
 
   public bool ExistsUIApp(string address) {
-    if (_appDataListStack.Count <= 0) return false;
+    foreach (var residentUiAppData in _residentAppDataList) {
+      if (residentUiAppData.Address == address) return true;
+    }
+
     foreach (var uiAppList in _appDataListStack) {
       foreach (var uiAppData in uiAppList) {
         if (uiAppData.Address == address) return true;
@@ -197,7 +211,10 @@ public class UIAppManager : MonoBehaviour {
   }
 
   public bool ExistsUIApp<T>() where T : UIApp {
-    if (_appDataListStack.Count <= 0) return false;
+    foreach (var residentUiAppData in _residentAppDataList) {
+      if (residentUiAppData.UIApp is T) return true;
+    }
+
     foreach (var uiAppList in _appDataListStack) {
       foreach (var uiAppData in uiAppList) {
         if (uiAppData.UIApp is T) return true;
