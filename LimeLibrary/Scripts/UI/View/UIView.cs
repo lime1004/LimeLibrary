@@ -121,6 +121,12 @@ public abstract class UIView : MonoBehaviour, IUIView {
   public string GetUIText(string label) => ParentApp.GetUIText(label);
   public string GetText<TDataTable, TData>(TextQuery<TDataTable, TData> textQuery, string label) where TDataTable : ITable<TData> where TData : struct, ITextData => ParentApp.GetText(textQuery, label);
 
+  public bool ExitsAnimation(string id) => Animator.Exists(id);
+  public async UniTask PlayAnimation(string id, CancellationToken cancellationToken) => await Animator.Play(id, cancellationToken);
+  public void PlayImmediateAnimation(string id) => Animator.PlayImmediate(id);
+  public void PauseAnimation(string id) => Animator.Pause(id);
+  public void StopAnimation(string id) => Animator.Stop(id);
+
   public void SetShowAnimationId(string showAnimationId) => _controller.ShowAnimationId = showAnimationId;
   public void SetHideAnimationId(string hideAnimationId) => _controller.HideAnimationId = hideAnimationId;
 }
