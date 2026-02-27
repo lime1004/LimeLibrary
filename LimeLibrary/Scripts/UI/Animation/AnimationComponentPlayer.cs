@@ -73,6 +73,7 @@ public class AnimationComponentPlayer : IUIAnimationPlayer {
     if (!_animationClip.legacy) {
       _animationClip.legacy = true;
     }
+    _animation.AddClip(_animationClip, _animationClip.name);
     _animation.clip = _animationClip;
   }
 }
