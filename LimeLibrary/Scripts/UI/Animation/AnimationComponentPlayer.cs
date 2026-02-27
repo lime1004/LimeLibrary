@@ -16,33 +16,64 @@ public class AnimationComponentPlayer : IUIAnimationPlayer {
   [SerializeField]
   private AnimationClip _animationClip;
 
+  private bool _isPaused;
+
+  private string ClipName => _animationClip.name;
+
   public void Play() {
-    var state = _animation[_animation.name];
-    if (state != null && state.speed == 0f && state.time > 0f && state.time < state.length) {
-      state.speed = 1f;
-    } else {
-      _animationClip.legacy = true;
-      _animation.clip = _animationClip;
-      _animation.Play(_animationClip.name);
+    if (_animation == null || _animationClip == null) return;
+
+    if (_isPaused) {
+      _animation[ClipName].speed = 1f;
+      _isPaused = false;
+      return;
     }
+
+    EnsureLegacyAndAssign();
+    _animation.Play(ClipName);
   }
 
   public void PlayImmediate() {
-    _animation.Play(_animation.clip.name);
-    _animation[_animation.clip.name].normalizedTime = 1f;
-  }
+    if (_animation == null || _animationClip == null) return;
 
-  public void Pause() {
-    _animation[_animation.clip.name].speed = 0f;
-  }
-
-  public void Stop() {
-    _animation.Rewind();
+    EnsureLegacyAndAssign();
+    _animation.Play(ClipName);
+    var state = _animation[ClipName];
+    state.normalizedTime = 1f;
+    _animation.Sample();
     _animation.Stop();
   }
 
+  public void Pause() {
+    if (_animation == null || _animationClip == null) return;
+
+    var state = _animation[ClipName];
+    if (state != null && _animation.isPlaying) {
+      state.speed = 0f;
+      _isPaused = true;
+    }
+  }
+
+  public void Stop() {
+    if (_animation == null) return;
+
+    _animation.Rewind();
+    _animation.Stop();
+    _isPaused = false;
+  }
+
   public UniTask WaitPlaying(CancellationToken cancellationToken) {
-    return UniTask.WaitWhile(() => _animation.isPlaying, cancellationToken: cancellationToken);
+    return UniTask.WaitWhile(
+      () => _animation != null && _animation.isPlaying,
+      cancellationToken: cancellationToken
+    );
+  }
+
+  private void EnsureLegacyAndAssign() {
+    if (!_animationClip.legacy) {
+      _animationClip.legacy = true;
+    }
+    _animation.clip = _animationClip;
   }
 }
 
