@@ -68,6 +68,34 @@ public class InputModeUpdater : SingletonMonoBehaviour<InputModeUpdater> {
     }
   }
 
+  /// <summary>
+  /// 外部からInputModeをインデックスで切り替える
+  /// </summary>
+  public void SetInputMode(int index) {
+    if (!_inputModeList.IsDefinedAt(index)) return;
+    if (_currentInputModeIndex == index) return;
+    ChangeInputMode(index);
+  }
+
+  /// <summary>
+  /// 外部からInputModeを名前で切り替える
+  /// </summary>
+  public void SetInputMode(string inputModeName) {
+    int index = _inputModeList.FindIndex(m => m.Name == inputModeName);
+    if (index >= 0) SetInputMode(index);
+  }
+
+  private void ChangeInputMode(int nextInputModeIndex) {
+    if (_inputModeList.IsDefinedAt(_currentInputModeIndex)) {
+      _inputModeList[_currentInputModeIndex].OnExitInputMode();
+    }
+    _inputModeList[nextInputModeIndex].OnEnterInputMode();
+    _currentInputModeIndex = nextInputModeIndex;
+#if LIME_R3
+    _onChangeInputModeSubject.OnNext(_inputModeList[nextInputModeIndex]);
+#endif
+  }
+
   private void OnUnpairedDeviceUsed(InputControl inputControl) {
     var device = inputControl.device;
 
@@ -76,14 +104,7 @@ public class InputModeUpdater : SingletonMonoBehaviour<InputModeUpdater> {
       if (_currentInputModeIndex == nextInputModeIndex) continue;
       if (!inputMode.CheckChangeInputMode(inputControl.device)) continue;
 
-      if (_inputModeList.IsDefinedAt(_currentInputModeIndex)) {
-        _inputModeList[_currentInputModeIndex].OnExitInputMode();
-      }
-      inputMode.OnEnterInputMode();
-      _currentInputModeIndex = nextInputModeIndex;
-#if LIME_R3
-      _onChangeInputModeSubject.OnNext(inputMode);
-#endif
+      ChangeInputMode(nextInputModeIndex);
       break;
     }
 
