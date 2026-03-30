@@ -95,7 +95,10 @@ public class UISingleView : MonoBehaviour, IUIView {
 
   public void SetSortingOrderFront() => _controller.SetSortingOrderFront();
 
-  public void Destroy() => OnDestroyView();
+  public void Destroy() {
+    OnDestroyView();
+    Destroy(gameObject);
+  }
 }
 
 }
