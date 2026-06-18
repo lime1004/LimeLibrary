@@ -15,6 +15,7 @@ public class UIToggle : MonoBehaviour, IUIParts {
 
   private readonly Subject<bool> _onValueChangeSubject = new();
   private readonly ClickRangeAdjuster _clickRangeAdjuster = new();
+  private Action<InputAction.CallbackContext> _togglePerformedCallback;
   private bool _isInitialized;
 
   public IUIView ParentView { get; private set; }
@@ -36,10 +37,11 @@ public class UIToggle : MonoBehaviour, IUIParts {
 
     _toggleInputAction = new InputAction("Toggle", InputActionType.Button);
     _toggleInputAction.Enable();
-    _toggleInputAction.performed += _ => {
+    _togglePerformedCallback = _ => {
       if (!IsEnable()) return;
       Toggle.isOn = !Toggle.isOn;
     };
+    _toggleInputAction.performed += _togglePerformedCallback;
 
     _isInitialized = true;
   }
@@ -53,7 +55,10 @@ public class UIToggle : MonoBehaviour, IUIParts {
   }
 
   private void OnDestroy() {
-    _toggleInputAction?.Dispose();
+    if (_toggleInputAction != null) {
+      _toggleInputAction.performed -= _togglePerformedCallback;
+      _toggleInputAction.Dispose();
+    }
   }
 
   public void SetIsOn(bool isOn) {
