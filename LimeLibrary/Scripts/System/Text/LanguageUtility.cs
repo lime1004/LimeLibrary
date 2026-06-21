@@ -3,6 +3,7 @@
 // ReSharper disable StringLiteralTypo
 #if LIME_STEAMWORKS
 using Steamworks;
+using LimeLibrary.Steam;
 #endif
 
 namespace LimeLibrary.Text {
@@ -11,7 +12,7 @@ public static class LanguageUtility {
   public static Language? GetDeviceLanguage() {
     // TODO Switch版対応
 #if LIME_STEAMWORKS
-    if (SteamManager.Initialized) {
+    if (SteamLifecycle.Initialized) {
       return ConvertFromSteamLanguage(SteamUtils.GetSteamUILanguage());
     }
 #endif
