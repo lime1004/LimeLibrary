@@ -1,7 +1,6 @@
 ﻿#if LIME_STEAMWORKS
 using System;
 using Steamworks;
-using UnityEngine;
 using LimeLibrary.Utility;
 #endif
 
@@ -34,7 +33,7 @@ public static class SteamLifecycle {
     try {
       if (SteamAPI.RestartAppIfNecessary(new AppId_t(appId))) {
         Logger.LogWarning("SteamLifecycle: Steam 経由での再起動が必要. アプリを終了する.");
-        Application.Quit();
+        UnityEngine.Application.Quit();
         return false;
       }
       if (!SteamAPI.Init()) {
