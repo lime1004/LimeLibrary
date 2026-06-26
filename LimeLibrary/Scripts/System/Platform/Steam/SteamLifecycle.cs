@@ -9,7 +9,13 @@ public class SteamLifecycle : MonoBehaviour {
   [SerializeField]
   private uint _appId;
 
-  public bool Initialized { get; private set; }
+  public static bool IsInitialized { get; private set; }
+  public bool Initialized => IsInitialized;
+
+  [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+  private static void ResetStaticState() {
+    IsInitialized = false;
+  }
 
   private void Update() {
     RunCallbacks();
@@ -19,8 +25,12 @@ public class SteamLifecycle : MonoBehaviour {
     Shutdown();
   }
 
+  private void OnApplicationQuit() {
+    Shutdown();
+  }
+
   public bool Initialize(uint appId) {
-    if (Initialized) return true;
+    if (IsInitialized) return true;
     try {
       if (SteamAPI.RestartAppIfNecessary(new AppId_t(appId))) {
         Logger.LogWarning("SteamLifecycle: Steam経由での再起動が必要です。アプリを終了します。");
@@ -29,31 +39,32 @@ public class SteamLifecycle : MonoBehaviour {
       }
       if (!SteamAPI.Init()) {
         Logger.LogWarning("SteamLifecycle: SteamAPI.Init() failed.");
-        Initialized = false;
+        IsInitialized = false;
         return false;
       }
-      Initialized = true;
+      IsInitialized = true;
       return true;
     } catch (Exception e) {
       Logger.LogWarning($"SteamLifecycle: Initialize threw an exception. {e}");
-      Initialized = false;
+      IsInitialized = false;
       return false;
     }
   }
 
   private void RunCallbacks() {
-    if (!Initialized) return;
+    if (!IsInitialized) return;
     SteamAPI.RunCallbacks();
   }
 
   private void Shutdown() {
-    if (!Initialized) return;
+    if (!IsInitialized) return;
     try {
       SteamAPI.Shutdown();
     } catch (Exception e) {
       Logger.LogWarning($"SteamLifecycle: Shutdown threw an exception. {e}");
+    } finally {
+      IsInitialized = false;
     }
-    Initialized = false;
   }
 }
 
