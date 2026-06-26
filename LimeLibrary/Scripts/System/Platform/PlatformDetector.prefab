@@ -1,0 +1,68 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8451481524566387744
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6584523485226188951}
+  - component: {fileID: -774922532775814450}
+  m_Layer: 0
+  m_Name: PlatformDetector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6584523485226188951
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8451481524566387744}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-774922532775814450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8451481524566387744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93caf7067fe143d6afee2a3a97f7bcad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  StoreArgumentName: store
+  _platformSettings:
+  - _detectCommandLineArgs:
+    - steam
+    _initializer:
+      rid: 1416325411044589568
+  - _detectCommandLineArgs:
+    - eos
+    _initializer:
+      rid: -2
+  _editorPlatformName: 
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 1416325411044589568
+      type: {class: SteamInitializer, ns: LimeLibrary.Steam, asm: LimeLibrary.Steamworks}
+      data:
+        _steamId: 0
+        _lifecyclePrefab: {fileID: 6205665746243175043, guid: e6023e5ede817dc4ca29583804ab4230, type: 3}
+        _parent: {fileID: 8451481524566387744}

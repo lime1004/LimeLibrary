@@ -1,9 +1,9 @@
-﻿using UnityEngine;
+﻿using LimeLibrary.Platform;
+using UnityEngine;
 
 // ReSharper disable StringLiteralTypo
 #if LIME_STEAMWORKS
 using Steamworks;
-using LimeLibrary.Steam;
 #endif
 
 namespace LimeLibrary.Text {
@@ -12,7 +12,7 @@ public static class LanguageUtility {
   public static Language? GetDeviceLanguage() {
     // TODO Switch版対応
 #if LIME_STEAMWORKS
-    if (SteamLifecycle.Initialized) {
+    if (PlatformDetector.Instance.PlatformName.Equals("steam", System.StringComparison.OrdinalIgnoreCase)) {
       return ConvertFromSteamLanguage(SteamUtils.GetSteamUILanguage());
     }
 #endif

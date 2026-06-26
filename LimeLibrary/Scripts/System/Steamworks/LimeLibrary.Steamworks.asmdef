@@ -1,0 +1,19 @@
+{
+    "name": "LimeLibrary.Steamworks",
+    "rootNamespace": "",
+    "references": [
+        "GUID:68bd7fdb68ef2684e982e8a9825b18a5",
+        "GUID:2c2578ff970d4d1418bcd816b9643364"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "LIME_STEAMWORKS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
