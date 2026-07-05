@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace LimeLibrary.License {
@@ -7,16 +8,35 @@ public class LicenseStringBuilder {
   private readonly IEnumerable<LicenseData> _licenceDataList;
 
   public LicenseStringBuilder(IEnumerable<LicenseData> licenceDataList) {
-    _licenceDataList = licenceDataList;
+    _licenceDataList = licenceDataList ?? Enumerable.Empty<LicenseData>();
   }
 
   public string Build() {
     var builder = new StringBuilder();
+    var usedLicenseTypes = new List<LicenseType>();
     foreach (var licenceData in _licenceDataList) {
       builder.AppendLine("-----------------------------------------------------------------------------------------------------");
       string licenceDataString = BuildLicenceData(licenceData);
       builder.AppendLine(licenceDataString);
+
+      if (!usedLicenseTypes.Contains(licenceData.LicenseType)) {
+        usedLicenseTypes.Add(licenceData.LicenseType);
+      }
     }
+
+    // 各ライブラリのCopyright表示に加え、使用されているライセンス種別の全文を1種類につき1回だけ末尾に載せる。
+    // (MIT/OFLはいずれも著作権表示に加えて許諾表示・ライセンス本文の同梱を要求するため)
+    foreach (var licenseType in usedLicenseTypes) {
+      string fullText = LicenseFullText.Get(licenseType);
+      if (string.IsNullOrEmpty(fullText)) continue;
+
+      builder.AppendLine("=========================================================================================================");
+      builder.AppendLine(GetLicenceString(licenseType));
+      builder.AppendLine();
+      builder.AppendLine(fullText);
+      builder.AppendLine();
+    }
+
     return builder.ToString();
   }
 
