@@ -16,7 +16,9 @@ public class Copyright {
 
   public void Append(StringBuilder builder) {
     builder.Append("Copyright (c) ");
-    builder.Append($"{_year} ");
+    if (!string.IsNullOrEmpty(_year)) {
+      builder.Append($"{_year} ");
+    }
     builder.Append($"{_name}");
     builder.Append("\n");
   }
