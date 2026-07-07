@@ -1,21 +1,35 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace LimeLibrary.License {
 
 public class LicenseStringBuilder {
-  private readonly IEnumerable<LicenseData> _licenceDataList;
+  // デフォルト幅はLicenseFullTextの本文の折り返し幅（最長78文字）に合わせている
+  private const int DefaultCopyrightSeparatorWidth = 78;
+  private const int DefaultLicenseFullTextSeparatorWidth = 78;
 
-  public LicenseStringBuilder(IEnumerable<LicenseData> licenceDataList) {
+  private readonly IEnumerable<LicenseData> _licenceDataList;
+  private readonly int _copyrightSeparatorWidth;
+  private readonly int _licenseFullTextSeparatorWidth;
+
+  public LicenseStringBuilder(
+    IEnumerable<LicenseData> licenceDataList,
+    int copyrightSeparatorWidth = DefaultCopyrightSeparatorWidth,
+    int licenseFullTextSeparatorWidth = DefaultLicenseFullTextSeparatorWidth) {
+    if (copyrightSeparatorWidth < 1) throw new ArgumentOutOfRangeException(nameof(copyrightSeparatorWidth));
+    if (licenseFullTextSeparatorWidth < 1) throw new ArgumentOutOfRangeException(nameof(licenseFullTextSeparatorWidth));
     _licenceDataList = licenceDataList ?? Enumerable.Empty<LicenseData>();
+    _copyrightSeparatorWidth = copyrightSeparatorWidth;
+    _licenseFullTextSeparatorWidth = licenseFullTextSeparatorWidth;
   }
 
   public string Build() {
     var builder = new StringBuilder();
     var usedLicenseTypes = new List<LicenseType>();
     foreach (var licenceData in _licenceDataList) {
-      builder.AppendLine("-----------------------------------------------------------------------------------------------------");
+      builder.AppendLine(new string('-', _copyrightSeparatorWidth));
       string licenceDataString = BuildLicenceData(licenceData);
       builder.AppendLine(licenceDataString);
 
@@ -30,7 +44,7 @@ public class LicenseStringBuilder {
       string fullText = LicenseFullText.Get(licenseType);
       if (string.IsNullOrEmpty(fullText)) continue;
 
-      builder.AppendLine("=========================================================================================================");
+      builder.AppendLine(new string('=', _licenseFullTextSeparatorWidth));
       builder.AppendLine(GetLicenceString(licenseType));
       builder.AppendLine();
       builder.AppendLine(fullText);
