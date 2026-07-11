@@ -55,16 +55,38 @@ public class InputModeUpdater : SingletonMonoBehaviour<InputModeUpdater> {
   }
 
   private void OnUnpairedDeviceUsedCallback(InputControl inputControl, InputEventPtr inputEventPtr) {
+    if (!IsInputModeSwitchCandidate(inputControl)) return;
     _onUseDeviceChannel.Writer.TryWrite(inputControl);
+  }
+
+  // NOTE: onUnpairedDeviceUsedは親のVector2Control等ではなく葉コントロール単位で通知される
+  // （マウスのposition/x等やスティックのleftStick/x等はAxisControl、D-padの各方向はButtonControl）。
+  // マウスは移動・スクロール由来の通知だけでも毎フレーム大量に来てキューを埋め、
+  // ゲームパッド切替の反映を遅らせるので、マウスについては消費側DefaultMouseKeyboard.CheckChangeInputMode
+  // が実際に見ているボタン（左/右/中）だけをキューに積む。他デバイスはそのまま通す
+  private static bool IsInputModeSwitchCandidate(InputControl inputControl) {
+    if (inputControl.device is not Mouse mouse) return true;
+
+    return inputControl == mouse.leftButton ||
+           inputControl == mouse.rightButton ||
+           inputControl == mouse.middleButton;
   }
 
   private async UniTaskVoid RunUseDeviceEvent(CancellationToken cancellationToken) {
     _onUseDeviceChannel = Channel.CreateSingleConsumerUnbounded<InputControl>();
+    var reader = _onUseDeviceChannel.Reader;
 
-    await foreach (var inputControl in _onUseDeviceChannel.Reader.ReadAllAsync(cancellationToken)) {
+    while (await reader.WaitToReadAsync(cancellationToken)) {
       // NOTE: ボタンの押下判定などが正確に取れないため、PlayerLoopTiming.Updateまで待つ
       await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
-      OnUnpairedDeviceUsed(inputControl);
+
+      // NOTE: 1件読むごとにYieldするとキューが伸びたときに末尾のイベントが数フレーム〜数秒単位で
+      // 遅延する（マウス移動のようにキュー投入頻度が高いデバイスが混ざると顕著）。
+      // 1フレームにつきYieldは1回だけにし、そのフレームで溜まっている分をTryReadでまとめて捌く
+      while (reader.TryRead(out var inputControl)) {
+        cancellationToken.ThrowIfCancellationRequested();
+        OnUnpairedDeviceUsed(inputControl);
+      }
     }
   }
 
