@@ -59,6 +59,7 @@ public class SelectableExtender {
     _parentView.InputObservables.OnChangeInputModeObservable.Subscribe(inputMode => {
       var appearanceDataList = _selectableAppearanceDictionary.GetSelectableAppearanceDataList(ExtendSelectionState);
       foreach (var selectableAppearanceData in appearanceDataList) {
+        if (!selectableAppearanceData.SelectableAppearance.IsReapplyOnInputModeChange) continue;
         if (selectableAppearanceData.IsEnableInputMode(inputMode.Name)) {
           selectableAppearanceData.Apply();
         }
