@@ -45,8 +45,8 @@ internal class SceneUpdater : MonoBehaviour {
     case SceneState.Create: {
       var scene = GetScene(_interface.GetNowSceneType());
       if (scene != null) {
-        _interface.OnStartScene(scene);
         scene.Initialize();
+        _interface.OnStartScene(scene);
         _sceneCreateTask = scene.CreateAsync(_prevSceneType, this.GetCancellationTokenOnDestroy()).RunHandlingError();
         _interface.SetSceneState(SceneState.CreateWait);
       }
