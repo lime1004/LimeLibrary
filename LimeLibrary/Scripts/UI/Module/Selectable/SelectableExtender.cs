@@ -47,6 +47,14 @@ public class SelectableExtender {
       UpdateSelectionState();
     }).AddTo(_compositeDisposable);
 
+    // 非アクティブ化中はLateUpdateが止まりUpdateSelectionStateが呼ばれないため、
+    // 状態がHighlighted/Pressed等のまま凍結する。currentSelectionStateはUnityのOnDisable
+    // （InstantClearState）との実行順が不定でクリア前の値を拾い得るため参照せず、
+    // 無条件にNormalへ倒す
+    selectable.OnDisableAsObservable().Subscribe(_ => {
+      ExtendSelectionState = ExtendSelectionState.Normal;
+    }).AddTo(_compositeDisposable);
+
     // 状態変更時処理
     OnChangeExtendSelectionState.Subscribe(_parentView, (states, view) => {
       var (prevState, nextState) = states;
