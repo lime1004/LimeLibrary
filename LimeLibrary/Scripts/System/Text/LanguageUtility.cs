@@ -1,22 +1,42 @@
-﻿using LimeLibrary.Platform;
+﻿using System;
 using UnityEngine;
-
-// ReSharper disable StringLiteralTypo
-#if LIME_STEAMWORKS
-using Steamworks;
-#endif
 
 namespace LimeLibrary.Text {
 
 public static class LanguageUtility {
-  public static Language? GetDeviceLanguage() {
-    // TODO Switch版対応
-#if LIME_STEAMWORKS
-    if (PlatformDetector.Instance.PlatformName.Equals("steam", System.StringComparison.OrdinalIgnoreCase)) {
-      return ConvertFromSteamLanguage(SteamUtils.GetSteamUILanguage());
-    }
-#endif
-    return ConvertFromSystemLanguage(Application.systemLanguage);
+  /// <summary>
+  /// OSの設定言語を取得
+  /// </summary>
+  public static Language GetSystemLanguage(Language fallback = Language.English) {
+    return ConvertFromSystemLanguage(Application.systemLanguage) ?? fallback;
+  }
+
+  private static Func<Language?> s_platformLanguageResolver;
+
+  /// <summary>
+  /// プラットフォームの設定言語を取得
+  /// </summary>
+  public static Language? GetPlatformLanguage() {
+    return s_platformLanguageResolver?.Invoke();
+  }
+
+  /// <summary>
+  /// プラットフォームの設定言語を取得、取得できなければOSの設定言語を取得
+  /// </summary>
+  public static Language GetPreferredLanguage() {
+    return GetPlatformLanguage() ?? GetSystemLanguage();
+  }
+
+  /// <summary>
+  /// プラットフォーム側から言語取得処理を登録する
+  /// </summary>
+  public static void SetPlatformLanguageResolver(Func<Language?> resolver) {
+    s_platformLanguageResolver = resolver;
+  }
+
+  [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+  private static void ResetStaticState() {
+    s_platformLanguageResolver = null;
   }
 
   public static Language? ConvertFromSteamLanguage(string steamLanguage) {

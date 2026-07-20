@@ -1,5 +1,6 @@
 using System;
 using LimeLibrary.Platform;
+using LimeLibrary.Text;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -13,12 +14,16 @@ public class SteamInitializer : IPlatformInitializer {
   private SteamLifecycle _lifecyclePrefab;
 
   public void Initialize(GameObject parent) {
-    if (_lifecyclePrefab == null) return;
+    // LifecycleObjectの生成
+    if (_lifecyclePrefab) {
+      var lifecycle = parent != null ?
+        Object.Instantiate(_lifecyclePrefab, parent.transform) :
+        Object.Instantiate(_lifecyclePrefab);
+      lifecycle.Initialize(_steamId);
+    }
 
-    var lifecycle = parent != null ?
-      Object.Instantiate(_lifecyclePrefab, parent.transform) :
-      Object.Instantiate(_lifecyclePrefab);
-    lifecycle.Initialize(_steamId);
+    // プラットフォーム言語取得処理の登録
+    LanguageUtility.SetPlatformLanguageResolver(SteamLanguage.GetLanguage);
   }
 }
 
