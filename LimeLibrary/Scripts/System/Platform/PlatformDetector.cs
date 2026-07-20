@@ -17,19 +17,26 @@ public class PlatformDetector : SingletonMonoBehaviour<PlatformDetector> {
 
   public string PlatformName { get; private set; } = string.Empty;
   public PlatformStoreSource DetectedSource { get; private set; } = PlatformStoreSource.None;
+  // NOTE: 成功可否ではなく初期化処理の試行完了を表す（判定失敗時もtrueになる）
+  public bool Initialized { get; private set; }
 
   protected override void Awake() {
     base.Awake();
 
-    (PlatformName, DetectedSource) = DetectPlatform();
+    // NOTE: 初期化中の例外で待機側がハングしないよう、finallyで必ず試行完了にする
+    try {
+      (PlatformName, DetectedSource) = DetectPlatform();
 
-    if (_platformSettings == null) return;
-
-    foreach (var platformSetting in _platformSettings) {
-      if (platformSetting == null) continue;
-      if (platformSetting.Match(PlatformName)) {
-        platformSetting.Initialize(gameObject);
+      if (_platformSettings != null) {
+        foreach (var platformSetting in _platformSettings) {
+          if (platformSetting == null) continue;
+          if (platformSetting.Match(PlatformName)) {
+            platformSetting.Initialize(gameObject);
+          }
+        }
       }
+    } finally {
+      Initialized = true;
     }
   }
 
