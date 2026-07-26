@@ -62,7 +62,7 @@ public class UIToggle : MonoBehaviour, IUIParts {
   }
 
   public void SetIsOn(bool isOn) {
-    Toggle.isOn = isOn;
+    Toggle.SetIsOnWithoutNotify(isOn);
   }
 
   public void AddInputBinding(string path) {

@@ -1,4 +1,5 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
 using LimeLibrary.Extensions;
 using LimeLibrary.UI.View;
 using R3;
@@ -15,7 +16,8 @@ public class UISlider : MonoBehaviour, IUIParts {
   public RectTransform RectTransform => transform.AsRectTransform();
 
   public Slider Slider { get; private set; }
-  public Observable<float> OnChangeValueObservable => Slider.OnValueChangedAsObservable();
+  // NOTE: R3のOnValueChangedAsObservableは購読時に現在値を1回流すため使わない
+  public Observable<float> OnChangeValueObservable => Slider.onValueChanged.AsObservable(Slider.GetCancellationTokenOnDestroy());
 
   public void Initialize(IUIView parentView) {
     if (_isInitialized) return;
@@ -28,7 +30,7 @@ public class UISlider : MonoBehaviour, IUIParts {
   }
 
   public void SetValue(float value) {
-    Slider.value = value;
+    Slider.SetValueWithoutNotify(value);
   }
 
   public void SetMinMaxValue(float min, float max) {
