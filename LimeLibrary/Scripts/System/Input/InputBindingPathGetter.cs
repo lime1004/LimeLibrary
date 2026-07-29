@@ -4,6 +4,7 @@ using System.Linq;
 using LimeLibrary.Input.InputMode;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Logger = LimeLibrary.Utility.Logger;
 
 namespace LimeLibrary.Input {
 
@@ -93,18 +94,21 @@ public class InputBindingPathGetter : ScriptableObject {
   }
 
   private bool ContainsGroup(string groups, string groupName) {
+    if (string.IsNullOrEmpty(groupName)) return false;
     return groups.Split(";").Any(group => group == groupName);
   }
 
   private string GetGroupName(IInputMode inputMode) {
     string[] controlPaths = GetControlPaths(inputMode);
     foreach (var controlScheme in _inputActionAsset.controlSchemes) {
+      if (controlScheme.deviceRequirements.Count != controlPaths.Length) continue;
       bool existsAll = controlPaths.All(controlPath =>
         controlScheme.deviceRequirements.Any(requirement => requirement.controlPath == controlPath));
       if (existsAll) {
         return controlScheme.name;
       }
     }
+    Logger.LogWarning($"InputBindingPathGetter: 一致するControlSchemeが見つかりません. InputMode: {inputMode.Name}, ControlPaths: {string.Join(", ", controlPaths)}");
     return string.Empty;
   }
 
