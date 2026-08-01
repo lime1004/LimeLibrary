@@ -95,6 +95,7 @@ public class InputBindingPathGetter : ScriptableObject {
 
   private bool ContainsGroup(string groups, string groupName) {
     if (string.IsNullOrEmpty(groupName)) return false;
+    if (string.IsNullOrEmpty(groups)) return false;
     return groups.Split(";").Any(group => group == groupName);
   }
 
