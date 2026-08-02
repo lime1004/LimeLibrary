@@ -78,20 +78,20 @@ public class UIInputReceiver : IDisposable {
       var binding = bindings[i];
 
       if (binding.isComposite) {
-        // Composite バインディングの処理
+        // NOTE: コンポジット親のパスは合成名で上書き対象外、かつ空だとAddCompositeBindingが例外を投げるためpathのまま使う
         var compositeBuilder = _inputAction.AddCompositeBinding(binding.path, interactions);
 
         // Composite の子要素を追加
         i++;
         while (i < bindings.Count && bindings[i].isPartOfComposite) {
           var partBinding = bindings[i];
-          compositeBuilder.With(partBinding.name, partBinding.path);
+          compositeBuilder.With(partBinding.name, partBinding.effectivePath);
           i++;
         }
         i--;
       } else if (!binding.isPartOfComposite) {
         // 通常のバインディング
-        _inputAction.AddBinding(binding.path, interactions: interactions);
+        _inputAction.AddBinding(binding.effectivePath, interactions: interactions);
       }
     }
   }
