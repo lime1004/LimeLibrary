@@ -20,7 +20,7 @@ public class ChoiceWindow : UISingleView {
   [SerializeField]
   private int _maxChoice = 8;
   [SerializeField]
-  private InputAction _cancelInputAction;
+  private InputActionReference _cancelInputAction;
 
   private class ChoiceData {
     public GameObject GameObject { get; set; }
@@ -37,7 +37,10 @@ public class ChoiceWindow : UISingleView {
   protected override UniTask OnInitialize(CancellationToken cancellationToken) {
     _selectableGroup = new SelectableGroupVertical(this, SelectableGroupSelectMode.Auto);
     _inputReceiver = new UIInputReceiver(this);
-    _inputReceiver.AddInputBinding(_cancelInputAction);
+    // キャンセル入力は未設定の構成も許容する
+    if (_cancelInputAction != null && _cancelInputAction.action != null) {
+      _inputReceiver.AddInputBinding(_cancelInputAction.action);
+    }
     _choiceTextPrefab.SetActive(false);
 
     EventObservables.GetObservable(UIViewEventType.ShowEnd).Subscribe(_ => {

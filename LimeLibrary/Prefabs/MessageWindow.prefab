@@ -1144,15 +1144,7 @@ MonoBehaviour:
   _initializeBehaviour: 0
   _choiceTextPrefab: {fileID: 3710053516764566881}
   _maxChoice: 8
-  _cancelInputAction:
-    m_Name: Cancel Input
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: d2e21b5c-468c-4303-b95d-75b8e8c908e2
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
+  _cancelInputAction: {fileID: 0}
 --- !u!223 &7635681173635406193
 Canvas:
   m_ObjectHideFlags: 0
