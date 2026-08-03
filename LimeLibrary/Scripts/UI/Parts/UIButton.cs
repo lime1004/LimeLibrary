@@ -21,6 +21,7 @@ public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerClickHa
 
   private readonly Dictionary<UIButtonEventType, Subject<BaseEventData>> _eventSubjects = new();
   private readonly CompositeDisposable _compositeDisposable = new();
+  private readonly CompositeDisposable _inputActionDisposable = new();
   private readonly ClickRangeAdjuster _clickRangeAdjuster = new();
 
   private bool _isInitialized;
@@ -63,13 +64,15 @@ public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerClickHa
 
   private void InitializeInputAction() {
     _inputAction?.Dispose();
+    // 作り直しのたびにFocus/Unfocusの購読が積み上がらないよう、InputAction専用の購読をここで捨てる
+    _inputActionDisposable.Clear();
 
     _inputAction = new InputAction("Button", InputActionType.Button);
     _inputAction.Enable();
     _inputAction.performed += OnPerformed;
 
-    ParentView.EventObservables.GetObservable(UIViewEventType.Focus).Subscribe(_ => _inputAction.Enable()).AddTo(_compositeDisposable);
-    ParentView.EventObservables.GetObservable(UIViewEventType.Unfocus).Subscribe(_ => _inputAction.Disable()).AddTo(_compositeDisposable);
+    ParentView.EventObservables.GetObservable(UIViewEventType.Focus).Subscribe(_ => _inputAction.Enable()).AddTo(_inputActionDisposable);
+    ParentView.EventObservables.GetObservable(UIViewEventType.Unfocus).Subscribe(_ => _inputAction.Disable()).AddTo(_inputActionDisposable);
   }
 
   public void SetClickEnabledFunc(Func<bool> func) {
@@ -230,6 +233,7 @@ public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerClickHa
       _inputAction.Dispose();
     }
 
+    _inputActionDisposable.Dispose();
     _compositeDisposable.Dispose();
   }
 }

@@ -24,6 +24,7 @@ public class UIKeyImage : MonoBehaviour, IUIParts {
 
   private Image _image;
   private bool _isInitialized;
+  private InputAction _bindSourceInputAction;
 
   public IUIView ParentView { get; private set; }
   public RectTransform RectTransform => transform.AsRectTransform();
@@ -56,7 +57,14 @@ public class UIKeyImage : MonoBehaviour, IUIParts {
       BindInput(_bindInputAction);
     }
 
+    // リバインドによるバインディング変更に追随させる
+    InputSystem.onActionChange += OnActionChange;
+
     _isInitialized = true;
+  }
+
+  private void OnDestroy() {
+    InputSystem.onActionChange -= OnActionChange;
   }
 
   public void SetImage(Image image) {
@@ -77,14 +85,28 @@ public class UIKeyImage : MonoBehaviour, IUIParts {
       Assertion.Assert(false, "InputBindingPathGetter is null");
       return;
     }
+    if (inputAction == null) {
+      Assertion.Assert(false, "InputAction is null");
+      return;
+    }
+
+    _bindSourceInputAction = InputActionAssetRegistry.Resolve(inputAction);
 
     foreach (var inputMode in InputModeUpdater.Instance.InputModeList) {
-      BindInput(_inputBindingPathGetter.GetInputBindingPath(inputAction, inputMode), inputMode.Name);
+      BindInput(_inputBindingPathGetter.GetInputBindingPath(_bindSourceInputAction, inputMode), inputMode.Name);
     }
   }
 
   public void BindInput(InputBindingType inputBindingType, string inputMode) {
     BindInput(InputBindingPath.Get(inputBindingType), inputMode);
+  }
+
+  private void OnActionChange(object actionOrMapOrAsset, InputActionChange inputActionChange) {
+    if (inputActionChange != InputActionChange.BoundControlsChanged) return;
+    if (_bindSourceInputAction == null) return;
+    if (!_bindSourceInputAction.IsActionChangeTarget(actionOrMapOrAsset)) return;
+
+    BindInput(_bindSourceInputAction);
   }
 
   private void ApplyImage(string inputMode) {
