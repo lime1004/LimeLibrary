@@ -35,6 +35,7 @@ public class InputControllerTypeUpdater : SingletonMonoBehaviour<InputController
       _controllerType = InputControllerType.XInputController;
       break;
     case "DualShock4GamepadHID":
+    case "DualSenseGamepadHID":
       _controllerType = InputControllerType.DualShockGamepad;
       break;
     case "SwitchProControllerHID":
@@ -43,7 +44,7 @@ public class InputControllerTypeUpdater : SingletonMonoBehaviour<InputController
     default: {
       if (_inputGamepadName.Contains("XInput")) {
         _controllerType = InputControllerType.XInputController;
-      } else if (_inputGamepadName.Contains("DualShock")) {
+      } else if (_inputGamepadName.Contains("DualShock") || _inputGamepadName.Contains("DualSense")) {
         _controllerType = InputControllerType.DualShockGamepad;
       } else if (_inputGamepadName.Contains("Switch")) {
         _controllerType = InputControllerType.SwitchProController;
