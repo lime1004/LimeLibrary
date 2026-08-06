@@ -13,6 +13,7 @@ using LimeLibrary.Module;
 using R3;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.Users;
 
@@ -23,6 +24,9 @@ namespace LimeLibrary.Input.InputMode {
 /// 入力デバイスの種類を更新するクラス
 /// </summary>
 public class InputModeUpdater : SingletonMonoBehaviour<InputModeUpdater> {
+  // NOTE: 8bitスティックの静止時の揺れ（±1/127程度）を弾き、デッドゾーン既定値0.125も上回る生値の閾値
+  private const float GamepadActuationThreshold = 0.2f;
+
   [SerializeField]
   private List<InputModeScriptableObject> _inputModeList;
   [SerializeField, ReadOnly]
@@ -55,21 +59,31 @@ public class InputModeUpdater : SingletonMonoBehaviour<InputModeUpdater> {
   }
 
   private void OnUnpairedDeviceUsedCallback(InputControl inputControl, InputEventPtr inputEventPtr) {
-    if (!IsInputModeSwitchCandidate(inputControl)) return;
+    if (!IsInputModeSwitchCandidate(inputControl, inputEventPtr)) return;
     _onUseDeviceChannel.Writer.TryWrite(inputControl);
   }
 
-  // NOTE: onUnpairedDeviceUsedは親のVector2Control等ではなく葉コントロール単位で通知される
-  // （マウスのposition/x等やスティックのleftStick/x等はAxisControl、D-padの各方向はButtonControl）。
-  // マウスは移動・スクロール由来の通知だけでも毎フレーム大量に来てキューを埋め、
-  // ゲームパッド切替の反映を遅らせるので、マウスについては消費側DefaultMouseKeyboard.CheckChangeInputMode
-  // が実際に見ているボタン（左/右/中）だけをキューに積む。他デバイスはそのまま通す
-  private static bool IsInputModeSwitchCandidate(InputControl inputControl) {
-    if (inputControl.device is not Mouse mouse) return true;
+  private static bool IsInputModeSwitchCandidate(InputControl inputControl, InputEventPtr inputEventPtr) {
+    // NOTE: 通知は葉コントロール単位で来るため、マウスは移動・スクロールだけで毎フレーム大量に流れる。消費側が見る3ボタンに絞る
+    if (inputControl.device is Mouse mouse) {
+      return inputControl == mouse.leftButton ||
+             inputControl == mouse.rightButton ||
+             inputControl == mouse.middleButton;
+    }
 
-    return inputControl == mouse.leftButton ||
-           inputControl == mouse.rightButton ||
-           inputControl == mouse.middleButton;
+    // NOTE: ゲームパッドはスティックの揺れだけでも通知が流れてくるので、実際に操作されたコントロールだけに絞る
+    if (inputControl.device is Gamepad) {
+      // NOTE: 値を評価できない型は操作の裏付けが取れないため通さない
+      if (inputControl is not InputControl<float> valueControl) return false;
+
+      // NOTE: このコールバックはイベントのデバイス反映前に呼ばれ、かつデッドゾーン設定に左右させたくないのでイベントの生値を読む
+      float value = valueControl.ReadUnprocessedValueFromEvent(inputEventPtr);
+      if (inputControl is ButtonControl buttonControl) return buttonControl.IsValueConsideredPressed(value);
+
+      return Mathf.Abs(value) >= GamepadActuationThreshold;
+    }
+
+    return true;
   }
 
   private async UniTaskVoid RunUseDeviceEvent(CancellationToken cancellationToken) {
@@ -80,9 +94,7 @@ public class InputModeUpdater : SingletonMonoBehaviour<InputModeUpdater> {
       // NOTE: ボタンの押下判定などが正確に取れないため、PlayerLoopTiming.Updateまで待つ
       await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
 
-      // NOTE: 1件読むごとにYieldするとキューが伸びたときに末尾のイベントが数フレーム〜数秒単位で
-      // 遅延する（マウス移動のようにキュー投入頻度が高いデバイスが混ざると顕著）。
-      // 1フレームにつきYieldは1回だけにし、そのフレームで溜まっている分をTryReadでまとめて捌く
+      // NOTE: 1件ごとにYieldすると末尾のイベントが遅延するため、Yieldは1フレーム1回にして溜まった分をまとめて捌く
       while (reader.TryRead(out var inputControl)) {
         cancellationToken.ThrowIfCancellationRequested();
         OnUnpairedDeviceUsed(inputControl);
