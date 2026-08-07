@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System.Threading;
+using Cysharp.Threading.Tasks;
 using LimeLibrary.Extensions;
 using LimeLibrary.UI.View;
 using UnityEngine;
@@ -13,7 +14,7 @@ public class KeyWait : UISingleView {
 
   private Vector2 _keyWaitPosition;
 
-  protected UniTask OnInitialize() {
+  protected override UniTask OnInitialize(CancellationToken cancellationToken) {
     _keyWaitPosition = transform.AsRectTransform().anchoredPosition;
 
     return UniTask.CompletedTask;
