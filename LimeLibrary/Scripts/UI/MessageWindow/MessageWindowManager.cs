@@ -30,6 +30,7 @@ public class MessageWindowManager : MonoBehaviour {
       showTaskList.Add(HideSpeakerWindow(cancellationToken));
     }
     _messageWindow.MessageMainWindow.MessageWindowType = messageWindowType;
+    ApplyMainWindowAnchor();
     showTaskList.Add(_messageWindow.MessageMainWindow.Show(cancellationToken));
 
     await showTaskList;
@@ -114,6 +115,24 @@ public class MessageWindowManager : MonoBehaviour {
   public async UniTask HideSpeakerWindow(CancellationToken cancellationToken) {
     if (!IsShowSpeakerWindow()) return;
     await _messageWindow.SpeakerWindow.Hide(cancellationToken);
+  }
+
+  // Anchor ===================================================================
+
+  private void ApplyMainWindowAnchor() {
+    // アンカーを持つバリアントのときだけ、その配置を各パーツへ写す
+    var messageMainWindow = _messageWindow.MessageMainWindow;
+    CopyRectTransform(messageMainWindow.SpeakerAnchor, _messageWindow.SpeakerWindow.RectTransform);
+    CopyRectTransform(messageMainWindow.KeyWaitAnchor, _messageWindow.KeyWait.RectTransform);
+  }
+
+  private static void CopyRectTransform(RectTransform source, RectTransform target) {
+    if (source == null) return;
+    target.anchorMin = source.anchorMin;
+    target.anchorMax = source.anchorMax;
+    target.pivot = source.pivot;
+    target.anchoredPosition = source.anchoredPosition;
+    target.sizeDelta = source.sizeDelta;
   }
 }
 
