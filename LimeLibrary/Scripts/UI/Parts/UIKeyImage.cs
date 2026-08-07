@@ -45,6 +45,13 @@ public class UIKeyImage : MonoBehaviour, IUIParts {
     // InputMode変更時の処理
     parentView.InputObservables.OnChangeInputModeObservable.Subscribe(inputMode => ApplyImage(inputMode.Name)).AddTo(this);
 
+    // ControllerType変更時の処理
+    parentView.InputObservables.OnChangeControllerTypeObservable.Subscribe(_ => {
+      var currentInputMode = parentView.InputObservables.CurrentInputMode;
+      if (currentInputMode == null) return;
+      ApplyImage(currentInputMode.Name);
+    }).AddTo(this);
+
     // View表示時処理登録
     parentView.OnShowEndObservable.Subscribe(_ => {
       var currentInputMode = parentView.InputObservables.CurrentInputMode;

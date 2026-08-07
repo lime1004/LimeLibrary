@@ -8,6 +8,7 @@ public interface IUIInputObservables {
   public IInputMode CurrentInputMode { get; }
   public InputControllerType CurrentControllerType { get; }
   public Observable<IInputMode> OnChangeInputModeObservable { get; }
+  public Observable<InputControllerType> OnChangeControllerTypeObservable { get; }
 }
 
 }

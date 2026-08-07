@@ -8,6 +8,7 @@ public class UIInputObservables : IUIInputObservables {
   public IInputMode CurrentInputMode => InputModeUpdater.Instance.CurrentInputMode;
   public InputControllerType CurrentControllerType => InputControllerTypeUpdater.Instance.ControllerType;
   public Observable<IInputMode> OnChangeInputModeObservable => InputModeUpdater.Instance.OnChangeInputModeObservable;
+  public Observable<InputControllerType> OnChangeControllerTypeObservable => InputControllerTypeUpdater.Instance.OnChangeControllerTypeObservable;
 }
 
 }

@@ -1,5 +1,6 @@
 ﻿using LimeLibrary.Attributes;
 using LimeLibrary.Module;
+using R3;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
@@ -24,6 +25,11 @@ public class InputControllerTypeUpdater : SingletonMonoBehaviour<InputController
 
   public InputControllerType ControllerType => _controllerType;
 
+#if LIME_R3
+  private readonly Subject<InputControllerType> _onChangeControllerTypeSubject = new();
+  public Observable<InputControllerType> OnChangeControllerTypeObservable => _onChangeControllerTypeSubject;
+#endif
+
   protected override void Awake() {
     base.Awake();
 
@@ -35,7 +41,13 @@ public class InputControllerTypeUpdater : SingletonMonoBehaviour<InputController
   }
 
   public void LateUpdate() {
+    var prevControllerType = _controllerType;
     UpdateControllerType();
+    if (_controllerType == prevControllerType) return;
+
+#if LIME_R3
+    _onChangeControllerTypeSubject.OnNext(_controllerType);
+#endif
   }
 
   private void OnEventCallback(InputEventPtr inputEventPtr, InputDevice inputDevice) {
