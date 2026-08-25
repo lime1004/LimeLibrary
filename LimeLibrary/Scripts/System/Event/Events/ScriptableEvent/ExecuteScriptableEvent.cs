@@ -11,6 +11,7 @@ namespace LimeLibrary.Event.Events {
 public class ExecuteScriptableEvent<T> : AbstractEvent where T : class, IScriptableEvent {
   private DynamicResource<T> _scriptableEventResource;
   private UniTask _executeTask;
+  private bool _isExecuting;
 
   private readonly string _eventAddress;
   private readonly IScriptableEventPlayer<T> _eventPlayer;
@@ -28,8 +29,16 @@ public class ExecuteScriptableEvent<T> : AbstractEvent where T : class, IScripta
 
     if (_contextCreator != null) {
       var context = await _contextCreator.Create(cancellationToken);
+      if (scriptableEvent.IsExecuting) {
+        Assertion.Assert(false, "ScriptableEvent is already executing.");
+        return;
+      }
+
       scriptableEvent.SetContext(context);
     }
+
+    if (!scriptableEvent.TryBeginExecution()) return;
+    _isExecuting = true;
 
     await scriptableEvent.Initialize(cancellationToken);
 
@@ -38,6 +47,11 @@ public class ExecuteScriptableEvent<T> : AbstractEvent where T : class, IScripta
 
   public override void Start() {
     base.Start();
+
+    if (!_isExecuting) {
+      _executeTask = UniTask.CompletedTask;
+      return;
+    }
 
     if (_eventPlayer == null) {
       Assertion.Assert(false, "EventPlayer is not set.");
@@ -58,6 +72,11 @@ public class ExecuteScriptableEvent<T> : AbstractEvent where T : class, IScripta
 
   public override void End() {
     base.End();
+
+    if (_isExecuting) {
+      _scriptableEventResource.Resource.EndExecution();
+      _isExecuting = false;
+    }
 
     _scriptableEventResource.Dispose();
   }
