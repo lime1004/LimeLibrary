@@ -34,6 +34,13 @@ public class EventUpdaterInterface : SingletonMonoBehaviour<EventUpdaterInterfac
   /// Eventのリクエスト
   /// </summary>
   public T RequestEvent<T>(T @event, EventBehaviourType behaviourType) where T : AbstractEvent {
+    if (@event == null) throw new ArgumentNullException(nameof(@event));
+
+    // Eventインスタンスは使い捨てで、二度目のリクエストはできない
+    if (!@event.TryRequest()) {
+      throw new InvalidOperationException("Event is already requested. " + typeof(T));
+    }
+
     @event.SetCancellationToken(this.GetCancellationTokenOnDestroy());
     _onRequestEventSubject.OnNext((behaviourType, @event));
     return @event;

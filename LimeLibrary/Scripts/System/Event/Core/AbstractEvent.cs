@@ -19,6 +19,7 @@ public abstract class AbstractEvent : IEvent {
   public UniTask FinishAsync(CancellationToken cancellationToken) => OnEndObservable.FirstAsync(cancellationToken).AsUniTask();
 
   private int _sequence;
+  private bool _isRequested;
 
   protected void AddSeq() {
     _sequence++;
@@ -44,6 +45,13 @@ public abstract class AbstractEvent : IEvent {
   public virtual void End() {
     _onEndSubject.OnNext(Unit.Default);
     _onEndSubject.OnCompleted();
+  }
+
+  internal bool TryRequest() {
+    if (_isRequested) return false;
+
+    _isRequested = true;
+    return true;
   }
 
   internal void SetCancellationToken(CancellationToken cancellationToken) {
