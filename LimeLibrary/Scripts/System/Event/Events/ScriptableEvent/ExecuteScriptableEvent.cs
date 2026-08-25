@@ -1,4 +1,5 @@
 ﻿#if LIME_R3 && LIME_UNITASK
+using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using LimeLibrary.Event.Core;
@@ -7,14 +8,17 @@ using LimeLibrary.Resource;
 
 namespace LimeLibrary.Event.Events {
 
-public class ExecuteScriptableEvent : AbstractEvent {
-  private DynamicResource<IScriptableEvent> _scriptableEventResource;
+public class ExecuteScriptableEvent<T> : AbstractEvent where T : class, IScriptableEvent {
+  private DynamicResource<T> _scriptableEventResource;
   private UniTask _executeTask;
 
   public string EventAddress { get; set; }
 
+  public Action<T> OnLoadedAction { get; set; }
+
   public override async UniTask InitializeAsync(CancellationToken cancellationToken) {
-    _scriptableEventResource = await ResourceLoader.LoadAsync<IScriptableEvent>(EventAddress, cancellationToken);
+    _scriptableEventResource = await ResourceLoader.LoadAsync<T>(EventAddress, cancellationToken);
+    OnLoadedAction?.Invoke(_scriptableEventResource.Resource);
     await _scriptableEventResource.Resource.Initialize(cancellationToken);
     await base.InitializeAsync(cancellationToken);
   }
@@ -39,6 +43,8 @@ public class ExecuteScriptableEvent : AbstractEvent {
     _scriptableEventResource.Dispose();
   }
 }
+
+public class ExecuteScriptableEvent : ExecuteScriptableEvent<IScriptableEvent> { }
 
 }
 #endif
