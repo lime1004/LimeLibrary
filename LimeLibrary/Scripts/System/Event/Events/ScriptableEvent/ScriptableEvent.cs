@@ -5,15 +5,17 @@ using UnityEngine;
 
 namespace LimeLibrary.Event.Events {
 
-public abstract class ScriptableEvent<T> : ScriptableObject, IScriptableEvent where T : IScriptableEventContext {
-  protected T Context { get; private set; }
+public abstract class ScriptableEvent : ScriptableObject, IScriptableEvent {
+  protected internal virtual void SetContext(IScriptableEventContext context) { }
+  void IScriptableEvent.SetContext(IScriptableEventContext c) => SetContext(c);
 
-  public async UniTask Initialize(CancellationToken cancellationToken) {
-    Context = await CreateContext(cancellationToken);
-  }
-
-  protected abstract UniTask<T> CreateContext(CancellationToken cancellationToken);
+  public abstract UniTask Initialize(CancellationToken cancellationToken);
   public abstract UniTask Execute(CancellationToken cancellationToken);
+}
+
+public abstract class ScriptableEvent<T> : ScriptableEvent where T : IScriptableEventContext {
+  protected T Context { get; private set; }
+  protected internal override void SetContext(IScriptableEventContext c) => Context = (T)c;
 }
 
 }

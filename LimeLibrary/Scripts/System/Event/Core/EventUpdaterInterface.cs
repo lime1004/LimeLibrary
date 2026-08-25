@@ -27,7 +27,13 @@ public class EventUpdaterInterface : SingletonMonoBehaviour<EventUpdaterInterfac
   /// Eventのリクエスト
   /// </summary>
   public T RequestEvent<T>(EventBehaviourType behaviourType) where T : AbstractEvent, new() {
-    var @event = new T();
+    return RequestEvent(new T(), behaviourType);
+  }
+
+  /// <summary>
+  /// Eventのリクエスト
+  /// </summary>
+  public T RequestEvent<T>(T @event, EventBehaviourType behaviourType) where T : AbstractEvent {
     @event.SetCancellationToken(this.GetCancellationTokenOnDestroy());
     _onRequestEventSubject.OnNext((behaviourType, @event));
     return @event;
