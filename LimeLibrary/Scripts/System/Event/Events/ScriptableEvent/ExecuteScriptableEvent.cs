@@ -5,13 +5,14 @@ using LimeLibrary.Event.Core;
 using LimeLibrary.Extensions;
 using LimeLibrary.Resource;
 using LimeLibrary.Utility;
+using UnityEngine;
 
 namespace LimeLibrary.Event.Events {
 
 public class ExecuteScriptableEvent<T> : AbstractEvent where T : class, IScriptableEvent {
   private DynamicResource<T> _scriptableEventResource;
+  private T _scriptableEvent;
   private UniTask _executeTask;
-  private bool _isExecuting;
 
   private readonly string _eventAddress;
   private readonly IScriptableEventPlayer<T> _eventPlayer;
@@ -24,31 +25,29 @@ public class ExecuteScriptableEvent<T> : AbstractEvent where T : class, IScripta
   }
 
   public override async UniTask InitializeAsync(CancellationToken cancellationToken) {
-    _scriptableEventResource = await ResourceLoader.LoadAsync<T>(_eventAddress, cancellationToken);
-    var scriptableEvent = _scriptableEventResource.Resource;
+    try {
+      _scriptableEventResource = await ResourceLoader.LoadAsync<T>(_eventAddress, cancellationToken);
+      if (!_scriptableEventResource.HasResource()) return;
+      _scriptableEvent = Object.Instantiate(_scriptableEventResource.Resource as Object) as T;
 
-    if (_contextCreator != null) {
-      var context = await _contextCreator.Create(cancellationToken);
-      if (scriptableEvent.IsExecuting) {
-        Assertion.Assert(false, "ScriptableEvent is already executing.");
-        return;
+      if (_contextCreator != null) {
+        var context = await _contextCreator.Create(cancellationToken);
+        _scriptableEvent.SetContext(context);
       }
 
-      scriptableEvent.SetContext(context);
+      await _scriptableEvent.Initialize(cancellationToken);
+
+      await base.InitializeAsync(cancellationToken);
+    } catch {
+      ReleaseScriptableEvent();
+      throw;
     }
-
-    if (!scriptableEvent.TryBeginExecution()) return;
-    _isExecuting = true;
-
-    await scriptableEvent.Initialize(cancellationToken);
-
-    await base.InitializeAsync(cancellationToken);
   }
 
   public override void Start() {
     base.Start();
 
-    if (!_isExecuting) {
+    if (_scriptableEvent == null) {
       _executeTask = UniTask.CompletedTask;
       return;
     }
@@ -59,7 +58,7 @@ public class ExecuteScriptableEvent<T> : AbstractEvent where T : class, IScripta
       return;
     }
 
-    _executeTask = _eventPlayer.Play(_scriptableEventResource.Resource, CancellationToken).RunHandlingError();
+    _executeTask = _eventPlayer.Play(_scriptableEvent, CancellationToken).RunHandlingError();
   }
 
   public override EventUpdateResult Update() {
@@ -71,14 +70,27 @@ public class ExecuteScriptableEvent<T> : AbstractEvent where T : class, IScripta
   }
 
   public override void End() {
-    base.End();
-
-    if (_isExecuting) {
-      _scriptableEventResource.Resource.EndExecution();
-      _isExecuting = false;
+    try {
+      base.End();
+    } finally {
+      ReleaseScriptableEvent();
     }
+  }
 
-    _scriptableEventResource.Dispose();
+  private void ReleaseScriptableEvent() {
+    var scriptableEvent = _scriptableEvent;
+    var resource = _scriptableEventResource;
+    _scriptableEvent = null;
+    _scriptableEventResource = null;
+
+    try {
+      scriptableEvent?.EndExecution();
+    } finally {
+      if (scriptableEvent is Object unityObject) {
+        Object.Destroy(unityObject);
+      }
+      resource?.Dispose();
+    }
   }
 }
 
