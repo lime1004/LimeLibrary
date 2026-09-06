@@ -6,24 +6,33 @@ using UnityEngine;
 namespace LimeLibrary.Event.Events {
 
 public abstract class ScriptableEvent : ScriptableObject, IScriptableEvent {
-  protected internal virtual void SetContext(IScriptableEventContext context) { }
-  protected internal virtual void ClearContext() { }
+  private protected virtual void SetContext(IScriptableEventContext context) { }
+  private protected virtual void ClearContext() { }
 
   void IScriptableEvent.SetContext(IScriptableEventContext c) => SetContext(c);
-  void IScriptableEvent.EndExecution() => ClearContext();
+
+  void IScriptableEvent.EndExecution() {
+    try {
+      OnEnd();
+    } finally {
+      ClearContext();
+    }
+  }
 
   public abstract UniTask Initialize(CancellationToken cancellationToken);
   public abstract UniTask Execute(CancellationToken cancellationToken);
+  protected virtual void OnEnd() { }
 }
 
 public abstract class ScriptableEvent<T> : ScriptableEvent where T : class, IScriptableEventContext {
   protected T Context { get; private set; }
-  protected internal override void SetContext(IScriptableEventContext c) {
+
+  private protected override void SetContext(IScriptableEventContext c) {
     base.SetContext(c);
     Context = (T)c;
   }
 
-  protected internal override void ClearContext() => Context = null;
+  private protected override void ClearContext() => Context = null;
 }
 
 }
