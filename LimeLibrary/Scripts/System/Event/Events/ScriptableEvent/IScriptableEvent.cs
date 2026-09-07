@@ -6,7 +6,7 @@ namespace LimeLibrary.Event.Events {
 
 public interface IScriptableEvent {
   internal void SetContext(IScriptableEventContext context);
-  internal void EndExecution();
+  internal UniTask EndExecution(CancellationToken cancellationToken);
   public UniTask Initialize(CancellationToken cancellationToken);
   public UniTask Execute(CancellationToken cancellationToken);
 }

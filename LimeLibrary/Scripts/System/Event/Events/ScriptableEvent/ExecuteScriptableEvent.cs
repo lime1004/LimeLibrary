@@ -13,6 +13,8 @@ public class ExecuteScriptableEvent<T> : AbstractEvent where T : class, IScripta
   private DynamicResource<T> _scriptableEventResource;
   private T _scriptableEvent;
   private UniTask _executeTask;
+  private bool _isReleaseStarted;
+  private bool _isReleaseCompleted;
 
   private readonly string _eventAddress;
   private readonly IScriptableEventPlayer<T> _eventPlayer;
@@ -39,7 +41,12 @@ public class ExecuteScriptableEvent<T> : AbstractEvent where T : class, IScripta
 
       await base.InitializeAsync(cancellationToken);
     } catch {
-      ReleaseScriptableEvent();
+      // NOTE: 後始末が失敗しても破棄まで進め、初期化の例外を投げ直す
+      try {
+        await ReleaseScriptableEventAsync().RunHandlingError().SuppressCancellationThrow();
+      } finally {
+        DestroyScriptableEvent();
+      }
       throw;
     }
   }
@@ -62,35 +69,46 @@ public class ExecuteScriptableEvent<T> : AbstractEvent where T : class, IScripta
   }
 
   public override EventUpdateResult Update() {
-    if (_executeTask.GetAwaiter().IsCompleted) {
-      return EventUpdateResult.Finish;
-    }
+    if (!_executeTask.GetAwaiter().IsCompleted) return EventUpdateResult.Continue;
 
-    return EventUpdateResult.Continue;
+    // 終了処理は非同期なので、完了するまでUpdateを続ける
+    if (!_isReleaseStarted) {
+      ReleaseScriptableEventAsync().RunHandlingError().Forget();
+    }
+    if (!_isReleaseCompleted) return EventUpdateResult.Continue;
+
+    return EventUpdateResult.Finish;
   }
 
   public override void End() {
     try {
       base.End();
     } finally {
-      ReleaseScriptableEvent();
+      DestroyScriptableEvent();
     }
   }
 
-  private void ReleaseScriptableEvent() {
+  private async UniTask ReleaseScriptableEventAsync() {
+    _isReleaseStarted = true;
+
+    try {
+      // NOTE: 中断時もEventの後始末を完走させるため、Cancelの影響を受けないトークンを渡す
+      if (_scriptableEvent != null) await _scriptableEvent.EndExecution(LifetimeCancellationToken);
+    } finally {
+      _isReleaseCompleted = true;
+    }
+  }
+
+  private void DestroyScriptableEvent() {
     var scriptableEvent = _scriptableEvent;
     var resource = _scriptableEventResource;
     _scriptableEvent = null;
     _scriptableEventResource = null;
 
-    try {
-      scriptableEvent?.EndExecution();
-    } finally {
-      if (scriptableEvent is Object unityObject) {
-        Object.Destroy(unityObject);
-      }
-      resource?.Dispose();
+    if (scriptableEvent is Object unityObject) {
+      Object.Destroy(unityObject);
     }
+    resource?.Dispose();
   }
 }
 

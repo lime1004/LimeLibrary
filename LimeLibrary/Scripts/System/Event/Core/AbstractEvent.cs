@@ -13,6 +13,8 @@ public abstract class AbstractEvent : IEvent {
   private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
   protected CancellationToken CancellationToken { get; private set; }
+  // NOTE: Cancelの影響を受けないトークン。中断されたEventの後始末処理に使う
+  protected CancellationToken LifetimeCancellationToken { get; private set; }
 
   public Observable<Unit> OnStartObservable => _onStartSubject;
   public Observable<Unit> OnEndObservable => _onEndSubject;
@@ -55,6 +57,7 @@ public abstract class AbstractEvent : IEvent {
   }
 
   internal void SetCancellationToken(CancellationToken cancellationToken) {
+    LifetimeCancellationToken = cancellationToken;
     CancellationToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _cancellationTokenSource.Token).Token;
   }
 

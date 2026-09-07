@@ -11,9 +11,9 @@ public abstract class ScriptableEvent : ScriptableObject, IScriptableEvent {
 
   void IScriptableEvent.SetContext(IScriptableEventContext c) => SetContext(c);
 
-  void IScriptableEvent.EndExecution() {
+  async UniTask IScriptableEvent.EndExecution(CancellationToken cancellationToken) {
     try {
-      OnEnd();
+      await OnEnd(cancellationToken);
     } finally {
       ClearContext();
     }
@@ -21,7 +21,7 @@ public abstract class ScriptableEvent : ScriptableObject, IScriptableEvent {
 
   public abstract UniTask Initialize(CancellationToken cancellationToken);
   public abstract UniTask Execute(CancellationToken cancellationToken);
-  protected virtual void OnEnd() { }
+  protected virtual UniTask OnEnd(CancellationToken cancellationToken) => UniTask.CompletedTask;
 }
 
 public abstract class ScriptableEvent<T> : ScriptableEvent where T : class, IScriptableEventContext {
