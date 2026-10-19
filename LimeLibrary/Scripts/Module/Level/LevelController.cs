@@ -73,16 +73,25 @@ public class LevelController {
     AddExperience(addExperience);
   }
 
-  public void SubLevel(int value) {
+  /// <summary>
+  /// レベルを下げ、指定した方式で経験値を戻す
+  /// </summary>
+  public void SubLevel(int value, SubLevelExperienceType experienceType) {
+    if (experienceType == SubLevelExperienceType.BeforeNextLevel && value <= 0) return;
+
     int nextLevel = Mathf.Max(_level - value, _minLevel);
-    int totalExperienceThisNextLevel = _levelTable.CalculateTotalExperience(nextLevel);
-    int subExperience = _experience - totalExperienceThisNextLevel;
+    int targetExperience = _levelTable.CalculateTotalExperience(nextLevel);
+    if (experienceType == SubLevelExperienceType.BeforeNextLevel) {
+      int beforeNextLevelExperience = _levelTable.CalculateTotalExperience(nextLevel + 1) - 1;
+      targetExperience = Mathf.Min(_experience, Mathf.Max(targetExperience, beforeNextLevelExperience));
+    }
+    int subExperience = _experience - targetExperience;
     SubExperience(subExperience);
   }
 
   public void SetLevel(int level) {
     if (level < _level) {
-      SubLevel(_level - level);
+      SubLevel(_level - level, SubLevelExperienceType.LevelStart);
     } else if (level > _level) {
       AddLevel(level - _level);
     }
