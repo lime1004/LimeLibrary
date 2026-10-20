@@ -10,6 +10,7 @@ namespace LimeLibrary.UI.View {
 internal class UIViewController {
   private readonly IUIViewEventNotifier _eventNotifier;
   private readonly UIAnimator _animator;
+  private int _transitionVersion;
 
   public GameObject RootObject { get; }
   public RectTransform RectTransform { get; }
@@ -50,6 +51,8 @@ internal class UIViewController {
       return;
     }
 
+    var transitionVersion = ++_transitionVersion;
+
     var mergedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, RootObject.GetCancellationTokenOnDestroy());
 
     State = UIViewState.Showing;
@@ -58,12 +61,15 @@ internal class UIViewController {
     _eventNotifier.Notify(UIViewEventType.ShowStart);
 
     if (_animator) {
+      // NOTE: 自分側のアニメーションが無い場合も相手側を止めないと、相手側の最終フレームのまま表示扱いになる
+      _animator.Stop(HideAnimationId);
       if (_animator.Exists(ShowAnimationId)) {
-        _animator.Stop(HideAnimationId);
         if (showOption.IsImmediate) {
           _animator.PlayImmediate(ShowAnimationId);
         } else {
           await _animator.Play(ShowAnimationId, mergedTokenSource.Token);
+          // NOTE: 停止したアニメーションの待機も正常終了するため、後続の表示・非表示処理を上書きしない
+          if (transitionVersion != _transitionVersion) return;
         }
       }
     }
@@ -71,7 +77,10 @@ internal class UIViewController {
     State = UIViewState.Show;
 
     if (showOption.FocusMode is not UIFocusMode.None) {
-      if (showOption.FocusMode is UIFocusMode.FocusNextFrame) await UniTask.NextFrame(cancellationToken: mergedTokenSource.Token);
+      if (showOption.FocusMode is UIFocusMode.FocusNextFrame) {
+        await UniTask.NextFrame(cancellationToken: mergedTokenSource.Token);
+        if (transitionVersion != _transitionVersion) return;
+      }
       Focus();
     }
 
@@ -81,6 +90,8 @@ internal class UIViewController {
   public async UniTask Hide(UIViewHideOption hideOption, CancellationToken cancellationToken) {
     if (State is UIViewState.Hide or UIViewState.Hiding && !hideOption.IsForce) return;
 
+    var transitionVersion = ++_transitionVersion;
+
     var mergedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, RootObject.GetCancellationTokenOnDestroy());
 
     State = UIViewState.Hiding;
@@ -89,12 +100,15 @@ internal class UIViewController {
     _eventNotifier.Notify(UIViewEventType.HideStart);
 
     if (_animator) {
+      // NOTE: 自分側のアニメーションが無い場合も相手側を止めないと、相手側の最終フレームのまま表示扱いになる
+      _animator.Stop(ShowAnimationId);
       if (_animator.Exists(HideAnimationId)) {
-        _animator.Stop(ShowAnimationId);
         if (hideOption.IsImmediate) {
           _animator.PlayImmediate(HideAnimationId);
         } else {
           await _animator.Play(HideAnimationId, mergedTokenSource.Token);
+          // NOTE: 停止したアニメーションの待機も正常終了するため、後続の表示・非表示処理を上書きしない
+          if (transitionVersion != _transitionVersion) return;
         }
       }
     }
