@@ -14,6 +14,7 @@ namespace LimeLibrary.UI.Dialog {
 
 public class UIDialogController {
   private readonly List<UIDialogData> _dialogDataList = new(8);
+  private readonly Dictionary<IUIView, CompositeDisposable> _hideSubscriptions = new();
   private readonly IEnumerable<IUIView> _allViews;
 
   private GameObject _backGroundGameObject;
@@ -61,12 +62,22 @@ public class UIDialogController {
 
     _dialogDataList.Add(dialogData);
 
+    if (!_hideSubscriptions.TryGetValue(view, out var hideSubscriptions)) {
+      hideSubscriptions = new CompositeDisposable();
+      _hideSubscriptions.Add(view, hideSubscriptions);
+      hideSubscriptions.AddTo(view.ObjectCancellationToken);
+      view.ObjectCancellationToken.Register(() => _hideSubscriptions.Remove(view));
+    }
+
+    // NOTE: 割り込まれたHideのHideEndは通知されないため、再表示時に前回の購読を破棄する
+    hideSubscriptions.Clear();
+
+    // NOTE: Showing中のHideStartを取りこぼさないように表示開始前に購読する
+    view.EventObservables.GetObservable(UIViewEventType.HideStart).Take(1).Subscribe(view, (_, view) => OnHideStart(view)).AddTo(hideSubscriptions);
+    view.EventObservables.GetObservable(UIViewEventType.HideEnd).Take(1).Subscribe(_ => OnHideEnd()).AddTo(hideSubscriptions);
+
     // 表示
     await view.Show(cancellationToken);
-
-    // 非表示時処理
-    view.EventObservables.GetObservable(UIViewEventType.HideStart).Take(1).Subscribe(view, (_, view) => OnHideStart(view)).AddTo(view.ObjectCancellationToken);
-    view.EventObservables.GetObservable(UIViewEventType.HideEnd).Take(1).Subscribe(_ => OnHideEnd()).AddTo(view.ObjectCancellationToken);
   }
 
   private void OnHideStart(IUIView uiView) {
