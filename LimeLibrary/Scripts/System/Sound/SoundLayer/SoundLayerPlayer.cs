@@ -47,6 +47,7 @@ public class SoundLayerPlayer<T> where T : struct, Enum {
   public void Stop(T layer, float fadeDuration = 0f) {
     var layerData = GetSoundLayerData(layer);
     if (layerData == null) return;
+    if (layerData.LayerState == SoundLayerState.Stop) return;
 
     layerData.SoundData.FadeDuration = fadeDuration;
     layerData.SoundData.Stop();
