@@ -9,8 +9,16 @@ using UnityEngine;
 namespace LimeLibrary.Sound {
 
 public class SoundData {
+  private enum StartState {
+    None,
+    Pending,
+    Started,
+  }
+
   private readonly ISoundSource _soundSource;
   private CancellationTokenSource _fadeCancellationTokenSource;
+  private int _requestVersion;
+  private StartState _startState;
 
   internal float MasterVolume { get; set; } = 1f;
   public float FadeDuration { get; set; }
@@ -28,52 +36,80 @@ public class SoundData {
   }
 
   public void Play() {
-    PlayAsync().RunHandlingError().Forget();
+    if (_startState == StartState.None) _startState = StartState.Pending;
+    PlayAsync(++_requestVersion).RunHandlingError().Forget();
   }
 
-  private async UniTask PlayAsync(CancellationToken cancellationToken = default) {
+  private async UniTask PlayAsync(int requestVersion) {
     if (_soundSource == null) return;
 
-    await UniTask.Delay(TimeSpan.FromSeconds(DelaySeconds), cancellationToken: cancellationToken);
+    await UniTask.Delay(TimeSpan.FromSeconds(DelaySeconds), cancellationToken: _soundSource.CancellationToken);
 
-    if (_soundSource.IsPaused()) {
-      _soundSource.SetPause(false);
-    } else {
-      if (!_soundSource.IsPlaying()) {
-        _soundSource.Play();
-      }
+    // 待機中に後から別の操作が来ていれば再生しない
+    if (requestVersion != _requestVersion) return;
+
+    bool isPaused = _soundSource.IsPaused();
+    if (isPaused) _soundSource.SetPause(false);
+    // 再生開始前に一時停止されていた場合も、一時停止の解除だけでは鳴らないので再生を始める
+    if (_startState == StartState.Pending || (!isPaused && !_soundSource.IsPlaying())) {
+      _startState = StartState.Started;
+      _soundSource.Play();
     }
-    await FadeIn(cancellationToken);
+    await FadeIn();
   }
 
   public void Pause() {
-    PauseAsync().RunHandlingError().Forget();
+    PauseAsync(++_requestVersion).RunHandlingError().Forget();
   }
 
-  private async UniTask PauseAsync(CancellationToken cancellationToken = default) {
-    await FadeOut(cancellationToken);
-    _soundSource?.SetPause(true);
+  private async UniTask PauseAsync(int requestVersion) {
+    if (!await FadeOutForRequest(requestVersion)) return;
+    _soundSource.SetPause(true);
   }
 
   public void Resume() {
+    ++_requestVersion;
     ResumeAsync().RunHandlingError().Forget();
   }
 
   private async UniTask ResumeAsync() {
-    _soundSource?.SetPause(false);
+    if (_soundSource == null) return;
+
+    _soundSource.SetPause(false);
+    // 再生開始の待機中に一時停止されていた場合は、ここで再生を始める
+    if (_startState == StartState.Pending) {
+      _startState = StartState.Started;
+      _soundSource.Play();
+    }
     await FadeIn();
   }
 
   public void Stop() {
-    StopAsync().RunHandlingError().Forget();
+    if (_startState == StartState.Pending) _startState = StartState.None;
+    StopAsync(++_requestVersion).RunHandlingError().Forget();
   }
 
-  private async UniTask StopAsync() {
-    await FadeOut();
-    _soundSource?.Stop();
+  private async UniTask StopAsync(int requestVersion) {
+    if (!await FadeOutForRequest(requestVersion)) return;
+    _soundSource.Stop();
+    _startState = StartState.None;
+  }
+
+  private async UniTask<bool> FadeOutForRequest(int requestVersion) {
+    if (_soundSource == null) return false;
+
+    // 音量変更でフェードが中断されても、後から別の操作が来ていなければ止める
+    try {
+      await FadeOut();
+    } catch (OperationCanceledException) {
+    }
+
+    if (_soundSource.CancellationToken.IsCancellationRequested) return false;
+    return requestVersion == _requestVersion;
   }
 
   public void Destroy() {
+    ++_requestVersion;
     _soundSource?.Destroy();
   }
 
