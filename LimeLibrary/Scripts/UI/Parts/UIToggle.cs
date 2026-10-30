@@ -70,6 +70,8 @@ public class UIToggle : MonoBehaviour, IUIParts {
   }
 
   private bool IsEnable() {
+    // 一度も有効化されずに破棄されるとOnDestroyが呼ばれず、入力のコールバックが残るため破棄済みを弾く
+    if (this == null) return false;
     if (gameObject.activeInHierarchy == false) return false;
     if (ParentView == null) return false;
     if (!ParentView.IsEnable()) return false;
