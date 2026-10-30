@@ -42,6 +42,8 @@ public class UIToggle : MonoBehaviour, IUIParts {
       Toggle.isOn = !Toggle.isOn;
     };
     _toggleInputAction.performed += _togglePerformedCallback;
+    // 一度も有効化されずに破棄されるとOnDestroyが呼ばれないため、破棄の検知はR3にも任せる
+    Disposable.Create(DisposeToggleInputAction).AddTo(gameObject);
 
     _isInitialized = true;
   }
@@ -55,10 +57,15 @@ public class UIToggle : MonoBehaviour, IUIParts {
   }
 
   private void OnDestroy() {
-    if (_toggleInputAction != null) {
-      _toggleInputAction.performed -= _togglePerformedCallback;
-      _toggleInputAction.Dispose();
-    }
+    DisposeToggleInputAction();
+  }
+
+  private void DisposeToggleInputAction() {
+    if (_toggleInputAction == null) return;
+
+    _toggleInputAction.performed -= _togglePerformedCallback;
+    _toggleInputAction.Dispose();
+    _toggleInputAction = null;
   }
 
   public void SetIsOn(bool isOn) {
@@ -70,7 +77,7 @@ public class UIToggle : MonoBehaviour, IUIParts {
   }
 
   private bool IsEnable() {
-    // 一度も有効化されずに破棄されるとOnDestroyが呼ばれず、入力のコールバックが残るため破棄済みを弾く
+    // 破棄の検知は次のフレームになることがあり、その間に入力のコールバックが走るため破棄済みを弾く
     if (this == null) return false;
     if (gameObject.activeInHierarchy == false) return false;
     if (ParentView == null) return false;
