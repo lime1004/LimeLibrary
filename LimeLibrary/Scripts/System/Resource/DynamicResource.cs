@@ -2,7 +2,6 @@
 using UnityEngine;
 using UnityEngine.ResourceManagement.AsyncOperations;
 #if LIME_ADDRESSABLES
-using System.Reflection;
 using UnityEngine.AddressableAssets;
 #endif
 
@@ -33,9 +32,9 @@ public class DynamicResource<T> : IDynamicResource where T : class {
 
 #if LIME_ADDRESSABLES
 #if UNITY_EDITOR
-    if (_handle.HasValue) {
+    if (_handle.HasValue && _handle.Value.IsValid()) {
       Addressables.Release(_handle.Value);
-    } else {
+    } else if (!_handle.HasValue) {
       Addressables.Release(Resource);
     }
 #endif
@@ -55,28 +54,6 @@ public class DynamicResource<T> : IDynamicResource where T : class {
 #endif
     Resource = null;
   }
-
-#if UNITY_EDITOR && LIME_ADDRESSABLES
-  public void ReleaseReflection() {
-    if (Resource == null) return;
-
-    var type = typeof(Addressables);
-    var addressableImplInfo = type.GetField("m_AddressablesInstance", BindingFlags.Static | BindingFlags.NonPublic);
-    object addressableImpl = addressableImplInfo.GetValue(null);
-
-    var addressableImplType = addressableImpl.GetType();
-    var methods = addressableImplType.GetMethods(BindingFlags.Public | BindingFlags.Instance);
-    foreach (var method in methods) {
-      if (method.Name == "Release" && method.IsGenericMethod) {
-        if (method.GetParameters()[0].ParameterType == method.GetGenericArguments()[0]) {
-          var genericReleaseMethodInfo = method.MakeGenericMethod(typeof(T));
-          genericReleaseMethodInfo.Invoke(addressableImpl, new object[] { _handle.HasValue ? _handle.Value : Resource });
-          return;
-        }
-      }
-    }
-  }
-#endif
 }
 
 }
