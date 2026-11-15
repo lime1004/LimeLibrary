@@ -29,7 +29,12 @@ public static class ResourceLoader {
   public static DynamicResource<T> Load<T>(string address) where T : class {
     var asyncOperationHandle = Addressables.LoadAssetAsync<T>(address);
     var resource = asyncOperationHandle.WaitForCompletion();
-    if (AssertIfFailed(asyncOperationHandle, address)) return new DynamicResource<T>(null);
+    var status = asyncOperationHandle.Status;
+    if (status != AsyncOperationStatus.Succeeded) {
+      if (asyncOperationHandle.IsValid()) Addressables.Release(asyncOperationHandle);
+      AssertIfFailed(status, address);
+      return new DynamicResource<T>(null);
+    }
     return ToDynamicResource(resource, asyncOperationHandle);
   }
 
@@ -39,8 +44,25 @@ public static class ResourceLoader {
   /// </summary>
   public static async UniTask<DynamicResource<T>> LoadAsync<T>(string address, CancellationToken cancellationToken) where T : class {
     var asyncOperationHandle = Addressables.LoadAssetAsync<T>(address);
-    var resource = await asyncOperationHandle.WithCancellation(cancellationToken);
-    if (AssertIfFailed(asyncOperationHandle, address)) return new DynamicResource<T>(null);
+    T resource;
+    try {
+      resource = await asyncOperationHandle.WithCancellation(cancellationToken);
+    } catch {
+      if (asyncOperationHandle.IsValid()) {
+        if (asyncOperationHandle.IsDone) {
+          Addressables.Release(asyncOperationHandle);
+        } else {
+          asyncOperationHandle.Completed += h => Addressables.Release(h);
+        }
+      }
+      throw;
+    }
+    var status = asyncOperationHandle.Status;
+    if (status != AsyncOperationStatus.Succeeded) {
+      if (asyncOperationHandle.IsValid()) Addressables.Release(asyncOperationHandle);
+      AssertIfFailed(status, address);
+      return new DynamicResource<T>(null);
+    }
     return ToDynamicResource(resource, asyncOperationHandle);
   }
 #endif
@@ -115,7 +137,12 @@ public static class ResourceLoader {
   public static DynamicResource<IList<T>> LoadWithLabel<T>(string label) where T : Object {
     var asyncOperationHandle = Addressables.LoadAssetsAsync<T>((object) label, null);
     var resourceList = asyncOperationHandle.WaitForCompletion();
-    if (AssertIfFailed(asyncOperationHandle, label)) return new DynamicResource<IList<T>>(null);
+    var status = asyncOperationHandle.Status;
+    if (status != AsyncOperationStatus.Succeeded) {
+      if (asyncOperationHandle.IsValid()) Addressables.Release(asyncOperationHandle);
+      AssertIfFailed(status, label);
+      return new DynamicResource<IList<T>>(null);
+    }
     return ToDynamicResource(resourceList, asyncOperationHandle);
   }
 
@@ -125,8 +152,25 @@ public static class ResourceLoader {
   /// </summary>
   public static async UniTask<DynamicResource<IList<T>>> LoadAsyncWithLabel<T>(string label, CancellationToken cancellationToken) where T : Object {
     var asyncOperationHandle = Addressables.LoadAssetsAsync<T>((object) label, null);
-    var resourceList = await asyncOperationHandle.WithCancellation(cancellationToken);
-    if (AssertIfFailed(asyncOperationHandle, label)) return new DynamicResource<IList<T>>(null);
+    IList<T> resourceList;
+    try {
+      resourceList = await asyncOperationHandle.WithCancellation(cancellationToken);
+    } catch {
+      if (asyncOperationHandle.IsValid()) {
+        if (asyncOperationHandle.IsDone) {
+          Addressables.Release(asyncOperationHandle);
+        } else {
+          asyncOperationHandle.Completed += h => Addressables.Release(h);
+        }
+      }
+      throw;
+    }
+    var status = asyncOperationHandle.Status;
+    if (status != AsyncOperationStatus.Succeeded) {
+      if (asyncOperationHandle.IsValid()) Addressables.Release(asyncOperationHandle);
+      AssertIfFailed(status, label);
+      return new DynamicResource<IList<T>>(null);
+    }
     return ToDynamicResource(resourceList, asyncOperationHandle);
   }
 #endif
@@ -140,7 +184,11 @@ public static class ResourceLoader {
   }
 
   private static bool AssertIfFailed(AsyncOperationHandle asyncOperationHandle, string str) {
-    if (asyncOperationHandle.Status != AsyncOperationStatus.Succeeded) {
+    return AssertIfFailed(asyncOperationHandle.Status, str);
+  }
+
+  private static bool AssertIfFailed(AsyncOperationStatus status, string str) {
+    if (status != AsyncOperationStatus.Succeeded) {
       Assertion.Assert(false, "リソースが見つかりません. " + str);
       return true;
     }
