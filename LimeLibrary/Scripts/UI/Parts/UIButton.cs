@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using LimeLibrary.Extensions;
+using LimeLibrary.UI.Module.Input;
 using LimeLibrary.UI.View;
 using LimeLibrary.Utility;
 using TMPro;
 using R3;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace LimeLibrary.UI.Parts {
@@ -17,11 +17,10 @@ public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerClickHa
   [SerializeField]
   private TextMeshProUGUI _text;
 
-  private InputAction _inputAction;
+  private UIInputReceiver _inputReceiver;
 
   private readonly Dictionary<UIButtonEventType, Subject<BaseEventData>> _eventSubjects = new();
   private readonly CompositeDisposable _compositeDisposable = new();
-  private readonly CompositeDisposable _inputActionDisposable = new();
   private readonly ClickRangeAdjuster _clickRangeAdjuster = new();
 
   private bool _isInitialized;
@@ -56,39 +55,45 @@ public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerClickHa
       _eventSubjects[UIButtonEventType.Click].OnNext(null);
     }).AddTo(this);
 
-    InitializeInputAction();
     ClearSubject();
 
     _isInitialized = true;
   }
 
-  private void InitializeInputAction() {
-    _inputAction?.Dispose();
-    // 作り直しのたびにFocus/Unfocusの購読が積み上がらないよう、InputAction専用の購読をここで捨てる
-    _inputActionDisposable.Clear();
+  private void CreateInputReceiverIfNeeded() {
+    // NOTE: キー入力を持たないボタンが大半なので、受け手は最初に割り当てを足したときに作る
+    if (_inputReceiver != null) return;
 
-    _inputAction = new InputAction("Button", InputActionType.Button);
-    _inputAction.Enable();
-    _inputAction.performed += OnPerformed;
-
-    ParentView.EventObservables.GetObservable(UIViewEventType.Focus).Subscribe(_ => _inputAction.Enable()).AddTo(_inputActionDisposable);
-    ParentView.EventObservables.GetObservable(UIViewEventType.Unfocus).Subscribe(_ => _inputAction.Disable()).AddTo(_inputActionDisposable);
+    _inputReceiver = new UIInputReceiver(ParentView);
+    // NOTE: 親の画面が有効でもボタン自身が押せない間は受け付けないよう、ボタンの条件を足す
+    _inputReceiver.SetEnableCondition(IsEnable);
+    _inputReceiver.OnInputObservable.Subscribe(_ => OnKeyPress()).AddTo(_compositeDisposable);
+    _inputReceiver.OnReleaseObservable.Subscribe(_ => OnKeyRelease()).AddTo(_compositeDisposable);
+    _inputReceiver.OnPressCancelObservable.Subscribe(_ => OnKeyPressCancel()).AddTo(_compositeDisposable);
   }
 
   public void SetClickEnabledFunc(Func<bool> func) {
     _clickEnabledFunc = func;
   }
 
-  private void OnPerformed(InputAction.CallbackContext context) {
-    if (!IsEnable()) return;
+  private void OnKeyPress() {
+    if (!IsIgnorePress) Click();
+    OnPointerDown(null);
+  }
 
-    if (context.control.IsActuated()) {
-      if (!IsIgnorePress) Click();
-      OnPointerDown(null);
-    } else {
+  private void OnKeyRelease() {
+    // NOTE: 離したときに押せなくなっていても押下中の状態は残さない
+    if (IsEnable()) {
       if (IsIgnorePress && !_isLongPressed) Click();
-      OnPointerUp(null);
+      _eventSubjects[UIButtonEventType.PointerUp].OnNext(null);
     }
+    ResetPressState();
+  }
+
+  private void OnKeyPressCancel() {
+    // NOTE: 押したまま割り当てを変えたときは離していないのでクリックにはせず、押下中の状態だけを片づける
+    if (IsEnable()) _eventSubjects[UIButtonEventType.PointerUp].OnNext(null);
+    ResetPressState();
   }
 
   private void OnDestroy() {
@@ -133,17 +138,22 @@ public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerClickHa
     }
   }
 
+  /// <summary>
+  /// キー入力のパスを足す。反映は次の入力更新から
+  /// </summary>
   public void AddInputBinding(string path) {
     if (string.IsNullOrEmpty(path)) {
       Assertion.Assert(false);
       return;
     }
-    _inputAction.AddBinding(path);
+    CreateInputReceiverIfNeeded();
+    _inputReceiver.AddInputBinding(path);
   }
 
-  public void ClearInputBinding() {
-    InitializeInputAction();
-  }
+  /// <summary>
+  /// キー入力のパスをすべて外す。反映は次の入力更新から
+  /// </summary>
+  public void ClearInputBinding() => _inputReceiver?.ClearInputBinding();
 
   public void SetText(string text) {
     if (Text == null) return;
@@ -212,6 +222,10 @@ public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerClickHa
   public void OnPointerUp(PointerEventData eventData) {
     if (!IsEnable()) return;
     _eventSubjects[UIButtonEventType.PointerUp].OnNext(eventData);
+    ResetPressState();
+  }
+
+  private void ResetPressState() {
     _isPress = false;
     _isLongPressed = false;
     _pointerDownCounter = 0f;
@@ -228,12 +242,8 @@ public class UIButton : MonoBehaviour, IUIParts, ISelectHandler, IPointerClickHa
     if (_disposed) return;
     _disposed = true;
 
-    if (_inputAction != null) {
-      _inputAction.performed -= OnPerformed;
-      _inputAction.Dispose();
-    }
-
-    _inputActionDisposable.Dispose();
+    // NOTE: 一覧の項目のようにボタンだけが先に破棄されることがあるため、親の破棄を待たずに受け手を外す
+    _inputReceiver?.Dispose();
     _compositeDisposable.Dispose();
   }
 }
