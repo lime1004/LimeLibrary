@@ -1,0 +1,33 @@
+{
+    "name": "LimeLibrary.Tests",
+    "rootNamespace": "",
+    "references": [
+        "GUID:2c2578ff970d4d1418bcd816b9643364",
+        "GUID:b1f1698328b192348a1367f320d43ed4",
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "GUID:77221876cc6b8244180b96e320b1bcd4",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "Unity.InputSystem.TestFramework",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll",
+        "R3.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS",
+        "LIME_INPUTSYSTEM",
+        "LIME_R3",
+        "LIME_UNITASK"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
