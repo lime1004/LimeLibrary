@@ -299,10 +299,11 @@ internal sealed class UISharedInputAction {
   private bool IsBindingHeld(InputBinding binding) {
     string path = binding.effectivePath;
     if (string.IsNullOrEmpty(path)) return false;
-    // NOTE: 1つのコントロールが複数の割り当てに使われることがあるため、コントロールから割り当てを引かずにパスで照らし合わせる
-    foreach (var control in _inputAction.controls) {
-      if (!InputControlPath.Matches(path, control)) continue;
-      if (!IsReleased(control)) return true;
+    // NOTE: InputControlPath.Matchesは別名（<Gamepad>/aなど）を照らし合わせないため、割り当ての解決と同じ探し方でパスからコントロールを探す
+    using (var controls = InputSystem.FindControls(path)) {
+      foreach (var control in controls) {
+        if (!IsReleased(control)) return true;
+      }
     }
     return false;
   }

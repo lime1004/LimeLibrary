@@ -375,6 +375,18 @@ public class UISharedInputActionTests : InputTestFixture {
     }
   }
 
+  [Test]
+  public void 別名のパスでも押されたまま作った共有アクションは離すまで押下を届けない() {
+    Press(_gamepad.buttonSouth);
+    CreateReceiver("A", "<Gamepad>/a");
+    InputSystem.Update();
+    Assert.That(_log, Is.Empty);
+
+    Release(_gamepad.buttonSouth);
+    Press(_gamepad.buttonSouth);
+    Assert.That(_log, Is.EqualTo(new[] { "A:press" }));
+  }
+
   private static InputAction CreateModifierAction() {
     var action = new InputAction("Source", InputActionType.Button);
     action.AddCompositeBinding("OneModifier").With("Modifier", "<Gamepad>/leftShoulder").With("Binding", "<Gamepad>/buttonSouth");
