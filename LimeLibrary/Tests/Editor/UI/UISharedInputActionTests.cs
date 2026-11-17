@@ -617,6 +617,26 @@ public class UISharedInputActionTests : InputTestFixture {
     Assert.That(_log, Is.EqualTo(new[] { "A:press" }));
   }
 
+  [Test]
+  public void 押下点を上げたReleaseOnlyで非表示の間に握り始めたトリガーは表示してから離しても届けない() {
+    CreateReceiver("A", "<Gamepad>/leftTrigger", "Press(behavior=1,pressPoint=0.9)");
+    InputSystem.Update();
+
+    // NOTE: 離しの0.6は離し点0.675を下回るが、コントロールの押下点0.5は上回る
+    _ui.HideEnd();
+    Set(_gamepad.leftTrigger, 0.1f);
+    Set(_gamepad.leftTrigger, 0.95f);
+    _ui.ShowEnd();
+    Set(_gamepad.leftTrigger, 0.6f);
+    Assert.That(_log, Is.Empty);
+
+    Set(_gamepad.leftTrigger, 0.0f);
+    Set(_gamepad.leftTrigger, 0.1f);
+    Set(_gamepad.leftTrigger, 0.95f);
+    Set(_gamepad.leftTrigger, 0.6f);
+    Assert.That(_log, Is.EqualTo(new[] { "A:press", "A:release" }));
+  }
+
   private void AdvanceTime(double seconds) {
     // NOTE: interactionのタイムアウトは入力更新のたびにしか見られないため、時間を小刻みに進める
     int stepCount = (int)System.Math.Round(seconds / 0.1);

@@ -4,6 +4,7 @@ using LimeLibrary.Input;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Composites;
 using UnityEngine.InputSystem.Controls;
+using UnityEngine.InputSystem.Interactions;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.Utilities;
 using UnityEngine.Pool;
@@ -142,9 +143,8 @@ internal sealed class UISharedInputAction {
     // 受け手へ知らせる前に、この入力更新で有効だった受け手を控えさせる
     UISharedInputActionRegistry.CaptureEnabledIfNewUpdate();
     uint updateCount = InputState.updateCount;
-    // 押し始めで届け先を決めていない押下と、押下点を越えたまま成立した仮の押し始めは、成立したところを押し始めとみなす
-    // NOTE: 離しで成立する入力は成立時に押下点を下回っているので、仮の押し始めの候補をそのまま使う
-    if (!_isPressing || (!_hasNotifiedPress && _isPressStartTentative && IsPressedPastPressPoint(context.control))) BeginPress();
+    // 押し始めで届け先を決めていない押下と、押下点で成立した仮の押し始めは、成立したところを押し始めとみなす
+    if (!_isPressing || ShouldRechoosePressStart(context)) BeginPress();
 
     _notifyPressDepth++;
     try {
@@ -161,6 +161,13 @@ internal sealed class UISharedInputAction {
     // Button型以外は1回の通知を1回の押下として扱い、毎回持ち主を選び直す
     if (!IsButton) EndPressWithoutNotify();
     if (_notifyPressDepth == 0) NotifyPendingPressEnd();
+  }
+
+  private bool ShouldRechoosePressStart(InputAction.CallbackContext context) {
+    if (!_isPressStartTentative || _hasNotifiedPress) return false;
+    // NOTE: ReleaseOnlyの離しでのperformedは押下点を変えると押下点との比べ方では見分けられないため、interactionで見分けて仮の候補をそのまま使う
+    if (context.interaction is PressInteraction { behavior: PressBehavior.ReleaseOnly }) return false;
+    return IsPressedPastPressPoint(context.control);
   }
 
   private void NotifyFirstPress(InputAction.CallbackContext context, uint updateCount) {
