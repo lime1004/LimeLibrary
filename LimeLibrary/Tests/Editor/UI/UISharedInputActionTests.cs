@@ -439,6 +439,24 @@ public class UISharedInputActionTests : InputTestFixture {
   }
 
   [Test]
+  public void 軸を負の向きに倒した修飾キーのまま作った組み合わせの共有アクションは正の向きに倒した入力を届ける() {
+    var sourceAction = new InputAction("Source", InputActionType.Button);
+    sourceAction.AddCompositeBinding("OneModifier(modifiersOrder=2)").With("Modifier", "<Gamepad>/leftStick/x").With("Binding", "<Gamepad>/buttonSouth");
+    try {
+      Set(_gamepad.leftStick, new Vector2(-1f, 0f));
+      Press(_gamepad.buttonSouth);
+      CreateReceiver("A").AddInputBinding(sourceAction);
+      InputSystem.Update();
+      Assert.That(_log, Is.Empty);
+
+      Set(_gamepad.leftStick, new Vector2(1f, 0f));
+      Assert.That(_log, Is.EqualTo(new[] { "A:press" }));
+    } finally {
+      sourceAction.Dispose();
+    }
+  }
+
+  [Test]
   public void 別名のパスでも押されたまま作った共有アクションは離すまで押下を届けない() {
     Press(_gamepad.buttonSouth);
     CreateReceiver("A", "<Gamepad>/a");

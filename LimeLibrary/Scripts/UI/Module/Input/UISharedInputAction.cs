@@ -337,6 +337,8 @@ internal sealed class UISharedInputAction {
 
   private static bool IsPressedAsButton(InputControl control) {
     if (control is ButtonControl buttonControl) return buttonControl.isPressed;
+    // NOTE: コンポジットはボタン以外の修飾キーを符号付きの値で押下点と比べるため、軸を負の向きに倒しても押されているとみなさない
+    if (control is InputControl<float> floatControl) return floatControl.ReadValue() >= InputSystem.settings.defaultButtonPressPoint;
     return control.magnitude >= InputSystem.settings.defaultButtonPressPoint;
   }
 
