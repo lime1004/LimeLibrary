@@ -555,6 +555,38 @@ public class UISharedInputActionTests : InputTestFixture {
     Assert.That(_log, Is.EqualTo(new[] { "A:press", "A:release" }));
   }
 
+  [Test]
+  public void 非表示の間に少しずつ握り始めた離しで成立するトリガーは表示してから離しても届けない() {
+    CreateReceiver("A", "<Gamepad>/leftTrigger", "Press(behavior=1)");
+    InputSystem.Update();
+
+    // NOTE: 押下点に届く前の0.1でStartedが来て、押下点を越えても次の通知は離すまで来ない
+    _ui.HideEnd();
+    Set(_gamepad.leftTrigger, 0.1f);
+    Set(_gamepad.leftTrigger, 0.9f);
+    _ui.ShowEnd();
+    Set(_gamepad.leftTrigger, 0.0f);
+    Assert.That(_log, Is.Empty);
+
+    Set(_gamepad.leftTrigger, 0.1f);
+    Set(_gamepad.leftTrigger, 0.9f);
+    Set(_gamepad.leftTrigger, 0.0f);
+    Assert.That(_log, Is.EqualTo(new[] { "A:press", "A:release" }));
+  }
+
+  [Test]
+  public void 押下点に届く前に有効になった受け手にはトリガーを押し込んだ押下を届ける() {
+    var receiver = CreateReceiver("A", "<Gamepad>/leftTrigger");
+    InputSystem.Update();
+
+    receiver.Enabled = false;
+    Set(_gamepad.leftTrigger, 0.1f);
+    receiver.Enabled = true;
+    Set(_gamepad.leftTrigger, 0.9f);
+
+    Assert.That(_log, Is.EqualTo(new[] { "A:press" }));
+  }
+
   private void AdvanceTime(double seconds) {
     // NOTE: interactionのタイムアウトは入力更新のたびにしか見られないため、時間を小刻みに進める
     int stepCount = (int)System.Math.Round(seconds / 0.1);

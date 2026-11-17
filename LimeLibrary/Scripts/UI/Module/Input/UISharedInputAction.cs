@@ -20,6 +20,7 @@ internal sealed class UISharedInputAction {
   private readonly float _interactionPressPoint;
 
   private bool _isPressing;
+  private bool _isPressStartTentative;
   private bool _hasNotifiedPress;
   private int _notifyPressDepth;
   private bool _isWaitingRelease;
@@ -120,8 +121,11 @@ internal sealed class UISharedInputAction {
 
     UISharedInputActionRegistry.CaptureEnabledIfNewUpdate();
     if (_isPressing) EndPress(context);
-    // NOTE: 長押しや離しで成立する押下も押し始めに有効だった受け手だけへ届けるため、押下点を越えた押し始めで届け先を決める
-    if (_listenerList.Count > 0 && IsPressedPastPressPoint(context.control)) BeginPress();
+    if (_listenerList.Count == 0) return;
+    // NOTE: 長押しや離しで成立する押下も押し始めに有効だった受け手だけへ届けるため、押し始めで届け先の候補を決める
+    BeginPress();
+    // NOTE: 押下点に届く前のStartedは、押下点で成立する入力なら成立したところで候補を決め直すため仮にしておく
+    _isPressStartTentative = !IsPressedPastPressPoint(context.control);
   }
 
   private void OnPerformed(InputAction.CallbackContext context) {
@@ -135,8 +139,9 @@ internal sealed class UISharedInputAction {
     // 受け手へ知らせる前に、この入力更新で有効だった受け手を控えさせる
     UISharedInputActionRegistry.CaptureEnabledIfNewUpdate();
     uint updateCount = InputState.updateCount;
-    // 押し始めで届け先を決めていない押下は、成立したところを押し始めとみなす
-    if (!_isPressing) BeginPress();
+    // 押し始めで届け先を決めていない押下と、押下点を越えたまま成立した仮の押し始めは、成立したところを押し始めとみなす
+    // NOTE: 離しで成立する入力は成立時に押下点を下回っているので、仮の押し始めの候補をそのまま使う
+    if (!_isPressing || (!_hasNotifiedPress && _isPressStartTentative && IsPressedPastPressPoint(context.control))) BeginPress();
 
     _notifyPressDepth++;
     try {
@@ -213,6 +218,7 @@ internal sealed class UISharedInputAction {
 
   private void BeginPress() {
     _isPressing = true;
+    _isPressStartTentative = false;
     _hasNotifiedPress = false;
     _pressCandidateList.Clear();
     _pressOwnerList.Clear();
@@ -237,6 +243,7 @@ internal sealed class UISharedInputAction {
 
   private void EndPressWithoutNotify() {
     _isPressing = false;
+    _isPressStartTentative = false;
     _hasNotifiedPress = false;
     _pressCandidateList.Clear();
     _pressOwnerList.Clear();
