@@ -1,21 +1,18 @@
-﻿using System;
-using LimeLibrary.Extensions;
+﻿using LimeLibrary.Extensions;
+using LimeLibrary.UI.Module.Input;
 using LimeLibrary.UI.View;
 using R3;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace LimeLibrary.UI.Parts {
 
 [RequireComponent(typeof(Toggle))]
 public class UIToggle : MonoBehaviour, IUIParts {
-  [SerializeField]
-  private InputAction _toggleInputAction;
+  private UIInputReceiver _inputReceiver;
 
   private readonly Subject<bool> _onValueChangeSubject = new();
   private readonly ClickRangeAdjuster _clickRangeAdjuster = new();
-  private Action<InputAction.CallbackContext> _togglePerformedCallback;
   private bool _isInitialized;
 
   public IUIView ParentView { get; private set; }
@@ -35,45 +32,30 @@ public class UIToggle : MonoBehaviour, IUIParts {
       _onValueChangeSubject.OnNext(isOn);
     }).AddTo(gameObject);
 
-    _toggleInputAction = new InputAction("Toggle", InputActionType.Button);
-    _toggleInputAction.Enable();
-    _togglePerformedCallback = _ => {
-      if (!IsEnable()) return;
-      Toggle.isOn = !Toggle.isOn;
-    };
-    _toggleInputAction.performed += _togglePerformedCallback;
-    // 一度も有効化されずに破棄されるとOnDestroyが呼ばれないため、破棄の検知はR3にも任せる
-    Disposable.Create(DisposeToggleInputAction).AddTo(gameObject);
-
     _isInitialized = true;
   }
 
-  private void OnEnable() {
-    _toggleInputAction?.Enable();
-  }
+  private void CreateInputReceiverIfNeeded() {
+    if (_inputReceiver != null) return;
 
-  private void OnDisable() {
-    _toggleInputAction?.Disable();
-  }
-
-  private void OnDestroy() {
-    DisposeToggleInputAction();
-  }
-
-  private void DisposeToggleInputAction() {
-    if (_toggleInputAction == null) return;
-
-    _toggleInputAction.performed -= _togglePerformedCallback;
-    _toggleInputAction.Dispose();
-    _toggleInputAction = null;
+    _inputReceiver = new UIInputReceiver(ParentView);
+    // NOTE: コンポーネントだけを無効にした間もキー入力では切り替えない
+    _inputReceiver.SetEnableCondition(() => IsEnable() && enabled);
+    _inputReceiver.OnInputObservable.Subscribe(_ => Toggle.isOn = !Toggle.isOn).AddTo(gameObject);
+    // NOTE: 一度もアクティブにならずに破棄されるとOnDestroyが呼ばれないため、破棄の検知はR3に任せる
+    Disposable.Create(_inputReceiver.Dispose).AddTo(gameObject);
   }
 
   public void SetIsOn(bool isOn) {
     Toggle.SetIsOnWithoutNotify(isOn);
   }
 
+  /// <summary>
+  /// 切り替えのキー入力のパスを足す。反映は次の入力更新から
+  /// </summary>
   public void AddInputBinding(string path) {
-    _toggleInputAction.AddBinding(path);
+    CreateInputReceiverIfNeeded();
+    _inputReceiver.AddInputBinding(path);
   }
 
   private bool IsEnable() {
