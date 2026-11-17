@@ -14,10 +14,12 @@ internal sealed class UISharedInputAction {
   private readonly UIInputBindingSet _bindingSet;
   private readonly InputAction _inputAction;
   private readonly List<UIInputReceiver> _listenerList = new();
+  private readonly List<UIInputReceiver> _pressCandidateList = new();
   private readonly List<UIInputReceiver> _pressOwnerList = new();
   private readonly float _interactionPressPoint;
 
   private bool _isPressing;
+  private bool _hasNotifiedPress;
   private bool _isWaitingRelease;
   private bool _isHeldWhileWaitingRelease;
 
@@ -49,6 +51,7 @@ internal sealed class UISharedInputAction {
 
   public bool RemoveListenerAndPress(UIInputReceiver receiver) {
     _listenerList.Remove(receiver);
+    _pressCandidateList.Remove(receiver);
     return _pressOwnerList.Remove(receiver);
   }
 
@@ -78,6 +81,7 @@ internal sealed class UISharedInputAction {
     _inputAction.canceled -= OnCanceled;
     _inputAction.Dispose();
     _listenerList.Clear();
+    _pressCandidateList.Clear();
     _pressOwnerList.Clear();
   }
 
@@ -93,9 +97,15 @@ internal sealed class UISharedInputAction {
       if (_isHeldWhileWaitingRelease) EndReleaseWait();
       return;
     }
-    if (!_isPressing) return;
+    if (!IsButton) return;
+    // 届け先を決めたあと最初の押下を届ける前に重ねて来たStartedは、同じ押下の続きとして扱う
+    if (_isPressing && !_hasNotifiedPress) return;
+    if (!_isPressing && _listenerList.Count == 0) return;
+
     UISharedInputActionRegistry.CaptureEnabledIfNewUpdate();
-    EndPress(context);
+    if (_isPressing) EndPress(context);
+    // NOTE: 長押しや離しで成立する押下も押し始めに有効だった受け手だけへ届けるため、押下点を越えた押し始めで届け先を決める
+    if (_listenerList.Count > 0 && IsPressedPastPressPoint(context.control)) BeginPress();
   }
 
   private void OnPerformed(InputAction.CallbackContext context) {
@@ -109,27 +119,43 @@ internal sealed class UISharedInputAction {
     // 受け手へ知らせる前に、この入力更新で有効だった受け手を控えさせる
     UISharedInputActionRegistry.CaptureEnabledIfNewUpdate();
     uint updateCount = InputState.updateCount;
-    bool isFirstNotify = !_isPressing;
-    if (isFirstNotify) {
-      BeginPress();
-    }
+    // 押し始めで届け先を決めていない押下は、成立したところを押し始めとみなす
+    if (!_isPressing) BeginPress();
 
-    // 押下の持ち主のうち、届ける瞬間にも有効なものだけへ届ける
-    // NOTE: 受け手の処理から写し直しが起きると同じアクションの通知が入れ子で来るため、届け先の写しは呼び出しごとに借りる
-    using (ListPool<UIInputReceiver>.Get(out var deliverList)) {
-      deliverList.AddRange(_pressOwnerList);
-      foreach (var receiver in deliverList) {
-        if (receiver.CanReceivePress(updateCount)) {
-          receiver.NotifyPress(context);
-          continue;
-        }
-        // NOTE: 最初の押下を受けなかった受け手には離しも届けない。押していないのに離しだけで動くのを防ぐ
-        if (isFirstNotify) _pressOwnerList.Remove(receiver);
-      }
+    if (_hasNotifiedPress) {
+      NotifyPressToOwners(context, updateCount);
+    } else {
+      _hasNotifiedPress = true;
+      NotifyFirstPress(context, updateCount);
     }
 
     // Button型以外は1回の通知を1回の押下として扱い、毎回持ち主を選び直す
     if (!IsButton) EndPressWithoutNotify();
+  }
+
+  private void NotifyFirstPress(InputAction.CallbackContext context, uint updateCount) {
+    // NOTE: 受け手の処理から写し直しが起きると同じアクションの通知が入れ子で来るため、届け先の写しは呼び出しごとに借りる
+    using (ListPool<UIInputReceiver>.Get(out var deliverList)) {
+      deliverList.AddRange(_pressCandidateList);
+      _pressCandidateList.Clear();
+      foreach (var receiver in deliverList) {
+        // NOTE: 受け手の処理から写し直しが起きて押下が区切られたら、残りの候補を持ち主にしない
+        if (!_isPressing) break;
+        // NOTE: 届ける瞬間に無効な候補は持ち主にせず、押していないのに離しだけで動くのを防ぐ
+        if (!receiver.CanReceivePress(updateCount)) continue;
+        _pressOwnerList.Add(receiver);
+        receiver.NotifyPress(context);
+      }
+    }
+  }
+
+  private void NotifyPressToOwners(InputAction.CallbackContext context, uint updateCount) {
+    using (ListPool<UIInputReceiver>.Get(out var deliverList)) {
+      deliverList.AddRange(_pressOwnerList);
+      foreach (var receiver in deliverList) {
+        if (receiver.CanReceivePress(updateCount)) receiver.NotifyPress(context);
+      }
+    }
   }
 
   private void OnCanceled(InputAction.CallbackContext context) {
@@ -144,11 +170,13 @@ internal sealed class UISharedInputAction {
 
   private void BeginPress() {
     _isPressing = true;
+    _hasNotifiedPress = false;
+    _pressCandidateList.Clear();
     _pressOwnerList.Clear();
-    // NOTE: 押下の処理中に開いた画面へ同じ押下を届けないよう、この入力更新で受け手へ知らせる前から有効だった受け手だけを持ち主にする
+    // NOTE: 押下の処理中に開いた画面へ同じ押下を届けないよう、この入力更新で受け手へ知らせる前から有効だった受け手だけを届け先の候補にする
     uint updateCount = InputState.updateCount;
     foreach (var receiver in _listenerList) {
-      if (receiver.CanOwnPress(updateCount)) _pressOwnerList.Add(receiver);
+      if (receiver.CanOwnPress(updateCount)) _pressCandidateList.Add(receiver);
     }
   }
 
@@ -166,6 +194,8 @@ internal sealed class UISharedInputAction {
 
   private void EndPressWithoutNotify() {
     _isPressing = false;
+    _hasNotifiedPress = false;
+    _pressCandidateList.Clear();
     _pressOwnerList.Clear();
   }
 
@@ -247,11 +277,18 @@ internal sealed class UISharedInputAction {
   }
 
   private bool IsReleased(InputControl control) {
+    float releasePoint = GetPressPoint(control) * InputSystem.settings.buttonReleaseThreshold;
+    return control.magnitude <= releasePoint;
+  }
+
+  private bool IsPressedPastPressPoint(InputControl control) {
+    return control != null && control.magnitude >= GetPressPoint(control);
+  }
+
+  private float GetPressPoint(InputControl control) {
     float pressPoint = control is ButtonControl buttonControl ? buttonControl.pressPointOrDefault : InputSystem.settings.defaultButtonPressPoint;
     // NOTE: interactionが低い押下点を持つと、コントロールの押下点より手前でも押下になるため低い方で測る
-    if (_interactionPressPoint < pressPoint) pressPoint = _interactionPressPoint;
-    float releasePoint = pressPoint * InputSystem.settings.buttonReleaseThreshold;
-    return control.magnitude <= releasePoint;
+    return _interactionPressPoint < pressPoint ? _interactionPressPoint : pressPoint;
   }
 
   private static float FindInteractionPressPoint(UIInputBindingSet bindingSet) {

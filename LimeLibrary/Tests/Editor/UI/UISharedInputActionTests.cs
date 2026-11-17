@@ -44,8 +44,8 @@ public class UISharedInputActionTests : InputTestFixture {
     base.TearDown();
   }
 
-  private UIInputReceiver CreateReceiver(string name, string bindingPath = null) {
-    var receiver = new UIInputReceiver(_ui);
+  private UIInputReceiver CreateReceiver(string name, string bindingPath = null, string interactions = "") {
+    var receiver = new UIInputReceiver(_ui, InputActionType.Button, interactions);
     receiver.OnInputObservable.Subscribe(_ => _log.Add($"{name}:press"));
     receiver.OnReleaseObservable.Subscribe(_ => _log.Add($"{name}:release"));
     receiver.OnPressCancelObservable.Subscribe(_ => _log.Add($"{name}:cancel"));
@@ -375,7 +375,7 @@ public class UISharedInputActionTests : InputTestFixture {
     var map = (IDictionary)typeof(UISharedInputActionRegistry).GetField("s_sharedInputActionMap", flags).GetValue(null);
     int count = 0;
     foreach (var sharedInputAction in map.Values) {
-      foreach (string fieldName in new[] { "_listenerList", "_pressOwnerList" }) {
+      foreach (string fieldName in new[] { "_listenerList", "_pressCandidateList", "_pressOwnerList" }) {
         var list = (IList)typeof(UISharedInputAction).GetField(fieldName, flags).GetValue(sharedInputAction);
         if (list.Contains(receiver)) count++;
       }
@@ -416,6 +416,48 @@ public class UISharedInputActionTests : InputTestFixture {
     Assert.That(_log, Is.EqualTo(new[] { "A:press", "A:release" }));
   }
 
+  [Test]
+  public void 非表示の間に押し始めた長押しは表示してから成立しても届けない() {
+    CreateReceiver("A", "<Gamepad>/buttonSouth", "Hold(duration=0.5)");
+    InputSystem.Update();
+
+    _ui.HideEnd();
+    Press(_gamepad.buttonSouth);
+    _ui.ShowEnd();
+    AdvanceTime(1.0);
+    Release(_gamepad.buttonSouth);
+    Assert.That(_log, Is.Empty);
+
+    Press(_gamepad.buttonSouth);
+    AdvanceTime(1.0);
+    Release(_gamepad.buttonSouth);
+    Assert.That(_log, Is.EqualTo(new[] { "A:press", "A:release" }));
+  }
+
+  [Test]
+  public void 非表示の間に押し始めた離しで成立する入力は表示してから離しても届けない() {
+    CreateReceiver("A", "<Gamepad>/buttonSouth", "Press(behavior=1)");
+    InputSystem.Update();
+
+    _ui.HideEnd();
+    Press(_gamepad.buttonSouth);
+    _ui.ShowEnd();
+    Release(_gamepad.buttonSouth);
+    Assert.That(_log, Is.Empty);
+
+    PressAndRelease(_gamepad.buttonSouth);
+    Assert.That(_log, Is.EqualTo(new[] { "A:press", "A:release" }));
+  }
+
+  private void AdvanceTime(double seconds) {
+    // NOTE: interactionのタイムアウトは入力更新のたびにしか見られないため、時間を小刻みに進める
+    int stepCount = (int)System.Math.Round(seconds / 0.1);
+    for (int i = 0; i < stepCount; i++) {
+      currentTime += 0.1;
+      InputSystem.Update();
+    }
+  }
+
   private sealed class TestUI : IUI {
     private readonly Subject<Unit> _onShowEndSubject = new();
     private readonly Subject<Unit> _onHideEndSubject = new();
@@ -428,6 +470,9 @@ public class UISharedInputActionTests : InputTestFixture {
     public TestUI(GameObject rootObject) {
       RootObject = rootObject;
     }
+
+    public void ShowEnd() => _onShowEndSubject.OnNext(Unit.Default);
+    public void HideEnd() => _onHideEndSubject.OnNext(Unit.Default);
 
     public UniTask Show(CancellationToken cancellationToken) => UniTask.CompletedTask;
     public UniTask Hide(CancellationToken cancellationToken) => UniTask.CompletedTask;
