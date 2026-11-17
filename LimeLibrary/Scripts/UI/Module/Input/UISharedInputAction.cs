@@ -289,23 +289,30 @@ internal sealed class UISharedInputAction {
   private bool IsPartHeld(string partName, int partStart, int partEnd) {
     // 同じ名前のパートは、どれか1つが押されていればそのパートが押されているとみなす
     var bindings = _inputAction.bindings;
+    // NOTE: コンポジットは修飾キーを離しのしきい値ではなくボタンとして押されているかで見るため、修飾キーのパートはその条件で測る
+    bool isModifierPart = partName != null && partName.StartsWith("modifier", StringComparison.OrdinalIgnoreCase);
     for (int i = partStart; i < partEnd; i++) {
       if (!string.Equals(bindings[i].name, partName, StringComparison.OrdinalIgnoreCase)) continue;
-      if (IsBindingHeld(bindings[i])) return true;
+      if (IsBindingHeld(bindings[i], isModifierPart)) return true;
     }
     return false;
   }
 
-  private bool IsBindingHeld(InputBinding binding) {
+  private bool IsBindingHeld(InputBinding binding, bool isModifierPart = false) {
     string path = binding.effectivePath;
     if (string.IsNullOrEmpty(path)) return false;
     // NOTE: InputControlPath.Matchesは別名（<Gamepad>/aなど）を照らし合わせないため、割り当ての解決と同じ探し方でパスからコントロールを探す
     using (var controls = InputSystem.FindControls(path)) {
       foreach (var control in controls) {
-        if (!IsReleased(control)) return true;
+        if (isModifierPart ? IsPressedAsButton(control) : !IsReleased(control)) return true;
       }
     }
     return false;
+  }
+
+  private static bool IsPressedAsButton(InputControl control) {
+    if (control is ButtonControl buttonControl) return buttonControl.isPressed;
+    return control.magnitude >= InputSystem.settings.defaultButtonPressPoint;
   }
 
   private static bool IsModifierComposite(InputBinding composite) {

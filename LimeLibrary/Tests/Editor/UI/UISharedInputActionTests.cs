@@ -376,6 +376,25 @@ public class UISharedInputActionTests : InputTestFixture {
   }
 
   [Test]
+  public void 修飾キーが押下点に届かないまま作った組み合わせの共有アクションは修飾キーを押し込んだ入力を届ける() {
+    var sourceAction = new InputAction("Source", InputActionType.Button);
+    sourceAction.AddCompositeBinding("OneModifier(modifiersOrder=2)").With("Modifier", "<Gamepad>/leftTrigger").With("Binding", "<Gamepad>/buttonSouth");
+    try {
+      // NOTE: 0.4は既定の離し点0.375を超えるが押下点0.5に届かず、コンポジットはまだ成立していない
+      Set(_gamepad.leftTrigger, 0.4f);
+      Press(_gamepad.buttonSouth);
+      CreateReceiver("A").AddInputBinding(sourceAction);
+      InputSystem.Update();
+      Assert.That(_log, Is.Empty);
+
+      Set(_gamepad.leftTrigger, 0.9f);
+      Assert.That(_log, Is.EqualTo(new[] { "A:press" }));
+    } finally {
+      sourceAction.Dispose();
+    }
+  }
+
+  [Test]
   public void 別名のパスでも押されたまま作った共有アクションは離すまで押下を届けない() {
     Press(_gamepad.buttonSouth);
     CreateReceiver("A", "<Gamepad>/a");
