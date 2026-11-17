@@ -31,8 +31,10 @@ public class UIInputReceiver : IDisposable {
   public bool Enabled {
     get => _enabled;
     set {
-      if (value && !_enabled) StampEnabledEdge();
+      bool wasEnabled = _enabled;
       _enabled = value;
+      if (value && !wasEnabled) StampEnabledEdge();
+      if (!value && wasEnabled) CancelPress();
     }
   }
   public Observable<InputAction.CallbackContext> OnInputObservable => _onInputSubject;
@@ -137,9 +139,13 @@ public class UIInputReceiver : IDisposable {
   }
 
   /// <summary>
-  /// 入力の受け付けを止める。入力そのものは常に有効で、届け先として選ばれるかだけが変わる
+  /// 入力の受け付けを止め、受けている途中の押下も打ち切る。入力そのものは常に有効で、届け先として選ばれるかだけが変わる
   /// </summary>
-  public void DisableInputAction() => _isAccepting = false;
+  public void DisableInputAction() {
+    bool wasAccepting = _isAccepting;
+    _isAccepting = false;
+    if (wasAccepting) CancelPress();
+  }
 
   internal void SetEnableCondition(Func<bool> enableCondition) => _enableCondition = enableCondition;
 
@@ -183,7 +189,7 @@ public class UIInputReceiver : IDisposable {
     _sharedInputAction = next;
     _sharedInputAction?.AddListener(this);
     // NOTE: 押したまま割り当てを変えると前の押下の離しは届かなくなるため、ここで押下を打ち切ったことを伝える
-    if (wasPressing) _onPressCancelSubject.OnNext(Unit.Default);
+    if (wasPressing) NotifyPressCancel();
   }
 
   internal void NotifyPress(InputAction.CallbackContext context) {
@@ -194,10 +200,19 @@ public class UIInputReceiver : IDisposable {
     if (_disposed) return;
     _onReleaseSubject.OnNext(context);
   }
+  internal void NotifyPressCancel() {
+    if (_disposed) return;
+    _onPressCancelSubject.OnNext(Unit.Default);
+  }
 
   private void StampEnabledEdge() {
     _hasEnabledEdge = true;
     _enabledEdgeUpdateCount = InputState.updateCount;
+  }
+
+  private void CancelPress() {
+    // NOTE: 押下中に無効になった受け手は、押したまま有効に戻っても続きを受けないよう押下を打ち切る
+    _sharedInputAction?.CancelPress(this);
   }
 
   private void RequestResolve() {

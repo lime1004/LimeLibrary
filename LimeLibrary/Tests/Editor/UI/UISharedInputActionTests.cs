@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using LimeLibrary.Input.Interaction;
 using LimeLibrary.UI;
 using LimeLibrary.UI.Module.Input;
 using NUnit.Framework;
@@ -13,6 +14,8 @@ using UnityEngine.InputSystem;
 namespace LimeLibrary.Tests.UI {
 
 public class UISharedInputActionTests : InputTestFixture {
+  private const string RepeatInteractions = "Repeat(_repeatDelay=0.5,_repeatInterval=0.1)";
+
   private Gamepad _gamepad;
   private GameObject _rootObject;
   private TestUI _ui;
@@ -24,6 +27,8 @@ public class UISharedInputActionTests : InputTestFixture {
     base.Setup();
     // NOTE: InputTestFixtureは入力の状態を差し替えるが台帳の静的な状態は残るため、テストごとに作り直す
     UISharedInputActionRegistry.ResetStaticState();
+    // NOTE: InputTestFixtureが入力の状態を作り直してもRepeatを使えるよう、念のため登録し直す
+    InputSystem.RegisterInteraction<RepeatInteraction>();
     _gamepad = InputSystem.AddDevice<Gamepad>();
     _rootObject = new GameObject("UISharedInputActionTests");
     _ui = new TestUI(_rootObject);
@@ -150,14 +155,84 @@ public class UISharedInputActionTests : InputTestFixture {
   }
 
   [Test]
-  public void 押下を受けたあと無効になった受け手にも離しは届ける() {
+  public void 押下を受けたあと無効にした受け手には打ち切りを伝え有効に戻しても離しは届けない() {
     var receiver = CreateReceiver("A", "<Gamepad>/buttonSouth");
 
     Press(_gamepad.buttonSouth);
     receiver.Enabled = false;
+    receiver.Enabled = true;
     Release(_gamepad.buttonSouth);
 
-    Assert.That(_log, Is.EqualTo(new[] { "A:press", "A:release" }));
+    Assert.That(_log, Is.EqualTo(new[] { "A:press", "A:cancel" }));
+  }
+
+  [Test]
+  public void 押下の処理の中で自分を無効にした受け手には押下を届け終えてから打ち切りを伝える() {
+    var receiver = CreateReceiver("A", "<Gamepad>/buttonSouth");
+    receiver.OnInputObservable.Subscribe(_ => {
+      receiver.Enabled = false;
+      _log.Add("A:pressEnd");
+    });
+
+    Press(_gamepad.buttonSouth);
+
+    Assert.That(_log, Is.EqualTo(new[] { "A:press", "A:pressEnd", "A:cancel" }));
+  }
+
+  [Test]
+  public void Repeatの途中で非表示になった受け手は再表示しても反復を届けない() {
+    CreateReceiver("A", "<Gamepad>/dpad/up", RepeatInteractions);
+    InputSystem.Update();
+
+    Press(_gamepad.dpad.up);
+    AdvanceTime(1.0);
+    Assert.That(_log.FindAll(x => x == "A:press").Count, Is.GreaterThanOrEqualTo(2));
+
+    _log.Clear();
+    // NOTE: 反復の合間に非表示と再表示を済ませ、届けるときの判定だけでは気づけない場面にする
+    _ui.HideEnd();
+    _ui.ShowEnd();
+    AdvanceTime(1.0);
+    Release(_gamepad.dpad.up);
+    Assert.That(_log, Is.EqualTo(new[] { "A:cancel" }));
+
+    _log.Clear();
+    Press(_gamepad.dpad.up);
+    Assert.That(_log, Is.EqualTo(new[] { "A:press" }));
+  }
+
+  [Test]
+  public void Repeatの途中で受け付ける条件を外れた受け手は条件が戻っても反復を届けない() {
+    var receiver = CreateReceiver("A", "<Gamepad>/dpad/up", RepeatInteractions);
+    bool isConditionMet = true;
+    receiver.SetEnableCondition(() => isConditionMet);
+    InputSystem.Update();
+
+    Press(_gamepad.dpad.up);
+    AdvanceTime(1.0);
+    Assert.That(_log.FindAll(x => x == "A:press").Count, Is.GreaterThanOrEqualTo(2));
+
+    _log.Clear();
+    isConditionMet = false;
+    AdvanceTime(0.5);
+    isConditionMet = true;
+    AdvanceTime(1.0);
+    Release(_gamepad.dpad.up);
+    Assert.That(_log, Is.EqualTo(new[] { "A:cancel" }));
+  }
+
+  [Test]
+  public void 無効の間に押し始めたRepeatは押したまま有効にしても届けない() {
+    var receiver = CreateReceiver("A", "<Gamepad>/dpad/up", RepeatInteractions);
+    InputSystem.Update();
+
+    receiver.Enabled = false;
+    Press(_gamepad.dpad.up);
+    receiver.Enabled = true;
+    AdvanceTime(1.0);
+    Release(_gamepad.dpad.up);
+
+    Assert.That(_log, Is.Empty);
   }
 
   [Test]
