@@ -197,6 +197,20 @@ public class UISharedInputActionTests : InputTestFixture {
   }
 
   [Test]
+  public void 控えた打ち切りを伝える処理の中で離されても残りの受け手には打ち切りだけを伝える() {
+    var first = CreateReceiver("A", "<Gamepad>/buttonSouth");
+    var second = CreateReceiver("B", "<Gamepad>/buttonSouth");
+    first.OnInputObservable.Subscribe(_ => first.Enabled = false);
+    second.OnInputObservable.Subscribe(_ => second.Enabled = false);
+    first.OnPressCancelObservable.Take(1).Subscribe(_ => InputSystem.ResetDevice(_gamepad));
+
+    Press(_gamepad.buttonSouth);
+    InputSystem.Update();
+
+    Assert.That(_log, Is.EqualTo(new[] { "A:press", "B:press", "A:cancel", "B:cancel" }));
+  }
+
+  [Test]
   public void 押下の処理の中で自分を無効にした受け手には押下を届け終えてから打ち切りを伝える() {
     var receiver = CreateReceiver("A", "<Gamepad>/buttonSouth");
     receiver.OnInputObservable.Subscribe(_ => {

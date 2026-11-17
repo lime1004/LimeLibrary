@@ -204,20 +204,17 @@ internal sealed class UISharedInputAction {
   }
 
   private void NotifyPendingPressEnd() {
-    using (ListPool<UIInputReceiver>.Get(out var cancelList))
-    using (ListPool<UIInputReceiver>.Get(out var releaseList)) {
-      cancelList.AddRange(_pendingCancelList);
-      _pendingCancelList.Clear();
-      releaseList.AddRange(_pendingReleaseList);
-      _pendingReleaseList.Clear();
-      // NOTE: 控えた時点で持ち主だった受け手は、そのあと離しで押下が区切られて持ち主の一覧から消えていても打ち切りを伝える
-      foreach (var receiver in cancelList) {
-        _pressOwnerList.Remove(receiver);
-        receiver.NotifyPressCancel();
-      }
-      foreach (var receiver in releaseList) {
-        receiver.NotifyRelease();
-      }
+    // NOTE: 伝えた先の処理から離しが来ることがあるため、控えは1件ずつ取り出し、まだ控えている持ち主に離しを重ねて伝えないようにする
+    while (_pendingCancelList.Count > 0) {
+      var receiver = _pendingCancelList[0];
+      _pendingCancelList.RemoveAt(0);
+      _pressOwnerList.Remove(receiver);
+      receiver.NotifyPressCancel();
+    }
+    while (_pendingReleaseList.Count > 0) {
+      var receiver = _pendingReleaseList[0];
+      _pendingReleaseList.RemoveAt(0);
+      receiver.NotifyRelease();
     }
   }
 
