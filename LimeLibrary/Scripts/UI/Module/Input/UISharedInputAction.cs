@@ -17,6 +17,7 @@ internal sealed class UISharedInputAction {
   private readonly List<UIInputReceiver> _pressCandidateList = new();
   private readonly List<UIInputReceiver> _pressOwnerList = new();
   private readonly List<UIInputReceiver> _pendingCancelList = new();
+  private readonly List<UIInputReceiver> _pendingReleaseList = new();
   private readonly float _interactionPressPoint;
 
   private bool _isPressing;
@@ -56,6 +57,7 @@ internal sealed class UISharedInputAction {
     _listenerList.Remove(receiver);
     _pressCandidateList.Remove(receiver);
     _pendingCancelList.Remove(receiver);
+    _pendingReleaseList.Remove(receiver);
     return _pressOwnerList.Remove(receiver);
   }
 
@@ -100,6 +102,7 @@ internal sealed class UISharedInputAction {
     _pressCandidateList.Clear();
     _pressOwnerList.Clear();
     _pendingCancelList.Clear();
+    _pendingReleaseList.Clear();
   }
 
   public void CaptureListenerEnabled(uint updateCount) {
@@ -120,7 +123,7 @@ internal sealed class UISharedInputAction {
     if (!_isPressing && _listenerList.Count == 0) return;
 
     UISharedInputActionRegistry.CaptureEnabledIfNewUpdate();
-    if (_isPressing) EndPress(context);
+    if (_isPressing) EndPress();
     if (_listenerList.Count == 0) return;
     // NOTE: 長押しや離しで成立する押下も押し始めに有効だった受け手だけへ届けるため、押し始めで届け先の候補を決める
     BeginPress();
@@ -156,11 +159,8 @@ internal sealed class UISharedInputAction {
     }
 
     // Button型以外は1回の通知を1回の押下として扱い、毎回持ち主を選び直す
-    if (!IsButton) {
-      EndPressWithoutNotify();
-      return;
-    }
-    if (_notifyPressDepth == 0) CancelPendingPress();
+    if (!IsButton) EndPressWithoutNotify();
+    if (_notifyPressDepth == 0) NotifyPendingPressEnd();
   }
 
   private void NotifyFirstPress(InputAction.CallbackContext context, uint updateCount) {
@@ -196,12 +196,20 @@ internal sealed class UISharedInputAction {
     }
   }
 
-  private void CancelPendingPress() {
-    using (ListPool<UIInputReceiver>.Get(out var cancelList)) {
+  private void NotifyPendingPressEnd() {
+    using (ListPool<UIInputReceiver>.Get(out var cancelList))
+    using (ListPool<UIInputReceiver>.Get(out var releaseList)) {
       cancelList.AddRange(_pendingCancelList);
       _pendingCancelList.Clear();
+      releaseList.AddRange(_pendingReleaseList);
+      _pendingReleaseList.Clear();
+      // NOTE: 控えた時点で持ち主だった受け手は、そのあと離しで押下が区切られて持ち主の一覧から消えていても打ち切りを伝える
       foreach (var receiver in cancelList) {
-        if (_pressOwnerList.Remove(receiver)) receiver.NotifyPressCancel();
+        _pressOwnerList.Remove(receiver);
+        receiver.NotifyPressCancel();
+      }
+      foreach (var receiver in releaseList) {
+        receiver.NotifyRelease();
       }
     }
   }
@@ -213,7 +221,7 @@ internal sealed class UISharedInputAction {
     }
     if (!_isPressing) return;
     UISharedInputActionRegistry.CaptureEnabledIfNewUpdate();
-    EndPress(context);
+    EndPress();
   }
 
   private void BeginPress() {
@@ -229,14 +237,21 @@ internal sealed class UISharedInputAction {
     }
   }
 
-  private void EndPress(InputAction.CallbackContext context) {
+  private void EndPress() {
     using (ListPool<UIInputReceiver>.Get(out var deliverList)) {
       deliverList.AddRange(_pressOwnerList);
       EndPressWithoutNotify();
 
       // 離したことは持ち主に有効かどうかを問わず伝え、押下中の状態を片づけさせる
       foreach (var receiver in deliverList) {
-        receiver.NotifyRelease(context);
+        // 打ち切りを控えている持ち主には、離しの代わりに打ち切りを伝える
+        if (_pendingCancelList.Contains(receiver)) continue;
+        // NOTE: 押下を届けている途中に離しが来たら、押下の処理を終えてから伝える
+        if (_notifyPressDepth > 0) {
+          _pendingReleaseList.Add(receiver);
+        } else {
+          receiver.NotifyRelease();
+        }
       }
     }
   }
@@ -247,7 +262,6 @@ internal sealed class UISharedInputAction {
     _hasNotifiedPress = false;
     _pressCandidateList.Clear();
     _pressOwnerList.Clear();
-    _pendingCancelList.Clear();
   }
 
   private void WaitReleaseIfHeld() {

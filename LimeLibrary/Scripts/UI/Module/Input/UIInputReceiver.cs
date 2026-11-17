@@ -14,7 +14,7 @@ public class UIInputReceiver : IDisposable {
   private readonly IUI _parentUI;
   private readonly UIInputBindingSet _bindingSet;
   private readonly Subject<InputAction.CallbackContext> _onInputSubject = new();
-  private readonly Subject<InputAction.CallbackContext> _onReleaseSubject = new();
+  private readonly Subject<Unit> _onReleaseSubject = new();
   private readonly Subject<Unit> _onPressCancelSubject = new();
   private readonly CompositeDisposable _parentSubscriptions = new();
 
@@ -38,7 +38,7 @@ public class UIInputReceiver : IDisposable {
     }
   }
   public Observable<InputAction.CallbackContext> OnInputObservable => _onInputSubject;
-  internal Observable<InputAction.CallbackContext> OnReleaseObservable => _onReleaseSubject;
+  internal Observable<Unit> OnReleaseObservable => _onReleaseSubject;
   internal Observable<Unit> OnPressCancelObservable => _onPressCancelSubject;
 
   public Observable<TValue> OnValueObservable<TValue>() where TValue : struct {
@@ -196,9 +196,9 @@ public class UIInputReceiver : IDisposable {
     if (_disposed) return;
     _onInputSubject.OnNext(context);
   }
-  internal void NotifyRelease(InputAction.CallbackContext context) {
+  internal void NotifyRelease() {
     if (_disposed) return;
-    _onReleaseSubject.OnNext(context);
+    _onReleaseSubject.OnNext(Unit.Default);
   }
   internal void NotifyPressCancel() {
     if (_disposed) return;

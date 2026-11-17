@@ -167,6 +167,36 @@ public class UISharedInputActionTests : InputTestFixture {
   }
 
   [Test]
+  public void 押下の処理の中で自分を無効にしてから離された受け手には押下を届け終えてから打ち切りだけを伝える() {
+    var receiver = CreateReceiver("A", "<Gamepad>/buttonSouth");
+    receiver.OnInputObservable.Subscribe(_ => {
+      receiver.Enabled = false;
+      // NOTE: ResetDeviceは押下の処理の中で同期してcanceledを出すため、押下を届けている途中の離しになる
+      InputSystem.ResetDevice(_gamepad);
+      _log.Add("A:pressEnd");
+    });
+
+    Press(_gamepad.buttonSouth);
+    InputSystem.Update();
+
+    Assert.That(_log, Is.EqualTo(new[] { "A:press", "A:pressEnd", "A:cancel" }));
+  }
+
+  [Test]
+  public void 押下の処理の中で離された受け手には押下を届け終えてから離しを伝える() {
+    var receiver = CreateReceiver("A", "<Gamepad>/buttonSouth");
+    receiver.OnInputObservable.Subscribe(_ => {
+      InputSystem.ResetDevice(_gamepad);
+      _log.Add("A:pressEnd");
+    });
+
+    Press(_gamepad.buttonSouth);
+    InputSystem.Update();
+
+    Assert.That(_log, Is.EqualTo(new[] { "A:press", "A:pressEnd", "A:release" }));
+  }
+
+  [Test]
   public void 押下の処理の中で自分を無効にした受け手には押下を届け終えてから打ち切りを伝える() {
     var receiver = CreateReceiver("A", "<Gamepad>/buttonSouth");
     receiver.OnInputObservable.Subscribe(_ => {
@@ -481,7 +511,7 @@ public class UISharedInputActionTests : InputTestFixture {
     var map = (IDictionary)typeof(UISharedInputActionRegistry).GetField("s_sharedInputActionMap", flags).GetValue(null);
     int count = 0;
     foreach (var sharedInputAction in map.Values) {
-      foreach (string fieldName in new[] { "_listenerList", "_pressCandidateList", "_pressOwnerList" }) {
+      foreach (string fieldName in new[] { "_listenerList", "_pressCandidateList", "_pressOwnerList", "_pendingCancelList", "_pendingReleaseList" }) {
         var list = (IList)typeof(UISharedInputAction).GetField(fieldName, flags).GetValue(sharedInputAction);
         if (list.Contains(receiver)) count++;
       }
