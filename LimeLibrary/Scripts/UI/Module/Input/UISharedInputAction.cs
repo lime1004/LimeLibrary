@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using LimeLibrary.Input;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Composites;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.Utilities;
@@ -66,7 +68,7 @@ internal sealed class UISharedInputAction {
   public void UpdateReleaseWait() {
     if (!_isWaitingRelease) return;
     // NOTE: 初めの状態の確認より先に離すとCanceledが来ないため、離したかを直接読む
-    if (IsAnyControlHeld()) return;
+    if (IsAnyBindingHeld()) return;
     EndReleaseWait();
   }
 
@@ -169,7 +171,7 @@ internal sealed class UISharedInputAction {
 
   private void WaitReleaseIfHeld() {
     // NOTE: 押されたまま作られたら、作る前からの押下を新しい押下と取り違えないよう離すまで捨てる
-    _isWaitingRelease = IsButton && IsAnyControlHeld();
+    _isWaitingRelease = IsButton && IsAnyBindingHeld();
     _isHeldWhileWaitingRelease = false;
   }
 
@@ -178,11 +180,70 @@ internal sealed class UISharedInputAction {
     _isHeldWhileWaitingRelease = false;
   }
 
-  private bool IsAnyControlHeld() {
+  private bool IsAnyBindingHeld() {
+    var bindings = _inputAction.bindings;
+    for (int i = 0; i < bindings.Count; i++) {
+      var binding = bindings[i];
+      if (binding.isComposite) {
+        int partEnd = i + 1;
+        while (partEnd < bindings.Count && bindings[partEnd].isPartOfComposite) partEnd++;
+        if (IsCompositeHeld(binding, i + 1, partEnd)) return true;
+        i = partEnd - 1;
+      } else if (!binding.isPartOfComposite && IsBindingHeld(binding)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private bool IsCompositeHeld(InputBinding composite, int partStart, int partEnd) {
+    var bindings = _inputAction.bindings;
+    if (!IsModifierComposite(composite)) {
+      for (int i = partStart; i < partEnd; i++) {
+        if (IsBindingHeld(bindings[i])) return true;
+      }
+      return false;
+    }
+
+    // NOTE: 修飾キーの組み合わせは全部のパートがそろって初めて押下になるため、修飾キーだけを押していても押されているとみなさない
+    for (int i = partStart; i < partEnd; i++) {
+      if (!IsPartHeld(bindings[i].name, partStart, partEnd)) return false;
+    }
+    return partStart < partEnd;
+  }
+
+  private bool IsPartHeld(string partName, int partStart, int partEnd) {
+    // 同じ名前のパートは、どれか1つが押されていればそのパートが押されているとみなす
+    var bindings = _inputAction.bindings;
+    for (int i = partStart; i < partEnd; i++) {
+      if (!string.Equals(bindings[i].name, partName, StringComparison.OrdinalIgnoreCase)) continue;
+      if (IsBindingHeld(bindings[i])) return true;
+    }
+    return false;
+  }
+
+  private bool IsBindingHeld(InputBinding binding) {
+    string path = binding.effectivePath;
+    if (string.IsNullOrEmpty(path)) return false;
+    // NOTE: 1つのコントロールが複数の割り当てに使われることがあるため、コントロールから割り当てを引かずにパスで照らし合わせる
     foreach (var control in _inputAction.controls) {
+      if (!InputControlPath.Matches(path, control)) continue;
       if (!IsReleased(control)) return true;
     }
     return false;
+  }
+
+  private static bool IsModifierComposite(InputBinding composite) {
+    if (string.IsNullOrEmpty(composite.path)) return false;
+    string compositeName = NameAndParameters.Parse(composite.path).name;
+    if (string.IsNullOrEmpty(compositeName)) return false;
+    var compositeType = InputSystem.TryGetBindingComposite(compositeName);
+    if (compositeType == null) return false;
+
+    return typeof(OneModifierComposite).IsAssignableFrom(compositeType)
+      || typeof(TwoModifiersComposite).IsAssignableFrom(compositeType)
+      || typeof(ButtonWithOneModifier).IsAssignableFrom(compositeType)
+      || typeof(ButtonWithTwoModifiers).IsAssignableFrom(compositeType);
   }
 
   private bool IsReleased(InputControl control) {

@@ -268,6 +268,45 @@ public class UISharedInputActionTests : InputTestFixture {
   }
 
   [Test]
+  public void 修飾キーだけを押したまま作った組み合わせの共有アクションは最初の組み合わせ入力から届ける() {
+    var sourceAction = CreateModifierAction();
+    try {
+      Press(_gamepad.leftShoulder);
+      CreateReceiver("A").AddInputBinding(sourceAction);
+      InputSystem.Update();
+
+      Press(_gamepad.buttonSouth);
+      Assert.That(_log, Is.EqualTo(new[] { "A:press" }));
+    } finally {
+      sourceAction.Dispose();
+    }
+  }
+
+  [Test]
+  public void 修飾キーと組み合わせのキーを押したまま作った共有アクションは押し直すまで届けない() {
+    var sourceAction = CreateModifierAction();
+    try {
+      Press(_gamepad.leftShoulder);
+      Press(_gamepad.buttonSouth);
+      CreateReceiver("A").AddInputBinding(sourceAction);
+      InputSystem.Update();
+      Assert.That(_log, Is.Empty);
+
+      Release(_gamepad.buttonSouth);
+      Press(_gamepad.buttonSouth);
+      Assert.That(_log, Is.EqualTo(new[] { "A:press" }));
+    } finally {
+      sourceAction.Dispose();
+    }
+  }
+
+  private static InputAction CreateModifierAction() {
+    var action = new InputAction("Source", InputActionType.Button);
+    action.AddCompositeBinding("OneModifier").With("Modifier", "<Gamepad>/leftShoulder").With("Binding", "<Gamepad>/buttonSouth");
+    return action;
+  }
+
+  [Test]
   public void 元のアクションの割り当てを変えると共有アクションが写し直される() {
     var asset = ScriptableObject.CreateInstance<InputActionAsset>();
     _objectList.Add(asset);
